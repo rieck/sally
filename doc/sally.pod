@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-B<sally> - a library for string features and string kernels
+B<sally> -- a library for string features and string kernels
 
 =head1 DESCRIPTION
 
