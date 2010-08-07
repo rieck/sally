@@ -1,6 +1,9 @@
 *.a
+*.la
+*.lo
 *.o
 .deps
+.libs
 /aclocal.m4
 /autom4te.cache
 /build
@@ -17,3 +20,4 @@
 /stamp-h1
 Makefile
 Makefile.in
+src/sally
