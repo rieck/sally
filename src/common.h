@@ -30,6 +30,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
 #include <math.h>
@@ -46,5 +47,14 @@
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 1
+#endif
+
 
 #endif                          /* COMMON_H */
