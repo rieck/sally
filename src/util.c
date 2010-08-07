@@ -11,7 +11,7 @@
  
 /**
  * @defgroup util Utility functions
- * The module contains utility functions.
+ * The module contains utility functions for Sally.
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */

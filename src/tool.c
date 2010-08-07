@@ -32,9 +32,9 @@ static void print_usage(void)
  */
 static void print_version(void)
 {
-   printf("Sally %s - A library for String Features and String Kernels\n"
-          "Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)\n", 
-          PACKAGE_VERSION);  
+    printf("Sally %s - A library for String Features and String Kernels\n"
+           "Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)\n", 
+           PACKAGE_VERSION);  
 }
 
 /**
@@ -47,21 +47,21 @@ static void parse_options(int argc, char **argv)
     int ch;
     while ((ch = getopt(argc, argv, "hvV")) != -1) {
         switch (ch) {
-        case 'v':
-            verbose++;
-            break;
-        case 'V':
-            print_version();
-            exit(EXIT_SUCCESS);
-            break;
-        case 'h':
-        case '?':
-            print_usage();
-            exit(EXIT_SUCCESS);
-            break;
+            case 'v':
+                verbose++;
+                break;
+            case 'V':
+                print_version();
+                exit(EXIT_SUCCESS);
+                break;
+            case 'h':
+            case '?':
+                print_usage();
+                exit(EXIT_SUCCESS);
+                break;
         }
     }
-
+    
     argc -= optind;
     argv += optind;
 }

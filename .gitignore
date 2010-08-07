@@ -17,7 +17,9 @@
 /m4
 /missing
 /sally-*.tar.gz
+/sally.xcodeproj
 /stamp-h1
 Makefile
 Makefile.in
+doc/html
 src/sally

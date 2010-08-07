@@ -8,4 +8,5 @@ bin_PROGRAMS		= sally
 libsally_la_SOURCES	= sally.c sally.h util.c util.h murmur.c murmur.h
 
 sally_SOURCES		= tool.c tool.h
-sally_LDADD		= libsally.la
+sally_LDADD             = libsally.la
+sally_LDFLAGS           = -all-static
