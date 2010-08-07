@@ -1,0 +1,21 @@
+=pod
+
+=head1 NAME
+
+B<sally> - a library for string features and string kernels
+
+=head1 DESCRIPTION
+
+B<sally> is not an acronym.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or (at
+your option) any later version.  This program is distributed without
+any warranty. See the GNU General Public License for more details.
+      
+=cut
