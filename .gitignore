@@ -13,6 +13,7 @@
 /ltmain.sh
 /m4
 /missing
+/sally-*.tar.gz
 /stamp-h1
 Makefile
 Makefile.in
