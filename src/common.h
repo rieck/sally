@@ -12,6 +12,18 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define __USE_BSD               /* Linux: dirent stuff */
+#define _BSD_SOURCE             /* Linux: strdup() */
+#define __USE_POSIX             /* Linux: readdir_r() */
+
+#ifdef __STRICT_ANSI__          
+#undef __STRICT_ANSI__          /* Required on Cygwin */
+#endif
+
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 /* Standard C headers */
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +35,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include <dirent.h>
 
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
