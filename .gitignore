@@ -23,3 +23,4 @@ Makefile
 Makefile.in
 doc/html
 src/sally
+tests/test_*
