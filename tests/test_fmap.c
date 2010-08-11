@@ -15,7 +15,7 @@
 #include "tests.h"
 
 /* Test file */
-#define TEST_FILE               "test.ft"
+#define TEST_FILE               "test.fm"
 /* Number of stress runs */
 #define STRESS_RUNS             10000
 /* String length */
@@ -71,7 +71,6 @@ int test_static()
 
     /* Destroy table */
     fmap_destroy();
-
     test_return(err, 100);
     return err;
 }
@@ -112,7 +111,6 @@ int test_stress()
 
     /* Destroy table */
     fmap_destroy();
-
     test_return(err, STRESS_RUNS);
     return err;
 }
@@ -128,7 +126,7 @@ int test_load_save()
 
     test_printf("Loading and saving of feature table");
 
-    /* Initialize table */
+    /* Create map */
     fmap_create();
     for (i = 0; tests[i].s != 0; i++)
         fmap_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
@@ -142,7 +140,7 @@ int test_load_save()
     fclose(z);
     fmap_destroy();
 
-    /* Init and load */
+    /* Create and load */
     fmap_create();
     z = fopen(TEST_FILE, "r");
     fmap_load(z);
