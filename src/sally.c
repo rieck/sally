@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 /** 
  * @defgroup sally Sally interface.
  * Functions and structures for interfacing with Sally. This file contains
@@ -17,7 +17,7 @@
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
-        
+
 #include "config.h"
 #include "common.h"
 #include "sally.h"
@@ -50,7 +50,7 @@ sally_t *sally_create()
     
     /* Set delimiters */
     sally_set_delim(j, DEFAULT_DELIM);
-        
+    
     return j;
 } 
 
@@ -63,10 +63,10 @@ void sally_destroy(sally_t *j)
 {
     if (!j)
         return;
-          
+    
     if (j->fmap)
         fmap_destroy();
-        
+    
     free(j);
 } 
 
@@ -83,25 +83,50 @@ void sally_version(FILE *f)
 }
 
 /**
- * Returns the string for an normalization mode
- * @param e normalization mode
+ * Returns the string for the embedding mode
+ * @param e embedding mode
  * @return String for normalization mode
  */
-char *sally_norm2str(norm_t e)
+char *sally_embed2str(embed_t e)
 {
     switch(e) {
-        case NORM_CNT:
-            return "cnt";
-        case NORM_BIN:
+        case EMBED_CNT:
+            return "cnt";            
+        case EMBED_BIN:
             return "bin";            
-        case NORM_CNT_L1:
-            return "cnt_l1";            
-        case NORM_CNT_L2:
-            return "cnt_l2";            
-        case NORM_BIN_L1:
-            return "bin_l1";            
-        case NORM_BIN_L2:
-            return "bin_l2";            
+    }
+    
+    return "unknown";
+}
+
+/**
+ * Returns the embedding mode for a string
+ * @param str String
+ * @return embedding mode
+ */
+norm_t sally_str2embed(char *str)
+{
+    if (!strcasecmp(str, "cnt"))
+        return EMBED_CNT;
+    if (!strcasecmp(str, "bin"))
+        return EMBED_BIN;
+    
+    warning("Unknown embedding '%s'. Using 'cnt'.", str);
+    return EMBED_CNT;
+}
+
+/**
+ * Returns the string for the normalization mode
+ * @param n normalization mode
+ * @return String for normalization mode
+ */
+char *sally_norm2str(norm_t n)
+{
+    switch(n) {
+        case NORM_L1:
+            return "l1";            
+        case NORM_L2:
+            return "l2";            
     }
     
     return "unknown";
@@ -114,21 +139,13 @@ char *sally_norm2str(norm_t e)
  */
 norm_t sally_str2norm(char *str)
 {
-    if (!strcasecmp(str, "cnt"))
-        return NORM_CNT;
-    if (!strcasecmp(str, "bin"))
-        return NORM_BIN;
-    if (!strcasecmp(str, "cnt_l1"))
-        return NORM_CNT_L1;
-    if (!strcasecmp(str, "cnt_l2"))
-        return NORM_CNT_L2;
-    if (!strcasecmp(str, "bin_l1"))
-        return NORM_BIN_L1;
-    if (!strcasecmp(str, "bin_l2"))
-        return NORM_BIN_L2;
-        
-    warning("Unknown NORMding mode '%s'. Using 'cnt'.", str);
-    return NORM_CNT;
+    if (!strcasecmp(str, "l1"))
+        return NORM_L1;
+    if (!strcasecmp(str, "l2"))
+        return NORM_L2;
+    
+    warning("Unknown normalization '%s'. Using 'l1'.", str);
+    return NORM_L1;
 }
 
 /**
@@ -140,25 +157,25 @@ void sally_set_delim(sally_t *ja, char *s)
 {
     char buf[5] = "0x00";
     unsigned int i, j;
-
+    
     /* Reset delimiters */
     memset(ja->delim, 0, 256);
-
+    
     for (i = 0; i < strlen(s); i++) {
         if (s[i] != '%') {
             ja->delim[(unsigned int) s[i]] = 1;
             continue;
         }
-
+        
         /* Skip truncated sequence */   
         if (strlen(s) - i < 2)
             break;
-
+        
         buf[2] = s[++i];
         buf[3] = s[++i];
         sscanf(buf, "%x", (unsigned int *) &j);
         ja->delim[j] = 1;
     }
 }
- 
+
 /** @} */

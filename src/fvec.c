@@ -93,6 +93,10 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
     /* Count features  */
     count_feat(fv);
     
+    /* Binarize if necessary */
+    if (j->embed == EMBED_BIN)
+        fvec_binarize(fv);
+    
     /* Compute normalization */
     fvec_norm(fv, j->norm);    
     
@@ -286,7 +290,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
  * @param y feature Y
  * @return result as a signed integer
  */
-int cmp_feat(const void *x, const void *y)
+static int cmp_feat(const void *x, const void *y)
 {
     if (*((feat_t *) x) > *((feat_t *) y))
         return +1;
@@ -328,7 +332,18 @@ static void count_feat(fvec_t *fv)
     fvec_realloc(fv);
 }
 
+/**
+ * Binarize a feature vector
+ * @param fv Feature vector
+ */
+void fvec_binarize(fvec_t *fv) 
+{
+    assert(fv);
 
+    int i;
+    for (i = 0; i < fv->len; i++)
+        fv->val[i] = 1.0;
+}
 
 /**
  * Shrinks the memory of a feature vector. The function reallocates
@@ -451,28 +466,14 @@ void fvec_norm(fvec_t *fv, norm_t e)
     int i;
 
     switch(e) {
-        case NORM_CNT:
-            break;
-        case NORM_BIN:
-            for (i = 0; i < fv->len; i++)
-                fv->val[i] = 1.0;
-            break;
-        case NORM_CNT_L1:
+        case NORM_L1:
             for (i = 0; i < fv->len; i++)
                 fv->val[i] = fv->val[i] / fv->total;        
             break;
-        case NORM_CNT_L2:
+        case NORM_L2:
             for (i = 0; i < fv->len; i++)
                 fv->val[i] = sqrt(fv->val[i] / fv->total);
             break;
-        case NORM_BIN_L1:
-            for (i = 0; i < fv->len; i++)
-                fv->val[i] = 1.0 / fv->len;
-            break;
-        case NORM_BIN_L2:
-            for (i = 0; i < fv->len; i++)
-                fv->val[i] = sqrt(1.0 / fv->len);
-            break;        
     }
 } 
 

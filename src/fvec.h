@@ -42,5 +42,7 @@ void fvec_destroy(fvec_t *);
 fvec_t *fvec_clone(fvec_t *);
 void fvec_print(fvec_t *);
 void fvec_realloc(fvec_t *);
+void fvec_set_label(fvec_t *fv, char *l);
+void fvec_binarize(fvec_t *fv);
 
 #endif                          /* FVEC_H */

@@ -7,7 +7,7 @@ bin_PROGRAMS		= sally
 
 libsally_la_SOURCES	= sally.c sally.h util.c util.h murmur.c murmur.h \
 			  fmap.c fmap.h fvec.c fvec.h md5.c md5.h uthash.h \
-			  common.h
+			  farray.c farray.h common.h
 
 sally_SOURCES		= tool.c tool.h
 sally_LDADD             = libsally.la
