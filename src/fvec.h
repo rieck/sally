@@ -37,12 +37,12 @@ typedef struct {
 
 /* Functions */
 fvec_t *fvec_extract(char *, int l, sally_t *);
-void fvec_norm(fvec_t *fv, norm_t e);
 void fvec_destroy(fvec_t *);
 fvec_t *fvec_clone(fvec_t *);
 void fvec_print(fvec_t *);
 void fvec_realloc(fvec_t *);
 void fvec_set_label(fvec_t *fv, char *l);
-void fvec_binarize(fvec_t *fv);
+void fvec_save(fvec_t *f, FILE * z);
+fvec_t *fvec_load(FILE *);
 
 #endif                          /* FVEC_H */

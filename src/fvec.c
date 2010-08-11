@@ -31,6 +31,7 @@
 #include "common.h"
 #include "fvec.h"
 #include "fhash.h"
+#include "fmath.h"
 #include "util.h"
 #include "md5.h"
 #include "murmur.h"
@@ -126,7 +127,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (ja->bits - 1)) - 1; 
 
-    if (hash_enabled())
+    if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
 
     /* Remove redundant delimiters */
@@ -163,13 +164,6 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
         
         /* Store n-gram */
         if (n == ja->nlen && i - k > 0) {
-
-#if 0
-            int u;
-            for (u = 0; u < i - k; u++)
-                printf("%c", (t + k)[u]);
-            printf("\n");
-#endif            
 
 #ifdef ENABLE_MD5HASH        
             MD5((unsigned char *) (t + k), i - k, buf);
@@ -453,7 +447,7 @@ void fvec_print(fvec_t *fv)
     assert(fv);
     int i;
 
-    printf("# feature vector [label: %u, len: %lu, total: %lu]\n", 
+    printf("Feature vector [label: %u, len: %lu, total: %lu]\n", 
            fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
@@ -463,5 +457,81 @@ void fvec_print(fvec_t *fv)
             printf("\n");
     }    
 }
+
+/**
+ * Loads a feature vector form a file stream
+ * @param f File pointer
+ * @return Feature vector
+ */
+fvec_t *fvec_load(FILE *z)
+{
+    assert(z);
+    fvec_t *f;
+    char buf[512];
+    int i, r;
+
+    /* Allocate feature vector (zero'd) */
+    f = calloc(1, sizeof(fvec_t));
+    if (!f) {
+        error("Could not load feature vector");
+        return NULL;
+    }
+
+    fgets(buf, 512, z);
+    r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%hu\n",
+               (unsigned long *) &f->len, (unsigned long *) &f->total,
+               (unsigned short *) &f->label);
+    if (r != 3) {
+        error("Could not parse feature vector");
+        fvec_destroy(f);
+        return NULL;
+    }
+
+    /* Empty feature vector */
+    if (f->len == 0)
+        return f;
+
+    /* Allocate arrays */
+    f->dim = (feat_t *) malloc(f->len * sizeof(feat_t));
+    f->val = (float *) malloc(f->len * sizeof(float));
+    if (!f->dim || !f->val) {
+        error("Could not allocate feature vector contents");
+        fvec_destroy(f);
+        return NULL;
+    }
+
+    /* Load features */
+    for (i = 0; i < f->len; i++) {
+        fgets(buf, 512, z);
+        r = sscanf(buf, "  %llx:%g\n", (unsigned long long *) &f->dim[i],
+                   (float *) &f->val[i]);
+        if (r != 2) {
+            error("Could not parse feature vector contents");
+            fvec_destroy(f);
+            return NULL;
+        }
+    }
+
+    return f;
+}
+
+
+/**
+ * Saves a feature vector to a file stream
+ * @param f Feature vector
+ * @param z File pointer
+ */
+void fvec_save(fvec_t *f, FILE * z)
+{
+    assert(f && z);
+    int i;
+
+    fprintf(z, "fvec: len=%lu, total=%lu, label=%hu\n",
+             f->len, f->total, f->label);
+    for (i = 0; i < f->len; i++)
+        fprintf(z, "  %.16llx:%.16g\n", (unsigned long long) f->dim[i],
+                 (float) f->val[i]);
+}
+
 
 /** @} */
