@@ -22,8 +22,8 @@
 #define DEFAULT_BITS	    26
 /* Default delimiters */
 #define DEFAULT_DELIM	   "%0a%0d%20"
-/* Default setting of feature map */
-#define DEFAULT_FMAP        FALSE
+/* Default setting of feature hash */
+#define DEFAULT_FHASH       FALSE
 
 /** 
  * NORMding of feature vectors 
@@ -51,7 +51,7 @@ typedef struct {
     norm_t norm;            /**< Normalization of vectors */
     int bits;               /**< Bits of hashing */
     char delim[256];        /**< Delimiters */
-    int fmap;               /**< Flag for feature map */
+    int fhash;              /**< Flag for feature hash */
 } sally_t; 
 
 /* Functions */

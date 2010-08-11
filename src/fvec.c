@@ -23,14 +23,14 @@
  * may be reduced and colliding dimensions will be added. 
  * (See 'Hash Kernels', Shi et al. AISTATS 2009)
  *
- * @author Konrad Rieck (konrad.rieck@tu-berlin.de)
+ * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 
 #include "config.h"
 #include "common.h"
 #include "fvec.h"
-#include "fmap.h"
+#include "fhash.h"
 #include "util.h"
 #include "md5.h"
 #include "murmur.h"
@@ -93,7 +93,7 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
     /* Count features  */
     count_feat(fv);
     
-    /* Binarize if necessary */
+    /* Binarize if requested */
     if (j->embed == EMBED_BIN)
         fvec_binarize(fv);
     
@@ -105,8 +105,8 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
 
 
 /**
- * Extract word n-grams from a string. The features (n-grams) are 
- * represented by hash values.
+ * Extract word n-grams from a string. The features are represented 
+ * by hash values.
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
@@ -126,7 +126,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (ja->bits - 1)) - 1; 
 
-    if (fmap_enabled())
+    if (hash_enabled())
         cache = malloc(l * sizeof(fentry_t));
 
     /* Remove redundant delimiters */
@@ -181,7 +181,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
-            if (fmap_enabled()) {
+            if (fhash_enabled()) {
                 cache[fv->len].len = i - k;
                 cache[fv->len].key = fv->dim[fv->len];
                 cache[fv->len].data = malloc(i - k);
@@ -200,14 +200,14 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
     /* Save extracted n-grams */
     fv->total = fv->len;
     
-    if (!fmap_enabled())
+    if (!fhash_enabled())
         return;
 
     /* Flush cache and add features to hash */
 #pragma omp critical
     {
         for (i = 0; i < fv->len; i++) {
-            fmap_put(cache[i].key, cache[i].data, cache[i].len);
+            fhash_put(cache[i].key, cache[i].data, cache[i].len);
             free(cache[i].data);
         }
     }
@@ -237,7 +237,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (ja->bits - 1)) - 1; 
 
-    if (fmap_enabled())
+    if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
@@ -255,7 +255,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
         fv->val[fv->len] = 1;
         
         /* Cache feature and key */
-        if (fmap_enabled()) {
+        if (fhash_enabled()) {
             cache[fv->len].len = ja->nlen;
             cache[fv->len].key = fv->dim[fv->len];
             cache[fv->len].data = malloc(ja->nlen);
@@ -269,14 +269,14 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
         fv->len++;
     }
     
-    if (!fmap_enabled())
+    if (!fhash_enabled())
         return;
 
     /* Flush cache and add features to hash */
 #pragma omp critical
     {
         for (i = 0; i < fv->len; i++) {
-            fmap_put(cache[i].key, cache[i].data, cache[i].len);
+            fhash_put(cache[i].key, cache[i].data, cache[i].len);
             free(cache[i].data);
         }
     }
@@ -332,18 +332,6 @@ static void count_feat(fvec_t *fv)
     fvec_realloc(fv);
 }
 
-/**
- * Binarize a feature vector
- * @param fv Feature vector
- */
-void fvec_binarize(fvec_t *fv) 
-{
-    assert(fv);
-
-    int i;
-    for (i = 0; i < fv->len; i++)
-        fv->val[i] = 1.0;
-}
 
 /**
  * Shrinks the memory of a feature vector. The function reallocates
@@ -455,27 +443,6 @@ void fvec_set_label(fvec_t *fv, char *l)
         memcpy(&(fv->label), buf, sizeof(fv->label));
     }
 }
-
-/**
- * norms a feature vector using a given normalizazion
- * @param fv Feature vector
- * @param e normding mode
- */
-void fvec_norm(fvec_t *fv, norm_t e)
-{
-    int i;
-
-    switch(e) {
-        case NORM_L1:
-            for (i = 0; i < fv->len; i++)
-                fv->val[i] = fv->val[i] / fv->total;        
-            break;
-        case NORM_L2:
-            for (i = 0; i < fv->len; i++)
-                fv->val[i] = sqrt(fv->val[i] / fv->total);
-            break;
-    }
-} 
 
 /**
  * Print the content of a feature vector

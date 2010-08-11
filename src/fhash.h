@@ -9,8 +9,8 @@
  * warranty. See the GNU General Public License for more details. 
  */
 
-#ifndef FMAP_H
-#define FMAP_H
+#ifndef FHASH_H
+#define FHASH_H
 
 #include "fvec.h"
 
@@ -24,9 +24,6 @@
 #endif
 #endif 
 
-/* Maximum length of stored features */
-#define MAX_FEATURE_LEN     64
-
 /** 
  * Entry of feature map
  */
@@ -37,16 +34,16 @@ typedef struct {
     UT_hash_handle hh;     /**< Uthash handle */
 } fentry_t;
 
-void fmap_create();
-void fmap_destroy();
+void fhash_create();
+void fhash_destroy();
 
-void fmap_put(feat_t, char *, int);
-fentry_t *fmap_get(feat_t);
-unsigned long fmap_size();
-void fmap_print();
-int fmap_enabled();
+void fhash_put(feat_t, char *, int);
+fentry_t *fhash_get(feat_t);
+unsigned long fhash_size();
+void fhash_print();
+int fhash_enabled();
 
-void fmap_save(FILE *f);
-void fmap_load(FILE *f);
+void fhash_save(FILE *f);
+void fhash_load(FILE *f);
 
-#endif                          /* FTABLE_H */
+#endif                          /* FHASH_H */

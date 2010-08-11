@@ -10,23 +10,23 @@
  */
 
 /** 
- * @defgroup fmap Global feature map
- * This map keeps track of extracted string features and their 
+ * @defgroup fhash Global feature hash table
+ * This hash table keeps track of extracted string features and their 
  * respective hash values.
  *
- * @author Konrad Rieck (konrad.rieck@tu-berlin.de)
+ * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 
 #include "config.h"
 #include "common.h"
 #include "fvec.h"
-#include "fmap.h"
+#include "fhash.h"
 #include "util.h"
 
 /* Hash table */
-static fentry_t *feature_map = NULL;
-static int map_enabled = FALSE;
+static fentry_t *hash_table = NULL;
+static int hash_enabled = FALSE;
 static unsigned long collisions = 0;
 static unsigned long insertions = 0;
 
@@ -34,22 +34,22 @@ static unsigned long insertions = 0;
 extern int verbose;
 
 /**
- * Add a feature and its key to the map. The function clones all input
+ * Add a feature and its key to the hash table. The function clones all input
  * arguments, that is new memory is allocated and the data is copied. 
  * @param k Key for feature
  * @param x Data of feature
  * @param l Length of feature
  */
-void fmap_put(feat_t k, char *x, int l)
+void fhash_put(feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
 
-    if (!map_enabled)
+    if (!hash_enabled)
         return;
 
     /* Check for duplicate */
-    HASH_FIND(hh, feature_map, &k, sizeof(feat_t), g);
+    HASH_FIND(hh, hash_table, &k, sizeof(feat_t), g);
 
     /* Check for collision */
     if (g) {
@@ -69,79 +69,79 @@ void fmap_put(feat_t k, char *x, int l)
         error("Could not allocate feature data");
 
     /* Add to hash and count insertion */
-    HASH_ADD(hh, feature_map, key, sizeof(feat_t), h);
+    HASH_ADD(hh, hash_table, key, sizeof(feat_t), h);
     insertions++;
 }
 
 /**
- * Gets an entry from the map. The returned memory must not be free'd.
+ * Gets an entry from the hash table. The returned memory must not be free'd.
  * @param key Feature key
  * @return feature table entry
  */
-fentry_t *fmap_get(feat_t key)
+fentry_t *fhash_get(feat_t key)
 {
     fentry_t *f;
-    HASH_FIND(hh, feature_map, &key, sizeof(feat_t), f);
+    HASH_FIND(hh, hash_table, &key, sizeof(feat_t), f);
     return f;
 }
 
 /**
- * Creates the feature map.
+ * Creates the feature hash table.
  */
-void fmap_create()
+void fhash_create()
 {
-    if (map_enabled)
-        fmap_destroy();
+    if (hash_enabled)
+        fhash_destroy();
 
-    map_enabled = TRUE;
+    hash_enabled = TRUE;
     collisions = 0;
     insertions = 0;
 }
 
 /**
- * Destroy the feature map.
+ * Destroy the feature hash table.
  */
-void fmap_destroy()
+void fhash_destroy()
 {
     fentry_t *f;
 
-    while (feature_map) {
-        f = feature_map;
-        HASH_DEL(feature_map, f);
+    while (hash_table) {
+        f = hash_table;
+        HASH_DEL(hash_table, f);
         free(f->data);
         free(f);
     }
 
-    map_enabled = FALSE;
+    hash_enabled = FALSE;
     collisions = 0;
     insertions = 0;
 }
 
 /**
- * Print the feature lookup table. 
+ * Print the feature hash table. 
  */
-void fmap_print()
+void fhash_print()
 {
-    info_msg(1, "Feature map");
-    info_msg(1, "  size: %lu, ins: %lu, colls: %lu (%5.2f%%)", 
-             fmap_size(), insertions, collisions, 
+    info_msg(1, "Feature hash table");
+    info_msg(1, "  size: %lu, insertions: %lu, collision: %lu (%5.2f%%)", 
+             fhash_size(), insertions, collisions, 
              (collisions * 100.0) / insertions);
 }
 
 /**
- * Returns the size of the feature map
+ * Returns the size of the feature hash table
  * @return size of table
  */
-unsigned long fmap_size()
+unsigned long fhash_size()
 {
-    return HASH_COUNT(feature_map);
+    return HASH_COUNT(hash_table);
 }
 
 /**
- * Check if feature map is enabled
+ * Check if feature hash table is enabled
  */
-int fmap_enabled() {
-    return map_enabled;
+int fhash_enabled() {
+    return hash_enabled;
 }
 
 /**
@@ -176,16 +176,16 @@ static int decode_string(char *str)
 }
 
 /**
- * Saves a feature map to a file stream.
+ * Saves the feature hash table to a file stream.
  * @param z File pointer
  */
-void fmap_save(FILE * z)
+void fhash_save(FILE *z)
 {
     fentry_t *f;
     int i;
 
-    fprintf(z, "fmap: len=%u\n", HASH_COUNT(feature_map));
-    for (f = feature_map; f != NULL; f = f->hh.next) {
+    fprintf(z, "fhash: len=%u\n", HASH_COUNT(hash_table));
+    for (f = hash_table; f != NULL; f = f->hh.next) {
         fprintf(z, "  %.16llx: ", (long long unsigned int) f->key);
         for (i = 0; i < f->len; i++) {
             if (isprint(f->data[i]) || f->data[i] == '%')
@@ -198,10 +198,10 @@ void fmap_save(FILE * z)
 }
 
 /**
- * Loads a feature table from a file stream
+ * Loads the feature hash table from a file stream
  * @param z File pointer
  */
-void fmap_load(FILE *z)
+void fhash_load(FILE *z)
 {
     int i, r;
     unsigned long len;
@@ -209,7 +209,7 @@ void fmap_load(FILE *z)
     feat_t key;
 
     fgets(buf, 512, z);
-    r = sscanf(buf, "fmap: len=%lu\n", (unsigned long *) &len);
+    r = sscanf(buf, "fhash: len=%lu\n", (unsigned long *) &len);
     if (r != 1) {
         error("Could not parse feature map");
         return;
@@ -228,9 +228,8 @@ void fmap_load(FILE *z)
         r = decode_string(str);
 
         /* Put string to table */
-        fmap_put(key, str, r);
+        fhash_put(key, str, r);
     }
 }
-
 
 /** @} */

@@ -30,7 +30,7 @@ static void print_usage(void)
            "  -e <embed>     Set embedding mode (cnt, bin). Default: '%s'\n"
            "  -r <norm>      Set normalization mode (l1, l2). Default: '%s'\n"
            "  -b <bits>      Set bits for hashing function. Default: %d\n"
-           "  -m             Enable global feature map.\n"
+           "  -m             Enable global feature hash table.\n"
            "  -v             Increase verbosity.\n"
            "  -V             Print version and copyright.\n"
            "  -h             Print this help screen.\n", DEFAULT_NLEN, 
@@ -74,7 +74,7 @@ static void parse_options(int argc, char **argv)
                 sally->bits = atoi(optarg);
                 break;
             case 'm':
-                sally->fmap = TRUE;
+                sally->fhash = TRUE;
                 break;
             case 'v':
                 verbose++;

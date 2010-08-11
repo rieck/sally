@@ -23,7 +23,7 @@
 #include "sally.h"
 #include "util.h"
 #include "fvec.h"
-#include "fmap.h"
+#include "fhash.h"
 #include "sally.h"
 
 /* Global verbosity */
@@ -46,7 +46,7 @@ sally_t *sally_create()
     j->nlen = DEFAULT_NLEN;
     j->norm = DEFAULT_NORM;
     j->bits = DEFAULT_BITS;
-    j->fmap = DEFAULT_FMAP;
+    j->fhash = DEFAULT_FHASH;
     
     /* Set delimiters */
     sally_set_delim(j, DEFAULT_DELIM);
@@ -64,8 +64,8 @@ void sally_destroy(sally_t *j)
     if (!j)
         return;
     
-    if (j->fmap)
-        fmap_destroy();
+    if (j->fhash)
+        fhash_destroy();
     
     free(j);
 } 
