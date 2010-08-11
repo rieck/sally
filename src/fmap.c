@@ -175,62 +175,62 @@ static int decode_string(char *str)
     return k;
 }
 
+/**
+ * Saves a feature map to a file stream.
+ * @param z File pointer
+ */
+void fmap_save(FILE * z)
+{
+    fentry_t *f;
+    int i;
+
+    fprintf(z, "fmap: len=%u\n", HASH_COUNT(feature_map));
+    for (f = feature_map; f != NULL; f = f->hh.next) {
+        fprintf(z, "  %.16llx: ", (long long unsigned int) f->key);
+        for (i = 0; i < f->len; i++) {
+            if (isprint(f->data[i]) || f->data[i] == '%')
+                fprintf(z, "%c", f->data[i]);
+            else
+                fprintf(z, "%%%.2x", f->data[i]);
+        }
+        fprintf(z, "\n");
+    }
+}
 
 /**
- * Loads the feature map from a file
- * @param f FILE input stream
+ * Loads a feature table from a file stream
+ * @param z File pointer
  */
-void fmap_load(FILE *f)
+void fmap_load(FILE *z)
 {
-    assert(f);
-    int j, r;
+    int i, r;
     unsigned long len;
+    char buf[512], str[512];
     feat_t key;
-    char buf[256];
 
-    fmap_create();
-    r = fscanf(f, "fm_len %lu\n", &len);
+    fgets(buf, 512, z);
+    r = sscanf(buf, "fmap: len=%lu\n", (unsigned long *) &len);
+    if (r != 1) {
+        error("Could not parse feature map");
+        return;
+    }
 
-    for (j = 0; j < len; j++) {
-    
-        r = fscanf(f, "%llx:%255s\n", (unsigned long long *) &key,
-                   (char *) buf);
-    
+    for (i = 0; i < len; i++) {
+        fgets(buf, 512, z);
+        r = sscanf(buf, "  %llx:%511s\n", (unsigned long long *) &key,
+                   (char *) str);
         if (r != 2) {
-            error("Could not parse feature map");
+            error("Could not parse feature map contents");
             return;
         }
-        
-        r = decode_string(buf);
-        fmap_put(key, buf, r);
+
+        /* Decode string */
+        r = decode_string(str);
+
+        /* Put string to table */
+        fmap_put(key, str, r);
     }
 }
 
-
-/**
- * Saves the feature map for a given feature vector
- * @param fv Feature vector
- * @param f FILE output stream
- */
-void fmap_save(fvec_t *fv, FILE *f)
-{
-    assert(fv && f);
-    fentry_t *fe;
-    int i, j;
-
-    fprintf(f, "fm_len %lu\n", fv->len);
-
-    for (j = 0; j < fv->len; j++) {
-        fe = fmap_get(fv->dim[j]);
-        fprintf(f, "%.16llx:", (long long unsigned int) fe->key);
-        for (i = 0; i < fe->len && i < MAX_FEATURE_LEN; i++) {
-            if (isprint(fe->data[i]) && fe->data[i] != '%')
-                fprintf(f, "%c", fe->data[i]);
-            else
-                fprintf(f, "%%%.2x", (unsigned char) fe->data[i]);
-        }
-        fprintf(f, "\n");
-    }
-}
 
 /** @} */

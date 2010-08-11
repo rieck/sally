@@ -46,7 +46,7 @@ unsigned long fmap_size();
 void fmap_print();
 int fmap_enabled();
 
-void fmap_save(fvec_t *fv, FILE *f);
+void fmap_save(FILE *f);
 void fmap_load(FILE *f);
 
 #endif                          /* FTABLE_H */
