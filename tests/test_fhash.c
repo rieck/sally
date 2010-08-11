@@ -11,15 +11,15 @@
 
 #include "config.h"
 #include "common.h"
-#include "fmap.h"
+#include "fhash.h"
 #include "tests.h"
 
 /* Test file */
-#define TEST_FILE               "test.fm"
+#define TEST_FILE               "test.fh"
 /* Number of stress runs */
 #define STRESS_RUNS             10000
 /* String length */
-#define STR_LENGTH              1024
+#define STR_LENGTH              4095
 
 /* Global variables */
 int verbose = 5;
@@ -52,14 +52,14 @@ int test_static()
     test_printf("Creation and maintenance of feature map");
 
     /* Initialize table */
-    fmap_create();
+    fhash_create();
     for (i = 0; tests[i].s != 0; i++)
-        fmap_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
+        fhash_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
 
     /* Randomly query elements */
     for (j = 0; j < 100; j++) {
         k = rand() % i;
-        f = fmap_get(tests[k].f);
+        f = fhash_get(tests[k].f);
 
         /* Check for correct feature string */
         if (memcmp(f->data, tests[k].s, f->len)) {
@@ -70,7 +70,7 @@ int test_static()
     }
 
     /* Destroy table */
-    fmap_destroy();
+    fhash_destroy();
     test_return(err, 100);
     return err;
 }
@@ -88,7 +88,7 @@ int test_stress()
     test_printf("Stress test for feature table");
 
     /* Initialize table */
-    fmap_create();
+    fhash_create();
 
     for (i = 0; i < STRESS_RUNS; i++) {
         /* Create random key and string */
@@ -100,17 +100,17 @@ int test_stress()
         switch (rand() % 2) {
         case 0:
             /* Insert random string */
-            fmap_put(key, buf, strlen(buf));
+            fhash_put(key, buf, strlen(buf));
             break;
         case 1:
             /* Query for string */
-            f = fmap_get(key);
+            f = fhash_get(key);
             break;
         }
     }
 
     /* Destroy table */
-    fmap_destroy();
+    fhash_destroy();
     test_return(err, STRESS_RUNS);
     return err;
 }
@@ -127,28 +127,28 @@ int test_load_save()
     test_printf("Loading and saving of feature table");
 
     /* Create map */
-    fmap_create();
+    fhash_create();
     for (i = 0; tests[i].s != 0; i++)
-        fmap_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
+        fhash_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
 
     /* Create and save feature vectors */
     if (!(z = fopen(TEST_FILE, "w"))) {
         printf("Could not create file (ignoring)\n");
         return FALSE;
     }
-    fmap_save(z);
+    fhash_save(z);
     fclose(z);
-    fmap_destroy();
+    fhash_destroy();
 
     /* Create and load */
-    fmap_create();
+    fhash_create();
     z = fopen(TEST_FILE, "r");
-    fmap_load(z);
+    fhash_load(z);
     fclose(z);
 
     /* Check elements */
     for (j = 0; j < i; j++) {
-        f = fmap_get(tests[j].f);
+        f = fhash_get(tests[j].f);
 
         /* Check for correct feature string */
         if (memcmp(f->data, tests[j].s, f->len)) {
@@ -158,7 +158,7 @@ int test_load_save()
     }
 
     /* Destroy table */
-    fmap_destroy();
+    fhash_destroy();
     unlink(TEST_FILE);
 
     test_return(err, i);

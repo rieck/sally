@@ -122,8 +122,7 @@ void fhash_destroy()
  */
 void fhash_print()
 {
-    info_msg(1, "Feature hash table");
-    info_msg(1, "  size: %lu, insertions: %lu, collision: %lu (%5.2f%%)", 
+    info_msg(1, "Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
              fhash_size(), insertions, collisions, 
              (collisions * 100.0) / insertions);
 }
