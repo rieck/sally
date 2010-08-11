@@ -112,11 +112,11 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
  * @param x Byte sequence 
  * @param l Length of sequence
  * @param d First delimiter
- * @param ja Sally configuration 
+ * @param sa Sally configuration 
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
+static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
 {
-    assert(fv && x &&  ja && l > 0);
+    assert(fv && x &&  sa && l > 0);
     unsigned int i, j = l, k = 0, s = 0, n = 0, o = 0;
     char *t = malloc(l + 1);
     fentry_t *cache = NULL;
@@ -125,15 +125,15 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
 #endif    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (ja->bits - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (sa->bits - 1)) - 1; 
 
-    if (fhash_enabled())
+    if (sa->fhash)
         cache = malloc(l * sizeof(fentry_t));
 
     /* Remove redundant delimiters */
     for (i = 0, j = 0; i < l; i++) {
-        if (ja->delim[(unsigned char) x[i]]) {
-            if (j == 0 || ja->delim[(unsigned char) t[j - 1]])
+        if (sa->delim[(unsigned char) x[i]]) {
+            if (j == 0 || sa->delim[(unsigned char) t[j - 1]])
                 continue;
             t[j++] = (char) d;
         } else {
@@ -163,7 +163,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
         } 
         
         /* Store n-gram */
-        if (n == ja->nlen && i - k > 0) {
+        if (n == sa->nlen && i - k > 0) {
 
 #ifdef ENABLE_MD5HASH        
             MD5((unsigned char *) (t + k), i - k, buf);
@@ -175,7 +175,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
-            if (fhash_enabled()) {
+            if (sa->fhash) {
                 cache[fv->len].len = i - k;
                 cache[fv->len].key = fv->dim[fv->len];
                 cache[fv->len].data = malloc(i - k);
@@ -194,7 +194,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
     /* Save extracted n-grams */
     fv->total = fv->len;
     
-    if (!fhash_enabled())
+    if (!sa->fhash)
         return;
 
     /* Flush cache and add features to hash */
@@ -215,11 +215,11 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *ja)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param ja Sally structure
+ * @param sa Sally structure
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
+static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *sa)
 {
-    assert(fv && x && ja);
+    assert(fv && x && sa);
 
     unsigned int i = 0;
     char *t = x;
@@ -229,32 +229,32 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
 #endif    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (ja->bits - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (sa->bits - 1)) - 1; 
 
-    if (fhash_enabled())
+    if (sa->fhash)
         cache = malloc(l * sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
-        if (t + ja->nlen > x + l)
+        if (t + sa->nlen > x + l)
             break;
 
 #ifdef ENABLE_MD5HASH        
-        MD5((unsigned char *) t, ja->nlen, buf);
+        MD5((unsigned char *) t, sa->nlen, buf);
         memcpy(fv->dim + fv->len, buf, sizeof(feat_t));
 #else            
-        fv->dim[fv->len] = MurmurHash64B(t, ja->nlen, 0x12345678); 
+        fv->dim[fv->len] = MurmurHash64B(t, sa->nlen, 0x12345678); 
 #endif    
         fv->dim[fv->len] &= hash_mask; 
         fv->val[fv->len] = 1;
         
         /* Cache feature and key */
-        if (fhash_enabled()) {
-            cache[fv->len].len = ja->nlen;
+        if (sa->fhash) {
+            cache[fv->len].len = sa->nlen;
             cache[fv->len].key = fv->dim[fv->len];
-            cache[fv->len].data = malloc(ja->nlen);
+            cache[fv->len].data = malloc(sa->nlen);
             if (cache[fv->len].data)
-                memcpy(cache[fv->len].data, t, ja->nlen);
+                memcpy(cache[fv->len].data, t, sa->nlen);
             else
                 error("Could not allocate feature data");
         }
@@ -263,7 +263,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *ja)
         fv->len++;
     }
     
-    if (!fhash_enabled())
+    if (!sa->fhash)
         return;
 
     /* Flush cache and add features to hash */
@@ -445,16 +445,24 @@ void fvec_set_label(fvec_t *fv, char *l)
 void fvec_print(fvec_t *fv)
 {
     assert(fv);
-    int i;
+    int i, j;
 
-    printf("Feature vector [label: %u, len: %lu, total: %lu]\n", 
+    printf("# Feature vector [label: %u, len: %lu, total: %lu]\n", 
            fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
-        printf("  %.16llx:%6.4f", (long long unsigned int) fv->dim[i], 
+        printf("#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
                fv->val[i]);
-        if (i % 3 == 2 || i == fv->len - 1)
-            printf("\n");
+
+        fentry_t *f = fhash_get(fv->dim[i]);        
+        for (j = 0; f && j < f->len; j++) {
+            if (isprint(f->data[j]) || f->data[j] == '%')
+                printf("%c", f->data[j]);
+            else
+                printf("%%%.2x", f->data[j]);
+        }
+        
+        printf("]\n");        
     }    
 }
 

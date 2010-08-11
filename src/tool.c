@@ -74,7 +74,7 @@ static void parse_options(int argc, char **argv)
                 sally->bits = atoi(optarg);
                 break;
             case 'm':
-                sally->fhash = TRUE;
+                sally_enable_fhash(sally);
                 break;
             case 'v':
                 verbose++;

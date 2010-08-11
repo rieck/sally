@@ -41,7 +41,6 @@ void fhash_put(feat_t, char *, int);
 fentry_t *fhash_get(feat_t);
 unsigned long fhash_size();
 void fhash_print();
-int fhash_enabled();
 
 void fhash_save(FILE *f);
 void fhash_load(FILE *f);

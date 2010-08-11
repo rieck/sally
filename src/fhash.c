@@ -26,7 +26,6 @@
 
 /* Hash table */
 static fentry_t *hash_table = NULL;
-static int hash_enabled = FALSE;
 static unsigned long collisions = 0;
 static unsigned long insertions = 0;
 
@@ -44,9 +43,6 @@ void fhash_put(feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
-
-    if (!hash_enabled)
-        return;
 
     /* Check for duplicate */
     HASH_FIND(hh, hash_table, &k, sizeof(feat_t), g);
@@ -90,10 +86,6 @@ fentry_t *fhash_get(feat_t key)
  */
 void fhash_create()
 {
-    if (hash_enabled)
-        fhash_destroy();
-
-    hash_enabled = TRUE;
     collisions = 0;
     insertions = 0;
 }
@@ -111,8 +103,6 @@ void fhash_destroy()
         free(f->data);
         free(f);
     }
-
-    hash_enabled = FALSE;
     collisions = 0;
     insertions = 0;
 }
@@ -122,7 +112,7 @@ void fhash_destroy()
  */
 void fhash_print()
 {
-    info_msg(1, "Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
+    printf("# Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
              fhash_size(), insertions, collisions, 
              (collisions * 100.0) / insertions);
 }
@@ -134,13 +124,6 @@ void fhash_print()
 unsigned long fhash_size()
 {
     return HASH_COUNT(hash_table);
-}
-
-/**
- * Check if feature hash table is enabled
- */
-int fhash_enabled() {
-    return hash_enabled;
 }
 
 /**

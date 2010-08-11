@@ -178,4 +178,51 @@ void sally_set_delim(sally_t *ja, char *s)
     }
 }
 
+/**
+ * Prints the configuration of Sally
+ */ 
+void sally_print(sally_t *s)
+{
+    assert(s);
+    char str[4 * 256 + 1], *ptr;
+    int i = 0;
+    
+    printf("# Sally configuration");
+    printf("#   nlen: %d, bits: %d, embed: %s, norm: %s, fhash: %s\n", 
+             s->nlen, s->bits, sally_embed2str(s->embed), sally_norm2str(s->norm),
+             s->fhash ? "enabled" : "disabled");
+             
+    for (i = 0, ptr = str; i < 256; i++) {
+        if (s->delim[i]) {
+            sprintf(ptr, "%%%.2x ", i);
+            ptr += 4; 
+        }
+    }
+    *ptr = '0';
+    
+    printf("#   delim: %s\n", str);
+} 
+
+/**
+ * Enable feature hash table
+ */
+void sally_enable_fhash(sally_t *sa) 
+{
+    if (sa->fhash)
+        fhash_destroy();
+        
+    sa->fhash = TRUE;
+    fhash_create();
+}
+
+
+/**
+ * Enable feature hash table
+ */
+void sally_disable_fhash(sally_t *sa) 
+{
+    fhash_destroy();
+    sa->fhash = FALSE;
+}
+
 /** @} */

@@ -65,5 +65,7 @@ char *sally_embed2str(embed_t e);
 norm_t sally_str2embed(char *str);
 void sally_version(FILE *f);
 void sally_set_delim(sally_t *, char *);
+void sally_enable_fhash(sally_t *sa);
+void sally_disable_fhash(sally_t *sa);
 
 #endif                          /* SALLY_H */
