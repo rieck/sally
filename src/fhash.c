@@ -10,9 +10,10 @@
  */
 
 /** 
- * @defgroup fhash Global feature hash table
+ * @defgroup fhash Feature hash table
  * This hash table keeps track of extracted string features and their 
- * respective hash values.
+ * respective hash values. It can be used for explaining but also debugging 
+ * extracted feature vectors.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
@@ -24,33 +25,32 @@
 #include "fhash.h"
 #include "util.h"
 
-/* Hash table */
-static fentry_t *hash_table = NULL;
-static unsigned long collisions = 0;
-static unsigned long insertions = 0;
-
 /* External variables */
 extern int verbose;
 
+/* Local functions */
+static int decode_string(char *str);
+
 /**
- * Add a feature and its key to the hash table. The function clones all input
- * arguments, that is new memory is allocated and the data is copied. 
+ * Adds a feature and its key to the hash table. The function clones all 
+ * input arguments: new memory is allocated and the data is copied.
+ * @param fh Feature hash 
  * @param k Key for feature
  * @param x Data of feature
  * @param l Length of feature
  */
-void fhash_put(feat_t k, char *x, int l)
+void fhash_put(fhash_t *fh, feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
 
     /* Check for duplicate */
-    HASH_FIND(hh, hash_table, &k, sizeof(feat_t), g);
+    HASH_FIND(hh, fh->hash, &k, sizeof(feat_t), g);
 
     /* Check for collision */
     if (g) {
         if (l != g->len || memcmp(x, g->data, l))
-            collisions++;
+            fh->cols++;
         return;
     }
 
@@ -65,70 +65,81 @@ void fhash_put(feat_t k, char *x, int l)
         error("Could not allocate feature data");
 
     /* Add to hash and count insertion */
-    HASH_ADD(hh, hash_table, key, sizeof(feat_t), h);
-    insertions++;
+    HASH_ADD(hh, fh->hash, key, sizeof(feat_t), h);
+    fh->ins++;
 }
 
 /**
- * Gets an entry from the hash table. The returned memory must not be free'd.
+ * Gets an entry from the hash table. 
+ * @warning The returned memory must not be freed.
+ * @param fh Feature hash
  * @param key Feature key
  * @return feature table entry
  */
-fentry_t *fhash_get(feat_t key)
+fentry_t *fhash_get(fhash_t *fh, feat_t key)
 {
     fentry_t *f;
-    HASH_FIND(hh, hash_table, &key, sizeof(feat_t), f);
+    HASH_FIND(hh, fh->hash, &key, sizeof(feat_t), f);
     return f;
 }
 
 /**
- * Creates the feature hash table.
+ * Creates and allocates the feature hash table.
+ * @return Feature hash
  */
-void fhash_create()
+fhash_t *fhash_create()
 {
-    collisions = 0;
-    insertions = 0;
+    fhash_t *fh = malloc(sizeof(fhash_t));
+
+    /* Initialize hash fields */
+    fh->hash = NULL;
+    fh->cols = 0;
+    fh->ins = 0;
+    return fh;
 }
 
 /**
- * Destroy the feature hash table.
+ * Destroys the feature hash table.
+ * @param fh Feature hash
  */
-void fhash_destroy()
+void fhash_destroy(fhash_t *fh)
 {
     fentry_t *f;
 
-    while (hash_table) {
-        f = hash_table;
-        HASH_DEL(hash_table, f);
+    while (fh->hash) {
+        f = fh->hash;
+        HASH_DEL(fh->hash, f);
         free(f->data);
         free(f);
     }
-    collisions = 0;
-    insertions = 0;
+    
+    free(fh);
 }
 
 /**
- * Print the feature hash table. 
+ * Prints the feature hash table. 
+ * @param fh Feature hash
  */
-void fhash_print()
+void fhash_print(fhash_t *fh)
 {
     printf("# Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
-             fhash_size(), insertions, collisions, 
-             (collisions * 100.0) / insertions);
+             fhash_size(fh), fh->ins, fh->cols, (fh->cols * 100.0) / fh->ins);
 }
 
 /**
  * Returns the size of the feature hash table
+ * @param fh Feature hash
  * @return size of table
  */
-unsigned long fhash_size()
+unsigned long fhash_size(fhash_t *fh)
 {
-    return HASH_COUNT(hash_table);
+    return HASH_COUNT(fh->hash);
 }
 
 /**
- * Decode a string with URI encoding. The function operates 
+ * Decodes a string with URI encoding. The function operates 
  * in-place. A trailing NULL character is appended to the string.
+ * @private
  * @param str Stirng to escape.
  * @return length of decoded sequence
  */
@@ -159,15 +170,16 @@ static int decode_string(char *str)
 
 /**
  * Saves the feature hash table to a file stream.
+ * @param fh Feature hash
  * @param z File pointer
  */
-void fhash_save(FILE *z)
+void fhash_save(fhash_t *fh, FILE *z)
 {
     fentry_t *f;
     int i;
 
-    fprintf(z, "fhash: len=%u\n", HASH_COUNT(hash_table));
-    for (f = hash_table; f != NULL; f = f->hh.next) {
+    fprintf(z, "fhash: len=%u\n", HASH_COUNT(fh->hash));
+    for (f = fh->hash; f != NULL; f = f->hh.next) {
         fprintf(z, "  %.16llx: ", (long long unsigned int) f->key);
         for (i = 0; i < f->len; i++) {
             if (isprint(f->data[i]) || f->data[i] == '%')
@@ -182,19 +194,24 @@ void fhash_save(FILE *z)
 /**
  * Loads the feature hash table from a file stream
  * @param z File pointer
+ * @return Feature hash
  */
-void fhash_load(FILE *z)
+fhash_t *fhash_load(FILE *z)
 {
     int i, r;
     unsigned long len;
     char buf[512], str[512];
     feat_t key;
+    fhash_t *fh;
+    
+    fh = calloc(1, sizeof(fhash_t));
 
     fgets(buf, 512, z);
     r = sscanf(buf, "fhash: len=%lu\n", (unsigned long *) &len);
     if (r != 1) {
         error("Could not parse feature map");
-        return;
+        free(fh);
+        return NULL;
     }
 
     for (i = 0; i < len; i++) {
@@ -203,15 +220,18 @@ void fhash_load(FILE *z)
                    (char *) str);
         if (r != 2) {
             error("Could not parse feature map contents");
-            return;
+            free(fh);
+            return NULL;
         }
 
         /* Decode string */
         r = decode_string(str);
 
         /* Put string to table */
-        fhash_put(key, str, r);
+        fhash_put(fh, key, str, r);
     }
+    
+    return fh;
 }
 
 /** @} */

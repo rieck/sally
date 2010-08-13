@@ -10,9 +10,10 @@
  */
 
 /** 
- * @defgroup sally Sally interface.
- * Functions and structures for interfacing with Sally. This file contains
- * the main code for using Sally from within other projects.
+ * @defgroup sally Main interface for Sally.
+ *
+ * Functions and structures for interfacing with Sally. This file 
+ * contains the main code for using Sally from within other projects.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
@@ -30,62 +31,61 @@
 int verbose = 0;
 
 /**
- * Create a sally structure. The function allocates memory and sets all 
- * learning parameters to default values.
- * @return Initialized sally structure
+ * Creates a Sally configuration. The function allocates memory and sets all 
+ * parameters to default values.
+ * @return Initialized Sally structure
  */
 sally_t *sally_create()
 {
-    sally_t *j = calloc(1, sizeof(sally_t));
-    if (!j) {
+    sally_t *sa = calloc(1, sizeof(sally_t));
+    if (!sa) {
         error("Could not allocate sally structure.");
         return NULL;
     }
     
     /* Set default values */
-    j->nlen = DEFAULT_NLEN;
-    j->norm = DEFAULT_NORM;
-    j->bits = DEFAULT_BITS;
-    j->fhash = DEFAULT_FHASH;
+    sa->nlen = DEFAULT_NLEN;
+    sa->norm = DEFAULT_NORM;
+    sa->bits = DEFAULT_BITS;
+    sa->fhash = DEFAULT_FHASH;
     
     /* Set delimiters */
-    sally_set_delim(j, DEFAULT_DELIM);
+    sally_set_delim(sa, DEFAULT_DELIM);
     
-    return j;
+    return sa;
 } 
 
 /**
- * Destroys a sally structure. The function frees all memory including 
+ * Destroys a Sally configuration. The function frees all memory including 
  * the data structure itself.
- * @param j sally structure
+ * @param sa sally structure
  */ 
-void sally_destroy(sally_t *j)
+void sally_destroy(sally_t *sa)
 {
-    if (!j)
+    if (!sa)
         return;
     
-    if (j->fhash)
-        fhash_destroy();
+    if (sa->fhash)
+        fhash_destroy(sa->fhash);
     
-    free(j);
+    free(sa);
 } 
 
 /**
- * Print version and copyright information
- * @param f File stream
+ * Prints version and copyright information to a file stream
+ * @param f File pointer
  */
 void sally_version(FILE *f)
 {
-    fprintf(f,
-            ".Oo Sally %s - A Library for String Features and String Kernels\n"
-            "    Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
-            PACKAGE_VERSION);
+    fprintf(f, ".Oo Sally %s - A Library for String Features and String Kernels\n"
+               "    Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+               PACKAGE_VERSION);
 }
 
 /**
- * Returns the string for the embedding mode
+ * Returns the string for the given embedding mode
  * @param e embedding mode
- * @return String for normalization mode
+ * @return String for embedding mode
  */
 char *sally_embed2str(embed_t e)
 {
@@ -100,7 +100,7 @@ char *sally_embed2str(embed_t e)
 }
 
 /**
- * Returns the embedding mode for a string
+ * Returns the embedding mode for the given string
  * @param str String
  * @return embedding mode
  */
@@ -116,7 +116,7 @@ norm_t sally_str2embed(char *str)
 }
 
 /**
- * Returns the string for the normalization mode
+ * Returns the string for the given normalization mode
  * @param n normalization mode
  * @return String for normalization mode
  */
@@ -133,7 +133,7 @@ char *sally_norm2str(norm_t n)
 }
 
 /**
- * Returns the normalization mode for a string
+ * Returns the normalization mode for the given string
  * @param str String
  * @return normalization mode
  */
@@ -150,20 +150,20 @@ norm_t sally_str2norm(char *str)
 
 /**
  * Decodes a string containing delimiters to global delimiter array
- * @param j sally structure
+ * @param sa sally structure
  * @param s String containing delimiters
  */
-void sally_set_delim(sally_t *ja, char *s)
+void sally_set_delim(sally_t *sa, char *s)
 {
     char buf[5] = "0x00";
     unsigned int i, j;
     
     /* Reset delimiters */
-    memset(ja->delim, 0, 256);
+    memset(sa->delim, 0, 256);
     
     for (i = 0; i < strlen(s); i++) {
         if (s[i] != '%') {
-            ja->delim[(unsigned int) s[i]] = 1;
+            sa->delim[(unsigned int) s[i]] = 1;
             continue;
         }
         
@@ -174,26 +174,27 @@ void sally_set_delim(sally_t *ja, char *s)
         buf[2] = s[++i];
         buf[3] = s[++i];
         sscanf(buf, "%x", (unsigned int *) &j);
-        ja->delim[j] = 1;
+        sa->delim[j] = 1;
     }
 }
 
 /**
  * Prints the configuration of Sally
+ * @param sa Sally configuration
  */ 
-void sally_print(sally_t *s)
+void sally_print(sally_t *sa)
 {
-    assert(s);
+    assert(sa);
     char str[4 * 256 + 1], *ptr;
     int i = 0;
     
     printf("# Sally configuration");
     printf("#   nlen: %d, bits: %d, embed: %s, norm: %s, fhash: %s\n", 
-             s->nlen, s->bits, sally_embed2str(s->embed), sally_norm2str(s->norm),
-             s->fhash ? "enabled" : "disabled");
+             sa->nlen, sa->bits, sally_embed2str(sa->embed), sally_norm2str(sa->norm),
+             sa->fhash ? "enabled" : "disabled");
              
     for (i = 0, ptr = str; i < 256; i++) {
-        if (s->delim[i]) {
+        if (sa->delim[i]) {
             sprintf(ptr, "%%%.2x ", i);
             ptr += 4; 
         }
@@ -209,10 +210,8 @@ void sally_print(sally_t *s)
 void sally_enable_fhash(sally_t *sa) 
 {
     if (sa->fhash)
-        fhash_destroy();
-        
-    sa->fhash = TRUE;
-    fhash_create();
+        fhash_destroy(sa->fhash);        
+    sa->fhash = fhash_create();
 }
 
 
@@ -221,8 +220,8 @@ void sally_enable_fhash(sally_t *sa)
  */
 void sally_disable_fhash(sally_t *sa) 
 {
-    fhash_destroy();
-    sa->fhash = FALSE;
+    fhash_destroy(sa->fhash);
+    sa->fhash = NULL;
 }
 
 /** @} */

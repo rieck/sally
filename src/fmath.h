@@ -17,4 +17,4 @@
 void fvec_norm(fvec_t *fv, norm_t e);
 void fvec_binarize(fvec_t *fv);
 
-#endif                          /* FVEC_H */
+#endif                          /* FMATH_H */

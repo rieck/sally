@@ -10,10 +10,10 @@
  */
 
 /** 
- * @defgroup fvec Math functions for feature vector
+ * @defgroup fvec Mathematics for feature vector
  *
- * Implementations of simple math functions for feature vectors, such as
- * normalizations.
+ * Implementations of simple mathetmatical functions for feature 
+ * vectors, such as normalizations, dot product, addition and so on.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
@@ -26,7 +26,7 @@
 #include "util.h"
 
 /**
- * Normalize a feature vector using a given normalization.
+ * Normalizes a feature vector using a given normalization.
  * @param fv Feature vector
  * @param n normalization mode
  */
@@ -48,7 +48,7 @@ void fvec_norm(fvec_t *fv, norm_t n)
 
 
 /**
- * Binarize the components of a feature vector.
+ * Binarizes the components of a feature vector.
  * @param fv Feature vector
  */
 void fvec_binarize(fvec_t *fv) 

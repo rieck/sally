@@ -14,7 +14,7 @@
  *
  * Generic implementation of a feature vector. A feature vector
  * contains a sparse representation of non-zero dimensions in the
- * feature space.  This allows for operating with vectors of high and
+ * feature space. This allows for operating with vectors of high and
  * even infinite dimensionality, as long as the association between
  * dimensions and non-zero values is sparse. 
  *
@@ -42,19 +42,22 @@ static void extract_wgrams(fvec_t *, char *x, int l, int d, sally_t *);
 static void extract_ngrams(fvec_t *, char *x, int l, sally_t *);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
+static void cache_put(fentry_t *c, fvec_t *fv, sally_t *sa, char *t, int l);
+static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa);
+
 
 /**
- * Allocate and extract a feature vector from a string.
+ * Allocates and extracts a feature vector from a string.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
- * @param j Sally configuration
+ * @param sa Sally configuration
  * @return feature vector
  */
-fvec_t *fvec_extract(char *x, int l, sally_t *j)
+fvec_t *fvec_extract(char *x, int l, sally_t *sa)
 {
     fvec_t *fv;
     int d;
-    assert(x && j && l >= 0);
+    assert(x && sa && l >= 0);
 
     /* Allocate feature vector */
     fv = calloc(1, sizeof(fvec_t));
@@ -80,13 +83,13 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
     }
 
     /* Find first delimiter symbol */
-    for (d = 0; !j->delim[(unsigned char) d] && d < 256; d++);
+    for (d = 0; !sa->delim[(unsigned char) d] && d < 256; d++);
     
     /* Check for byte or word n-grams */
     if (d == 256)
-        extract_ngrams(fv, x, l, j);
+        extract_ngrams(fv, x, l, sa);
     else
-        extract_wgrams(fv, x, l, d, j);
+        extract_wgrams(fv, x, l, d, sa);
 
     /* Sort extracted features */
     qsort(fv->dim, fv->len, sizeof(feat_t), cmp_feat);
@@ -95,18 +98,56 @@ fvec_t *fvec_extract(char *x, int l, sally_t *j)
     count_feat(fv);
     
     /* Binarize if requested */
-    if (j->embed == EMBED_BIN)
+    if (sa->embed == EMBED_BIN)
         fvec_binarize(fv);
-    
+
     /* Compute normalization */
-    fvec_norm(fv, j->norm);    
+    fvec_norm(fv, sa->norm);    
     
     return fv;
 }
 
+/**
+ * Caches a feature for later addition to the feature hash table
+ * @param c Pointer to cache
+ * @param fv Feature vector
+ * @param sa Sally configuration
+ * @param t Pointer to feature
+ * @param l Length of feature
+ */
+static void cache_put(fentry_t *c, fvec_t *fv, sally_t *sa, char *t, int l) 
+{
+    c[fv->len].len = l;
+    c[fv->len].key = fv->dim[fv->len];
+    c[fv->len].data = malloc(l);
+    if (c[fv->len].data)
+        memcpy(c[fv->len].data, t, l);
+    else
+        error("Could not allocate feature data");
+}    
 
 /**
- * Extract word n-grams from a string. The features are represented 
+ * Flushs all features from the cache to the feature hash table.
+ * @param c Pointer to cache
+ * @param fv Feature vector
+ * @param sa Sally configuration
+ */
+static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa) 
+{
+    int i; 
+    
+    /* Flush cache and add features to hash */
+#pragma omp critical
+    {
+        for (i = 0; i < fv->len; i++) {
+            fhash_put(sa->fhash, c[i].key, c[i].data, c[i].len);
+            free(c[i].data);
+        }
+    }
+}
+
+/**
+ * Extracts word n-grams from a string. The features are represented 
  * by hash values.
  * @param fv Feature vector
  * @param x Byte sequence 
@@ -155,11 +196,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
         /* Count delimiters */
         if (t[i] == d) {
             n++;
-            /* Remember first starting point */
-            if (n == 1)
+            if (n == 1)          /* Remember first starting point */
                 s = i;
-            /* Remember word starting point */
-            o = i;
+            o = i;               /* Remember word starting point */
         } 
         
         /* Store n-gram */
@@ -175,15 +214,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
-            if (sa->fhash) {
-                cache[fv->len].len = i - k;
-                cache[fv->len].key = fv->dim[fv->len];
-                cache[fv->len].data = malloc(i - k);
-                if (cache[fv->len].data)
-                    memcpy(cache[fv->len].data, (t + k), i - k);
-                else
-                    error("Could not allocate feature data");
-            }
+            if (sa->fhash) 
+                cache_put(cache, fv, sa, (t + k) , i - k);
             
             k = s + 1, i = s, n = 0, o = s;
             fv->len++;
@@ -197,14 +229,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
     if (!sa->fhash)
         return;
 
-    /* Flush cache and add features to hash */
-#pragma omp critical
-    {
-        for (i = 0; i < fv->len; i++) {
-            fhash_put(cache[i].key, cache[i].data, cache[i].len);
-            free(cache[i].data);
-        }
-    }
+    /* Flush cache */
+    cache_flush(cache, fv, sa);
     free(cache);    
 }
 
@@ -248,17 +274,10 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *sa)
         fv->dim[fv->len] &= hash_mask; 
         fv->val[fv->len] = 1;
         
-        /* Cache feature and key */
-        if (sa->fhash) {
-            cache[fv->len].len = sa->nlen;
-            cache[fv->len].key = fv->dim[fv->len];
-            cache[fv->len].data = malloc(sa->nlen);
-            if (cache[fv->len].data)
-                memcpy(cache[fv->len].data, t, sa->nlen);
-            else
-                error("Could not allocate feature data");
-        }
-        
+        /* Cache feature */
+        if (sa->fhash)
+            cache_put(cache, fv, sa, t, sa->nlen);
+                
         t++;
         fv->len++;
     }
@@ -266,15 +285,9 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *sa)
     if (!sa->fhash)
         return;
 
-    /* Flush cache and add features to hash */
-#pragma omp critical
-    {
-        for (i = 0; i < fv->len; i++) {
-            fhash_put(cache[i].key, cache[i].data, cache[i].len);
-            free(cache[i].data);
-        }
-    }
-    free(cache);    
+    /* Flush cache */
+    cache_flush(cache, fv, sa);
+    free(cache);   
 }
 
 
@@ -325,7 +338,6 @@ static void count_feat(fvec_t *fv)
     /* Reallocate memory */
     fvec_realloc(fv);
 }
-
 
 /**
  * Shrinks the memory of a feature vector. The function reallocates
@@ -419,7 +431,6 @@ fvec_t *fvec_clone(fvec_t *o)
     return fv;
 }
 
-
 /**
  * Sets the label of a feature vector
  * @param fv Feature vector
@@ -441,8 +452,9 @@ void fvec_set_label(fvec_t *fv, char *l)
 /**
  * Print the content of a feature vector
  * @param fv feature vector
+ * @param sa Sally configuration
  */
-void fvec_print(fvec_t *fv)
+void fvec_print(fvec_t *fv, sally_t *sa)
 {
     assert(fv);
     int i, j;
@@ -454,12 +466,14 @@ void fvec_print(fvec_t *fv)
         printf("#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
                fv->val[i]);
 
-        fentry_t *f = fhash_get(fv->dim[i]);        
-        for (j = 0; f && j < f->len; j++) {
-            if (isprint(f->data[j]) || f->data[j] == '%')
-                printf("%c", f->data[j]);
-            else
-                printf("%%%.2x", f->data[j]);
+        if (sa && sa->fhash) {
+            fentry_t *f = fhash_get(sa->fhash, fv->dim[i]);        
+            for (j = 0; f && j < f->len; j++) {
+                if (isprint(f->data[j]) || f->data[j] == '%')
+                    printf("%c", f->data[j]);
+                else
+                    printf("%%%.2x", f->data[j]);
+            }
         }
         
         printf("]\n");        
