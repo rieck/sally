@@ -50,6 +50,7 @@ sally_t *sally_create()
     sa->fhash = DEFAULT_FHASH;
     
     /* Set delimiters */
+    sa->delim = malloc(256 * sizeof(char));
     sally_set_delim(sa, DEFAULT_DELIM);
     
     return sa;
@@ -66,7 +67,9 @@ void sally_destroy(sally_t *sa)
         return;
     
     if (sa->fhash)
-        fhash_destroy(sa->fhash);
+        fhash_destroy(sa->fhash);    
+    if (sa->delim)
+        free(sa->delim);
     
     free(sa);
 } 
@@ -163,7 +166,7 @@ void sally_set_delim(sally_t *sa, char *s)
     
     for (i = 0; i < strlen(s); i++) {
         if (s[i] != '%') {
-            sa->delim[(unsigned int) s[i]] = 1;
+            DELIM(sa, s[i]) = 1;
             continue;
         }
         
@@ -174,7 +177,7 @@ void sally_set_delim(sally_t *sa, char *s)
         buf[2] = s[++i];
         buf[3] = s[++i];
         sscanf(buf, "%x", (unsigned int *) &j);
-        sa->delim[j] = 1;
+        DELIM(sa, j) = 1;
     }
 }
 
@@ -194,7 +197,7 @@ void sally_print(sally_t *sa)
              sally_norm2str(sa->norm), sa->fhash ? "enabled" : "disabled");
              
     for (i = 0, ptr = str; i < 256; i++) {
-        if (sa->delim[i]) {
+        if (DELIM(sa, i)) {
             sprintf(ptr, "%%%.2x ", i);
             ptr += 4; 
         }

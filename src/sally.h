@@ -25,6 +25,9 @@
 /* Default setting of feature hash */
 #define DEFAULT_FHASH       NULL
 
+/* Convenience macro */
+#define DELIM(s, i)    ((char *) s->delim)[(unsigned int) i]
+
 /** 
  * Normalization modes
  */
@@ -50,7 +53,7 @@ typedef struct {
     embed_t embed;          /**< Embedding mode */
     norm_t norm;            /**< Normalization of vectors */
     int bits;               /**< Bits of hashing */
-    char delim[256];        /**< Delimiters */
+    void *delim;            /**< Delimiters */
     void *fhash;            /**< Feature hash table */
 } sally_t; 
 

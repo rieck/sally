@@ -83,7 +83,7 @@ fvec_t *fvec_extract(char *x, int l, sally_t *sa)
     }
 
     /* Find first delimiter symbol */
-    for (d = 0; !sa->delim[(unsigned char) d] && d < 256; d++);
+    for (d = 0; !DELIM(sa, d) && d < 256; d++);
     
     /* Check for byte or word n-grams */
     if (d == 256)
@@ -173,8 +173,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
 
     /* Remove redundant delimiters */
     for (i = 0, j = 0; i < l; i++) {
-        if (sa->delim[(unsigned char) x[i]]) {
-            if (j == 0 || sa->delim[(unsigned char) t[j - 1]])
+        if (DELIM(sa, x[i])) {
+            if (j == 0 || DELIM(sa, t[j - 1]))
                 continue;
             t[j++] = (char) d;
         } else {
