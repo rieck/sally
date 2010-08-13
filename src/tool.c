@@ -112,6 +112,24 @@ int main(int argc, char **argv)
     parse_options(argc, argv);
     char **data = argv + optind; 
     int len = argc - optind;
+
+    #define BLOCK 5
+
+    char *files[BLOCK];
+    char *names[BLOCK];
+    int sizes[BLOCK];
+    
+    int num = input_open_dir(data[0]);
+    
+    while (num > 0) {
+        int r = input_read_dir(files, sizes, names, BLOCK);
+        num -= r;
+        
+        int i;
+        for (i = 0; i < r; i++)
+            printf("%s(%d) ", names[i], sizes[i]);
+        printf("\n");
+    }
     
     /* Destroy Sally */
     sally_destroy(sa);
