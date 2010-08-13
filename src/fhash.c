@@ -119,11 +119,12 @@ void fhash_destroy(fhash_t *fh)
 
 /**
  * Prints the feature hash table. 
+ * @param f File pointer
  * @param fh Feature hash
  */
-void fhash_print(fhash_t *fh)
+void fhash_print(FILE *f, fhash_t *fh)
 {
-    printf("# Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
+    fprintf(f, "# Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
              fhash_size(fh), fh->ins, fh->cols, (fh->cols * 100.0) / fh->ins);
 }
 

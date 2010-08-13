@@ -451,32 +451,33 @@ void fvec_set_label(fvec_t *fv, char *l)
 
 /**
  * Print the content of a feature vector
+ * @param f File pointer
  * @param fv feature vector
  * @param sa Sally configuration
  */
-void fvec_print(fvec_t *fv, sally_t *sa)
+void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
 {
     assert(fv);
     int i, j;
 
-    printf("# Feature vector [label: %u, len: %lu, total: %lu]\n", 
+    fprintf(f, "# Feature vector [label: %u, len: %lu, total: %lu]\n", 
            fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
-        printf("#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
+        fprintf(f, "#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
                fv->val[i]);
 
         if (sa && sa->fhash) {
-            fentry_t *f = fhash_get(sa->fhash, fv->dim[i]);        
-            for (j = 0; f && j < f->len; j++) {
-                if (isprint(f->data[j]) || f->data[j] == '%')
-                    printf("%c", f->data[j]);
+            fentry_t *fe = fhash_get(sa->fhash, fv->dim[i]);        
+            for (j = 0; f && j < fe->len; j++) {
+                if (isprint(fe->data[j]) || fe->data[j] == '%')
+                    fprintf(f, "%c", fe->data[j]);
                 else
-                    printf("%%%.2x", f->data[j]);
+                    fprintf(f, "%%%.2x", fe->data[j]);
             }
         }
         
-        printf("]\n");        
+        fprintf(f, "]\n");        
     }    
 }
 

@@ -80,8 +80,8 @@ void sally_destroy(sally_t *sa)
  */
 void sally_version(FILE *f)
 {
-    fprintf(f, ".Oo Sally %s - A Library for String Features and String Kernels\n"
-               "    Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+    fprintf(f, "# Sally %s - A Library for String Features and String Kernels\n"
+               "# Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
                PACKAGE_VERSION);
 }
 
@@ -183,16 +183,17 @@ void sally_set_delim(sally_t *sa, char *s)
 
 /**
  * Prints the configuration of Sally
+ * @param f File pointer
  * @param sa Sally configuration
  */ 
-void sally_print(sally_t *sa)
+void sally_print(FILE *f, sally_t *sa)
 {
     assert(sa);
     char str[4 * 256 + 1], *ptr;
     int i = 0;
     
-    printf("# Sally configuration\n");
-    printf("#   nlen: %d, bits: %d, embed: %s, norm: %s, fhash: %s\n", 
+    fprintf(f, "# Sally configuration\n");
+    fprintf(f, "#   nlen: %d, bits: %d, embed: %s, norm: %s, fhash: %s\n", 
              sa->nlen, sa->bits, sally_embed2str(sa->embed), 
              sally_norm2str(sa->norm), sa->fhash ? "enabled" : "disabled");
              
@@ -204,7 +205,7 @@ void sally_print(sally_t *sa)
     }
     *ptr = 0;
     
-    printf("#   delim: %s\n", str);
+    fprintf(f, "#   delim: %s\n", str);
 } 
 
 /**

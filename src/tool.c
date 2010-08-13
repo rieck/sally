@@ -93,7 +93,7 @@ static void parse_options(int argc, char **argv)
     argv += optind;
     
     if (verbose)
-        sally_version(sa);
+        sally_print(stdout, sa);
         
 }
 

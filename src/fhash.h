@@ -50,7 +50,7 @@ void fhash_destroy(fhash_t *);
 void fhash_put(fhash_t *, feat_t, char *, int);
 fentry_t *fhash_get(fhash_t *, feat_t);
 unsigned long fhash_size(fhash_t *);
-void fhash_print(fhash_t *);
+void fhash_print(FILE *, fhash_t *);
 void fhash_save(fhash_t *, FILE *f);
 fhash_t *fhash_load(FILE *f);
 

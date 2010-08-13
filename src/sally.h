@@ -44,7 +44,6 @@ typedef enum {
     EMBED_BIN,              /**< Binary flags for features */
 } embed_t;
 
-
 /**
  * Generic configuration of Sally
  */
@@ -61,6 +60,7 @@ typedef struct {
 sally_t *sally_create(void);
 void sally_destroy(sally_t *);
 void sally_version(FILE *f);
+void sally_print(FILE *f, sally_t *);
 
 /* Configuration functions */
 void sally_set_delim(sally_t *, char *);
