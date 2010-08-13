@@ -188,10 +188,10 @@ void sally_print(sally_t *sa)
     char str[4 * 256 + 1], *ptr;
     int i = 0;
     
-    printf("# Sally configuration");
+    printf("# Sally configuration\n");
     printf("#   nlen: %d, bits: %d, embed: %s, norm: %s, fhash: %s\n", 
-             sa->nlen, sa->bits, sally_embed2str(sa->embed), sally_norm2str(sa->norm),
-             sa->fhash ? "enabled" : "disabled");
+             sa->nlen, sa->bits, sally_embed2str(sa->embed), 
+             sally_norm2str(sa->norm), sa->fhash ? "enabled" : "disabled");
              
     for (i = 0, ptr = str; i < 256; i++) {
         if (sa->delim[i]) {
@@ -199,7 +199,7 @@ void sally_print(sally_t *sa)
             ptr += 4; 
         }
     }
-    *ptr = '0';
+    *ptr = 0;
     
     printf("#   delim: %s\n", str);
 } 

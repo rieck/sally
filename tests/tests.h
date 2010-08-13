@@ -17,7 +17,7 @@
 #include "util.h"
 
 /* With of text line */
-#define LINE_WIDTH          65
+#define LINE_WIDTH          60
 
 /* Functions */
 void test_printf(char *fmt, ...);

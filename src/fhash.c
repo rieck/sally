@@ -44,6 +44,8 @@ void fhash_put(fhash_t *fh, feat_t k, char *x, int l)
     assert(x && l > 0);
     fentry_t *g, *h;
 
+    fh->ins++;
+
     /* Check for duplicate */
     HASH_FIND(hh, fh->hash, &k, sizeof(feat_t), g);
 
@@ -66,7 +68,6 @@ void fhash_put(fhash_t *fh, feat_t k, char *x, int l)
 
     /* Add to hash and count insertion */
     HASH_ADD(hh, fh->hash, key, sizeof(feat_t), h);
-    fh->ins++;
 }
 
 /**
