@@ -71,6 +71,7 @@ fvec_t *fvec_extract(char *x, int l, sally_t *sa)
     fv->total = 0;
     fv->dim = (feat_t *) malloc(l * sizeof(feat_t));
     fv->val = (float *) malloc(l * sizeof(float));
+    fv->src = NULL;
 
     /* Check for empty sequence */
     if (l == 0)
@@ -386,6 +387,8 @@ void fvec_destroy(fvec_t *fv)
         free(fv->dim);
     if (fv->val)
         free(fv->val);
+    if (fv->src)
+        free(fv->src);        
     free(fv);
 }
 /**
@@ -410,6 +413,8 @@ fvec_t *fvec_clone(fvec_t *o)
     fv->len = o->len;
     fv->total = o->total;
 
+    if (o->src)
+        fv->src = strdup(o->src);
 
     /* Check for empty sequence */
     if (o->len == 0)
@@ -429,6 +434,16 @@ fvec_t *fvec_clone(fvec_t *o)
     }
 
     return fv;
+}
+
+/**
+ * Sets the source of a feature vector
+ * @param fv Feature vector
+ * @param s Source of features
+ */
+void fvec_set_source(fvec_t *fv, char *s)
+{
+    fv->src = strdup(s);
 }
 
 /**
@@ -460,8 +475,8 @@ void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
     assert(fv);
     int i, j;
 
-    fprintf(f, "# Feature vector [label: %u, len: %lu, total: %lu]\n", 
-           fv->label, fv->len, fv->total);
+    fprintf(f, "# Feature vector [src: %s, label: %u, len: %lu, total: %lu]\n", 
+           fv->src, fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
         fprintf(f, "#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
@@ -504,11 +519,13 @@ fvec_t *fvec_load(FILE *z)
     r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%hu\n",
                (unsigned long *) &f->len, (unsigned long *) &f->total,
                (unsigned short *) &f->label);
-    if (r != 3) {
-        error("Could not parse feature vector");
-        fvec_destroy(f);
-        return NULL;
-    }
+    if (r != 3) 
+        goto err;
+
+    /* Load src string */
+    f->src = calloc(sizeof(char), 256);
+    if (fscanf(z, "  %255[^\n]\n", f->src) != 1) 
+        goto err;
 
     /* Empty feature vector */
     if (f->len == 0)
@@ -522,20 +539,21 @@ fvec_t *fvec_load(FILE *z)
         fvec_destroy(f);
         return NULL;
     }
-
+    
     /* Load features */
     for (i = 0; i < f->len; i++) {
         fgets(buf, 512, z);
         r = sscanf(buf, "  %llx:%g\n", (unsigned long long *) &f->dim[i],
                    (float *) &f->val[i]);
-        if (r != 2) {
-            error("Could not parse feature vector contents");
-            fvec_destroy(f);
-            return NULL;
-        }
+        if (r != 2) 
+            goto err;
     }
 
     return f;
+err:
+    error("Failed to parse feature vector");
+    fvec_destroy(f);
+    return NULL;
 }
 
 
@@ -551,6 +569,7 @@ void fvec_save(fvec_t *f, FILE * z)
 
     fprintf(z, "fvec: len=%lu, total=%lu, label=%hu\n",
              f->len, f->total, f->label);
+    fprintf(z, "  %s\n", f->src);
     for (i = 0; i < f->len; i++)
         fprintf(z, "  %.16llx:%.16g\n", (unsigned long long) f->dim[i],
                  (float) f->val[i]);

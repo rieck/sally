@@ -49,6 +49,9 @@ void export_fvec_libsvm(FILE *f, sally_t *sa, fvec_t **fv, int l)
             fprintf(f, "%llu:%f ", (long long unsigned int)  fv[j]->dim[i] + 1, 
                     fv[j]->val[i]);
         
+        if (fv[j]->src)
+            fprintf(f, "# %s", fv[j]->src);
+        
         fprintf(f, "\n");    
     }
 }
