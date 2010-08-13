@@ -1,5 +1,5 @@
 /*
- * Sally - A Tool for Embedding Strings in a Vector Space
+ * Sally - A Tool for Embedding Strings in Vector Spaces
  * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
@@ -80,7 +80,7 @@ void sally_destroy(sally_t *sa)
  */
 void sally_version(FILE *f)
 {
-    fprintf(f, "# Sally %s - A Tool for Embedding Strings in a Vector Space\n"
+    fprintf(f, "# Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
                "# Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
                PACKAGE_VERSION);
 }
