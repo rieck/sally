@@ -71,13 +71,13 @@ int input_open_dir(char *p)
 int input_read_dir(char **data, int *sizes, char **names, int len)
 {
     assert(data && sizes && names);
-    int i, j = 0, size;
+    int i, j = 0;
  
     /* Determine maximum path length and allocate buffer */
     int maxlen = fpathconf(dirfd(dir), _PC_NAME_MAX);
     
     /* Load block of files */
-#pragma omp parallel for shared(data, names) 
+#pragma omp parallel for
     for (i = 0; i < len; i++) {
         struct dirent *buf, *dp;
         buf = malloc(offsetof(struct dirent, d_name) + maxlen + 1);
@@ -91,16 +91,15 @@ int input_read_dir(char **data, int *sizes, char **names, int len)
         if (dp->d_type != DT_REG) 
             goto skip;
 
-	names[j] = strdup(dp->d_name);
-        data[j] = load_file(path, dp->d_name, &size);
-        sizes[j] = size;
-
-#pragma omp atomic
-	j++;
+#pragma omp critical
+        {
+            names[j] = strdup(dp->d_name);
+            data[j] = load_file(path, dp->d_name, sizes + j);
+            j++;
+        }
 skip:
         free(buf);	
     }
-
     return j;
 }
 
