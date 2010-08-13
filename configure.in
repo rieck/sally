@@ -58,6 +58,30 @@ if test "x$ENABLE_OPENMP" = "xyes" ; then
    CFLAGS="$CFLAGS $OPENMP_CFLAGS"
 fi 
 
+# libarchive
+AC_ARG_ENABLE(libarchive,
+    [  --enable-libarchive     enable support for loading archives. ],
+    [
+        if test "x$enableval" = "xyes" ; then
+                ENABLE_LIBARCHIVE=yes
+                AC_DEFINE(ENABLE_LIBARCHIVE, 1, [Enable support for loading archives])
+        else
+                ENABLE_LIBARCHIVE=no
+        fi
+    ], [ ENABLE_LIBARCHIVE=no ]
+)
+
+AC_CHECK_HEADERS([archive.h], HEADER_LIBARCHIVE="yes")
+AC_CHECK_LIB([archive], archive_read_new, LIBRARY_LIBARCHIVE="yes")
+
+if test "x$ENABLE_LIBARCHIVE" = "xyes" ; then
+    if test "x$LIBRARY_LIBARCHIVE" != "x" && test "x$HEADER_LIBARCHIVE" != "x" ; then
+        LIBS="-larchive $LIBS"
+    else
+        AC_MSG_ERROR([libarchive requested but not available])
+    fi
+fi
+
 # Check headers
 AC_CHECK_HEADERS([getopt.h string.h strings.h])
 AC_CHECK_HEADERS([uthash.h uthash/uthash.h], HEADER_UTHASH="yes")
@@ -90,6 +114,7 @@ AC_CONFIG_FILES([
 AC_OUTPUT_COMMANDS([],[
    ENABLE_OPENMP=$ENABLE_OPENMP
    ENABLE_MD5HASH=$ENABLE_MD5HASH
+   ENABLE_LIBARCHIVE=$ENABLE_LIBARCHIVE
 ])
 
 AC_OUTPUT
@@ -97,4 +122,5 @@ AC_OUTPUT
 echo
 echo " .Oo Features:"
 echo "     Support for multi-processing (--enable-openmp):        $ENABLE_OPENMP"
+echo "     Support for loading archives (--enable-libarchive):    $ENABLE_LIBARCHIVE"
 echo "     MD5 as alternative hash (--enable-md5hash):            $ENABLE_MD5HASH"

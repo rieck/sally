@@ -16,7 +16,7 @@ case $arg in
        CPPFLAGS="-I $HOME/usr/include" \
        CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
        CXXFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
-       ./configure --enable-openmp --prefix=$HOME/usr
+       ./configure --enable-openmp --enable-libarchive --prefix=$HOME/usr
        ;;       
 
    twoface*|rieck*)
@@ -25,7 +25,7 @@ case $arg in
        CXX="g++-mp-4.4" \
        CFLAGS="-march=native -DDEBUG -g -pedantic -pipe -O2" \
        CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe -O2" \
-       ./configure --enable-openmp --prefix=/opt/rieck
+       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
    *)    

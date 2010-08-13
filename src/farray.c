@@ -349,19 +349,20 @@ farray_t *farray_extract_arc(char *arc, sally_t *sa)
     /* Read contents */
 #pragma omp parallel for shared(a) private(name,raw) ordered
     for (i = 0; i < total; i++) {
-
+        long len = 0;
 #pragma omp critical (farray)
         {
             /* Perform reading of archive in critical region */
             archive_read_next_header(a, &entry);
             const struct stat *s = archive_entry_stat(entry);
+            len = s->st_size;
             if (!S_ISREG(s->st_mode)) {
                 raw = NULL;
                 archive_read_data_skip(a);
                 name = NULL;
             } else {
-                raw = malloc(s->st_size * sizeof(char));
-                archive_read_data(a, raw, s->st_size);
+                raw = malloc(len * sizeof(char));
+                archive_read_data(a, raw, len);
                 name = strdup((char *) archive_entry_pathname(entry));
             }
         }
@@ -371,7 +372,7 @@ farray_t *farray_extract_arc(char *arc, sally_t *sa)
             continue;
             
         /* Extract feature vector from string */
-        fvec_t *fv = fvec_extract(raw, s->st_size, sa);
+        fvec_t *fv = fvec_extract(raw, len, sa);
                 
         /* Set additional information */
         fvec_set_source(fv, name);
@@ -379,8 +380,6 @@ farray_t *farray_extract_arc(char *arc, sally_t *sa)
         
 #pragma omp critical (farray)
         farray_add(fa, fv);
-
-skip:
         free(raw);
         free(name);
     }
