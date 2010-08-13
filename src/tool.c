@@ -12,7 +12,6 @@
 #include "config.h"
 #include "common.h"
 #include "sally.h"
-#include "farray.h"
 
 extern int verbose;
 
@@ -106,16 +105,13 @@ static void parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-    /* Create Sally configuration */
+    /* Create Sally */
     sa = sally_create();    
 
     /* Parse options */
     parse_options(argc, argv);
     char **data = argv + optind; 
     int len = argc - optind;
-
-    farray_t *fa = sally_import(sa, data, len);
-    farray_print(stdout, fa, sa);
     
     /* Destroy Sally */
     sally_destroy(sa);
