@@ -1,4 +1,4 @@
-# Sally - A Library for String Features and String Kernels
+# Sally - A Tool for Embedding Strings in a Vector Space
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 AC_INIT([sally], [0.1.0], [konrad@mlsec.org])
@@ -9,7 +9,7 @@ AC_PREFIX_DEFAULT("/usr/local")
 LIB_VERSION=1:1:1
 
 echo
-echo "  .Oo Sally - A Library for String Features and String Kernels"
+echo "  .Oo Sally - A Tool for Embedding Strings in a Vector Space"
 echo "      Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)"
 echo
 

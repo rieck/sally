@@ -1,4 +1,4 @@
-# Sally - A Library for String Features and String Kernels
+# Sally - A Tool for Embedding Strings in a Vector Space
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 man1_MANS = sally.man 
