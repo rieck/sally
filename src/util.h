@@ -32,8 +32,5 @@
 void err_msg(char *, const char *, char *, ...);
 void info_msg(int, char *, ...);
 double time_stamp();
-char *file_suffix(char *file);
-void list_dentries(char *dir, int *fnum, int *total);
-char *load_file(char *path, char *name);
 
 #endif                          /* UTIL_H */

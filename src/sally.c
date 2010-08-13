@@ -23,12 +23,44 @@
 #include "common.h"
 #include "sally.h"
 #include "util.h"
-#include "fvec.h"
+#include "farray.h"
 #include "fhash.h"
 #include "sally.h"
 
 /* Global verbosity */
 int verbose = 0;
+
+/**
+ * Imports data using Sally configuration
+ * @param sa Sally configuration
+ * @param data Files, directories ... 
+ * @param len Length of array 
+ */
+farray_t *sally_import(sally_t *sa, char **data, int len) 
+{
+    farray_t *fa = NULL;
+    int i = 0;
+        
+    for (i = 0; i < len; i++) {
+
+        info_msg(1, "Extracting features from %s.", data[i]);         
+        farray_t *f = farray_extract_dir(data[i], sa);
+        if (!f) {
+            error("Could not extract features from '%s'", data[i]);
+            continue;
+        }
+        
+        if (!fa) 
+            fa = f;
+        else 
+            farray_merge(fa, f);
+    }
+    
+    if (!fa) 
+        error("No data extracted. Shrug.");
+
+    return fa;
+}
 
 /**
  * Creates a Sally configuration. The function allocates memory and sets all 
