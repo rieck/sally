@@ -12,8 +12,9 @@
 #ifndef IN_DIR_H
 #define IN_DIR_H
 
-int input_open_dir(char *);
-int input_read_dir(char **, int *, char **, int);
-void input_close_dir();
+int input_dir_open(char *);
+int input_dir_read(char **, int *, char **, int);
+void input_dir_close();
+float input_arc_desc2label(char *);
 
 #endif                          /* IN_DIR_H */

@@ -19,10 +19,9 @@
 
 #include "config.h"
 #include "common.h"
-#include "fvec.h"
 #include "util.h"
-
 #include "in_dir.h"
+#include "murmur.h"
 
 /* Local functions */
 static char *load_file(char *path, char *name, int *size);
@@ -36,7 +35,7 @@ static char *path = NULL;
  * @param p Directory name
  * @return number of regular files
  */
-int input_open_dir(char *p) 
+int input_dir_open(char *p) 
 {
     assert(p);    
     struct dirent *dp;
@@ -68,7 +67,7 @@ int input_open_dir(char *p)
  * @param len Length of block
  * @return number of read files
  */
-int input_read_dir(char **data, int *sizes, char **names, int len)
+int input_dir_read(char **data, int *sizes, char **names, int len)
 {
     assert(data && sizes && names);
     int i, j = 0;
@@ -106,7 +105,7 @@ skip:
 /**
  * Closes an open directory.
  */
-void input_close_dir()
+void input_dir_close()
 {
     closedir(dir);
 }
@@ -158,5 +157,35 @@ static char *load_file(char *path, char *name, int *size)
 
     return x;
 }
+
+/** 
+ * Converts a file name to a label. The label is computed from the 
+ * file's suffix; either directly if the suffix is a number or 
+ * indirectly by hashing.
+ * @param desc Description (file name) 
+ * @return label value.
+ */
+float input_dir_desc2label(char *desc)
+{
+    char *endptr;
+    char *name = desc + strlen(desc) - 1;
+
+    /* Determine dot in file name */
+    while (name != desc && *name != '.')
+        name--; 
+
+    /* Place pointer before '.' */
+    if (name != desc)
+        name++;
+
+    /* Test direct conversion */
+    float f = strtof(name, &endptr);
+    
+    /* Compute hash value */
+    if (!endptr || strlen(endptr) > 0) 
+        f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
+    
+    return f;
+} 
 
 /** @} */

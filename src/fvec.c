@@ -451,17 +451,9 @@ void fvec_set_source(fvec_t *fv, char *s)
  * @param fv Feature vector
  * @param l Label string
  */
-void fvec_set_label(fvec_t *fv, char *l)
+void fvec_set_label(fvec_t *fv, float l)
 {
-    unsigned char buf[MD5_DIGEST_LENGTH];
-    char *endptr = NULL;
-
-    fv->label = (unsigned int) strtol(l, &endptr, 10);
-    
-    if (!endptr || strlen(endptr) > 0) {
-        MD5((unsigned char *) l, strlen(l), buf);
-        memcpy(&(fv->label), buf, sizeof(fv->label));
-    }
+    fv->label = l;
 }
 
 /**
@@ -475,7 +467,7 @@ void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
     assert(fv);
     int i, j;
 
-    fprintf(f, "# Feature vector [src: %s, label: %u, len: %lu, total: %lu]\n", 
+    fprintf(f, "# Feature vector [src: %s, label: %g, len: %lu, total: %lu]\n", 
            fv->src, fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
@@ -516,9 +508,9 @@ fvec_t *fvec_load(FILE *z)
     }
 
     fgets(buf, 512, z);
-    r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%hu\n",
+    r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%g\n",
                (unsigned long *) &f->len, (unsigned long *) &f->total,
-               (unsigned short *) &f->label);
+               (float *) &f->label);
     if (r != 3) 
         goto err;
 
@@ -567,7 +559,7 @@ void fvec_save(fvec_t *f, FILE * z)
     assert(f && z);
     int i;
 
-    fprintf(z, "fvec: len=%lu, total=%lu, label=%hu\n",
+    fprintf(z, "fvec: len=%lu, total=%lu, label=%g\n",
              f->len, f->total, f->label);
     fprintf(z, "  %s\n", f->src);
     for (i = 0; i < f->len; i++)

@@ -13,9 +13,12 @@
 #define IN_ARC_H
 
 #ifdef ENABLE_LIBARCHIVE
-int input_open_arc(char *);
-int input_read_arc(char **, int *, char **, int);
-void input_close_arc();
+
+int input_arc_open(char *);
+int input_arc_read(char **, int *, char **, int);
+void input_arc_close();
+float input_arc_desc2label(char *);
+
 #endif                          /* ENABLE_LIBARCHIVE */
 
 #endif                          /* IN_ARC_H */

@@ -32,7 +32,7 @@ typedef struct {
     float *val;             /**< List of values */
     unsigned long len;      /**< Length of list */
     unsigned long total;    /**< Total features in string */
-    unsigned short label;   /**< Label of features */
+    float label;            /**< Label of features */
     char *src;              /**< Source of features */
 } fvec_t;
 
@@ -42,7 +42,7 @@ void fvec_destroy(fvec_t *);
 fvec_t *fvec_clone(fvec_t *);
 void fvec_print(FILE *, fvec_t *, sally_t *);
 void fvec_realloc(fvec_t *);
-void fvec_set_label(fvec_t *fv, char *l);
+void fvec_set_label(fvec_t *fv, float l);
 void fvec_set_source(fvec_t *fv, char *s);
 void fvec_save(fvec_t *f, FILE * z);
 fvec_t *fvec_load(FILE *);

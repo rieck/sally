@@ -13,6 +13,8 @@
 #include "common.h"
 #include "sally.h"
 
+#include "in_arc.h"
+
 extern int verbose;
 
 /* Static variables */
@@ -119,10 +121,12 @@ int main(int argc, char **argv)
     char *names[BLOCK];
     int sizes[BLOCK];
     
-    int num = input_open_dir(data[0]);
+    printf("%s %f\n", data[0], input_arc_desc2label(data[0]));
     
+#if 0    
+    int num = input_arc_open(data[0]);    
     while (num > 0) {
-        int r = input_read_dir(files, sizes, names, BLOCK);
+        int r = input_arc_read(files, sizes, names, BLOCK);
         num -= r;
         
         int i;
@@ -130,6 +134,8 @@ int main(int argc, char **argv)
             printf("%s(%d) ", names[i], sizes[i]);
         printf("\n");
     }
+    input_arc_close();
+#endif
     
     /* Destroy Sally */
     sally_destroy(sa);

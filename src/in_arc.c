@@ -20,6 +20,7 @@
 #include "config.h"
 #include "common.h"
 #include "util.h"
+#include "murmur.h"
 
 #ifdef ENABLE_LIBARCHIVE
 
@@ -35,7 +36,7 @@ static struct archive *a = NULL;
  * @param name Archive name
  * @return number of regular files
  */
-int input_open_arc(char *name) 
+int input_arc_open(char *name) 
 {
     assert(name);    
     struct archive_entry *entry;
@@ -70,15 +71,15 @@ int input_open_arc(char *name)
 /**
  * Reads a block of files into memory.
  * @param sa Sally configuration
- * @param data Array for file data
- * @param sizes Array of file sizes
- * @param names Array of file names
+ * @param data Array for data
+ * @param sizes Array for sizes
+ * @param desc Array for descriptions
  * @param len Length of block
  * @return number of read files
  */
-int input_read_arc(char **data, int *sizes, char **names, int len)
+int input_arc_read(char **data, int *sizes, char **desc, int len)
 {
-    assert(data && sizes && names);
+    assert(data && sizes && desc);
     struct archive_entry *entry;
     int i, j = 0;
     
@@ -95,7 +96,7 @@ int input_read_arc(char **data, int *sizes, char **names, int len)
         /* Add entry */
         data[j] = malloc(s->st_size * sizeof(char));
         archive_read_data(a, data[j], s->st_size);
-        names[j] = strdup(archive_entry_pathname(entry));
+        desc[j] = strdup(archive_entry_pathname(entry));
         sizes[j] = s->st_size;
         j++;
     }
@@ -106,10 +107,40 @@ int input_read_arc(char **data, int *sizes, char **names, int len)
 /**
  * Closes an open directory.
  */
-void input_close_arc()
+void input_arc_close()
 {
     archive_read_finish(a);
 }
+
+/** 
+ * Converts a file name to a label. The label is computed from the 
+ * file's suffix; either directly if the suffix is a number or 
+ * indirectly by hashing.
+ * @param desc Description (file name) 
+ * @return label value.
+ */
+float input_arc_desc2label(char *desc)
+{
+    char *endptr;
+    char *name = desc + strlen(desc) - 1;
+
+    /* Determine dot in file name */
+    while (name != desc && *name != '.')
+        name--; 
+
+    /* Place pointer before '.' */
+    if (name != desc)
+        name++;
+
+    /* Test direct conversion */
+    float f = strtof(name, &endptr);
+    
+    /* Compute hash value */
+    if (!endptr || strlen(endptr) > 0) 
+        f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
+    
+    return f;
+} 
 
 #endif
 
