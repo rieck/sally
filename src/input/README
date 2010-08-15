@@ -1,16 +1,17 @@
 
 Develop input modules
 
-Create files 
+Create files and add to Makefile.am
   input_xxx.c 
   input_xxx.h
 
-Implement functions 
+Implement functions in input_xxx.c
   input_xxx_open(), 
   input_xxx_read(), 
   input_xxx_close(),
   input_xxx_desc2label()
 
-Integrate code to input.h
-  include <input_xxx.h>
+Integrate code in input.c and input.h
+  add INPUT_XXX to input.x
+  add include <input_xxx.h>
   extend input_config()

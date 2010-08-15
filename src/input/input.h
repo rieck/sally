@@ -22,22 +22,13 @@ typedef enum {
 #endif    
 } input_t;
 
+/* Configuration */
+void input_config(input_t);
+
 /* Generic interface */
 int input_open(char *);
 int input_read(char **, int *, char **, int);
 void input_close(void);
 float input_desc2label(char *);
-
-/* Directoy module */
-int input_dir_open(char *);
-int input_dir_read(char **, int *, char **, int);
-void input_dir_close(void);
-float input_dir_desc2label(char *);
-
-/* Archive module */
-int input_arc_open(char *);
-int input_arc_read(char **, int *, char **, int);
-void input_arc_close(void);
-float input_arc_desc2label(char *);
 
 #endif                          /* INPUT_H */
