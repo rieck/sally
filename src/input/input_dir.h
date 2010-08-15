@@ -9,12 +9,13 @@
  * warranty. See the GNU General Public License for more details. 
  */
  
-#ifndef IN_DIR_H
-#define IN_DIR_H
+#ifndef INPUT_DIR_H
+#define INPUT_DIR_H
 
+/* Directoy module */
 int input_dir_open(char *);
 int input_dir_read(char **, int *, char **, int);
-void input_dir_close();
-float input_arc_desc2label(char *);
+void input_dir_close(void);
+float input_dir_desc2label(char *);
 
-#endif                          /* IN_DIR_H */
+#endif                          /* INPUT_DIR_H */

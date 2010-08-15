@@ -20,7 +20,7 @@
 #include "config.h"
 #include "common.h"
 #include "util.h"
-#include "in_dir.h"
+#include "input.h"
 #include "murmur.h"
 
 /* Local functions */

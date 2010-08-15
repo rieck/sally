@@ -26,7 +26,7 @@
 
 #include <archive.h>
 #include <archive_entry.h>
-#include "in_arc.h"
+#include "input.h"
 
 /* Local variables */
 static struct archive *a = NULL;

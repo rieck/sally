@@ -13,8 +13,6 @@
 #include "common.h"
 #include "sally.h"
 
-#include "in_arc.h"
-
 extern int verbose;
 
 /* Static variables */
@@ -112,30 +110,6 @@ int main(int argc, char **argv)
 
     /* Parse options */
     parse_options(argc, argv);
-    char **data = argv + optind; 
-    int len = argc - optind;
-
-    #define BLOCK 5
-
-    char *files[BLOCK];
-    char *names[BLOCK];
-    int sizes[BLOCK];
-    
-    printf("%s %f\n", data[0], input_arc_desc2label(data[0]));
-    
-#if 0    
-    int num = input_arc_open(data[0]);    
-    while (num > 0) {
-        int r = input_arc_read(files, sizes, names, BLOCK);
-        num -= r;
-        
-        int i;
-        for (i = 0; i < r; i++)
-            printf("%s(%d) ", names[i], sizes[i]);
-        printf("\n");
-    }
-    input_arc_close();
-#endif
     
     /* Destroy Sally */
     sally_destroy(sa);
