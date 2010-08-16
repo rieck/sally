@@ -1,4 +1,13 @@
 
+ Sally - A Tool for Embedding Strings in Vector Spaces
+ Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ --
+
+ Development of Input Modules
+ 
+ 
+
+
 Develop input modules
 
 Create files and add to Makefile.am

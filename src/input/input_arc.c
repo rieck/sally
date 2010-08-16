@@ -10,9 +10,7 @@
  */
 
 /** 
- * @defgroup input Input functions
- * Implementation of various functions for reading data.
- *
+ * @defgroup input 
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -70,7 +68,6 @@ int input_arc_open(char *name)
 
 /**
  * Reads a block of files into memory.
- * @param sa Sally configuration
  * @param data Array for data
  * @param sizes Array for sizes
  * @param desc Array for descriptions

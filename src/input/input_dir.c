@@ -10,9 +10,7 @@
  */
 
 /** 
- * @defgroup input Input functions
- * Implementation of various functions for reading data.
- *
+ * @defgroup input 
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -60,7 +58,6 @@ int input_dir_open(char *p)
 
 /**
  * Reads a block of files into memory.
- * @param sa Sally configuration
  * @param data Array for file data
  * @param sizes Array of file sizes
  * @param names Array of file names

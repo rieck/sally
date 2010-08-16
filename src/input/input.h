@@ -12,18 +12,8 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-/** 
- * Supported input modes 
- */
-typedef enum {
-    INPUT_DIR, 		/* Read files from directory */
-#ifdef ENABLE_LIBARCHIVE
-    INPUT_ARC,		/* Read files from archive */
-#endif    
-} input_t;
-
 /* Configuration */
-void input_config(input_t);
+void input_config(char *);
 
 /* Generic interface */
 int input_open(char *);

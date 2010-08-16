@@ -490,7 +490,7 @@ void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
 
 /**
  * Loads a feature vector form a file stream
- * @param f File pointer
+ * @param z File pointer
  * @return Feature vector
  */
 fvec_t *fvec_load(FILE *z)

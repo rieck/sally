@@ -10,11 +10,7 @@
  */
 
 /** 
- * @defgroup fvec Mathematics for feature vector
- *
- * Implementations of simple mathetmatical functions for feature 
- * vectors, such as normalizations, dot product, addition and so on.
- *
+ * @defgroup fvec 
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */

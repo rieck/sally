@@ -10,7 +10,7 @@
  */
 
 /** 
- * @defgroup sally Main interface for Sally.
+ * @defgroup sally Sally interface
  *
  * Functions and structures for interfacing with Sally. This file 
  * contains the main code for using Sally from within other projects.
