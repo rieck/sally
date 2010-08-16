@@ -4,6 +4,10 @@
 
 B<sally> -- a tool for embedding strings in vector spaces
 
+=head1 SYNOPSIS
+
+B<sally> [B<-hvV>] I<config> I<input> I<output>
+
 =head1 DESCRIPTION
 
 B<sally> is not an acronym.
