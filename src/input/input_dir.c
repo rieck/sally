@@ -58,13 +58,13 @@ int input_dir_open(char *p)
 
 /**
  * Reads a block of files into memory.
- * @param data Array for file data
+ * @param strs Array for file data
  * @param sizes Array of file sizes
  * @param names Array of file names
  * @param len Length of block
  * @return number of read files
  */
-int input_dir_read(char **data, int *sizes, char **names, int len)
+int input_dir_read(char **strs, int *sizes, char **names, int len)
 {
     assert(data && sizes && names);
     int i, j = 0;
@@ -90,7 +90,7 @@ int input_dir_read(char **data, int *sizes, char **names, int len)
 #pragma omp critical
         {
             names[j] = strdup(dp->d_name);
-            data[j] = load_file(path, dp->d_name, sizes + j);
+            strs[j] = load_file(path, dp->d_name, sizes + j);
             j++;
         }
 skip:

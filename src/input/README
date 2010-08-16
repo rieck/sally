@@ -1,26 +1,52 @@
 
- Sally - A Tool for Embedding Strings in Vector Spaces
- Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
- --
+Sally - A Tool for Embedding Strings in Vector Spaces
+Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+--
 
- Development of Input Modules
- 
- 
+Development of Input Modules
 
-
-Develop input modules
-
-Create files and add to Makefile.am
-  input_xxx.c 
-  input_xxx.h
-
-Implement functions in input_xxx.c
-  input_xxx_open(), 
-  input_xxx_read(), 
-  input_xxx_close(),
-  input_xxx_desc2label()
-
-Integrate code in input.c and input.h
-  add INPUT_XXX to input.x
-  add include <input_xxx.h>
-  extend input_config()
+  Sally can be easily extended to support different formats of strings as
+  input data.  In particular, the development of a new input module involves
+  three steps, where we denote the new input format as 'xxx':
+  
+  1) Create source files 'input_xxx.c' and 'input_xxx.h' for the functions
+     and declarations of the input module.  Add these files to 'Makefile.am'
+     to include them in compilation
+  
+  2) Implement four functions in 'input_xxx.c' and add declarations of these
+     functions to 'input_xxx.h'.  The functions are as follows:
+      
+     input_xxx_open(char *name) 
+     
+     This function opens the input source for the format xxx for reading of
+     data.  For example, if 'xxx' refers to an archive, this functions
+     corresponds to opening the archive and preparing it for loading its
+     entries.  The function return 1 on success and 0 on failure.
+     
+     input_xxx_read(char **strs, int *sizes, char **desc, int len)
+     
+     This function reads a block of strings from the input source. The
+     provided arrays need to be allocated by the caller, where their length
+     is provided in the parameter 'len'.  The meaning of the other
+     parameters are as follows: strs is used to store the loaded strings,
+     sizes is an array for the length of the strings, and desc an array of
+     descriptions.  The function returns the number of loaded strings; 0
+     indicates the end of the input source.
+       
+     input_xxx_close()
+     
+     This function closes the input source for the format xxx. Memory
+     allocated by input_xxx_open() should be freed.
+     
+     input_xxx_desc2label()
+     
+     This function converts a description string into a float number. It is
+     used to extract labels from the descriptions.  If no labels are
+     contained this function should return 0 or 1.
+    
+  3) Integrate the new interface into Sally by extending the code in
+     'input.c'. First, ass 'input_xxx.h' to the list of included headers
+     and, second, extend the function input_config() to initialize the new
+     format if requested.
+     
+         

@@ -68,13 +68,13 @@ int input_arc_open(char *name)
 
 /**
  * Reads a block of files into memory.
- * @param data Array for data
+ * @param strs Array for data
  * @param sizes Array for sizes
  * @param desc Array for descriptions
  * @param len Length of block
  * @return number of read files
  */
-int input_arc_read(char **data, int *sizes, char **desc, int len)
+int input_arc_read(char **strs, int *sizes, char **desc, int len)
 {
     assert(data && sizes && desc);
     struct archive_entry *entry;
@@ -91,8 +91,8 @@ int input_arc_read(char **data, int *sizes, char **desc, int len)
         }
         
         /* Add entry */
-        data[j] = malloc(s->st_size * sizeof(char));
-        archive_read_data(a, data[j], s->st_size);
+        strs[j] = malloc(s->st_size * sizeof(char));
+        archive_read_data(a, strs[j], s->st_size);
         desc[j] = strdup(archive_entry_pathname(entry));
         sizes[j] = s->st_size;
         j++;

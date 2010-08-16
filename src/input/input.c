@@ -75,15 +75,15 @@ int input_open(char *name)
 
 /**
  * Wrapper for reading a block from the input source.
- * @param data Allocated array for data pointers
+ * @param strs Allocated array for data pointers
  * @param sizes Allocated array for data sizes
  * @param desc Allocated array for descriptions
  * @param len Length of allocated arrays
  * @return Number of read sequences
  */
-int input_read(char **data, int *sizes, char **desc, int len)
+int input_read(char **strs, int *sizes, char **desc, int len)
 {
-    return func.input_read(data, sizes, desc, len);
+    return func.input_read(strs, sizes, desc, len);
 }
 
 /**
