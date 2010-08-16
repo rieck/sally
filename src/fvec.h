@@ -13,7 +13,6 @@
 #define FVEC_H
 
 #include <stdint.h>
-#include "sally.h"
 
 /** Data type for a feature */
 typedef uint64_t 	feat_t;
@@ -37,7 +36,7 @@ typedef struct {
 } fvec_t;
 
 /* Functions */
-fvec_t *fvec_extract(char *, int l, sally_t *);
+fvec_t *fvec_extract(char *, int l);
 void fvec_destroy(fvec_t *);
 fvec_t *fvec_clone(fvec_t *);
 void fvec_print(FILE *, fvec_t *, sally_t *);

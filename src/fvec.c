@@ -37,14 +37,21 @@
 #include "murmur.h"
 #include "sally.h"
 
+/* External variables */
+extern int verbose;
+extern config_t cfg;
+
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l, int d, sally_t *);
-static void extract_ngrams(fvec_t *, char *x, int l, sally_t *);
+static void extract_wgrams(fvec_t *, char *x, int l, int d);
+static void extract_ngrams(fvec_t *, char *x, int l);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
-static void cache_put(fentry_t *c, fvec_t *fv, sally_t *sa, char *t, int l);
-static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa);
+static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
+static void cache_flush(fentry_t *c, fvec_t *fv);
 
+/* Delimiter functions and table */
+static void decode_delim(const char *s);
+static char delim[256] = { DELIM_NOT_INIT };
 
 /**
  * Allocates and extracts a feature vector from a string.
@@ -53,7 +60,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa);
  * @param sa Sally configuration
  * @return feature vector
  */
-fvec_t *fvec_extract(char *x, int l, sally_t *sa)
+fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
     int d;

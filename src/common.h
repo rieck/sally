@@ -47,6 +47,12 @@
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
+#ifdef HAVE_ZLIB_H
+#include <zlib.h>
+#endif
+#ifdef HAVE_LIBCONFIG_H
+#include <libconfig.h>
+#endif
 
 #ifndef TRUE
 #define TRUE 1

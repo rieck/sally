@@ -14,28 +14,18 @@
 #include "sally.h"
 
 extern int verbose;
-
-/* Static variables */
-static sally_t *sa = NULL;
+exter cfg_t cfg;
 
 /**
  * Print usage of command line tool
  */  
 static void print_usage(void)
 {
-    printf("Usage: sally [options]\n"
+    printf("Usage: sally [options] <config> <input> <output>\n"
            "Options:\n"
-           "  -n <nlen>      Set length of n-grams. Default: %d\n"
-           "  -d <delim>     Set delimiter characters. Default: '%s'\n"
-           "  -e <embed>     Set embedding mode (cnt, bin). Default: '%s'\n"
-           "  -r <norm>      Set normalization mode (l1, l2). Default: '%s'\n"
-           "  -b <bits>      Set bits for hashing function. Default: %d\n"
-           "  -t             Enable global feature hash table.\n"
            "  -v             Increase verbosity.\n"
            "  -V             Print version and copyright.\n"
-           "  -h             Print this help screen.\n", DEFAULT_NLEN, 
-           DEFAULT_DELIM, sally_embed2str(DEFAULT_EMBED), 
-           sally_norm2str(DEFAULT_NORM), DEFAULT_BITS);
+           "  -h             Print this help screen.\n");
 }
 
 /**
@@ -43,7 +33,7 @@ static void print_usage(void)
  */
 static void print_version(void)
 {
-    sally_version(stdout);
+    sally_version(stdout, "");
 }
 
 /**
@@ -54,26 +44,8 @@ static void print_version(void)
 static void parse_options(int argc, char **argv)
 {
     int ch;
-    while ((ch = getopt(argc, argv, "n:e:r:d:b:thvV")) != -1) {
+    while ((ch = getopt(argc, argv, "hvV")) != -1) {
         switch (ch) {
-            case 'n':
-                sa->nlen = atoi(optarg);
-                break;
-            case 'e':
-                sa->embed = sally_str2embed(optarg);
-                break;
-            case 'r':
-                sa->norm = sally_str2norm(optarg);
-                break;
-            case 'd':
-                sally_set_delim(sa, DEFAULT_DELIM);
-                break;
-            case 'b':
-                sa->bits = atoi(optarg);
-                break;
-            case 't':
-                sally_enable_fhash(sa);
-                break;
             case 'v':
                 verbose++;
                 break;
@@ -91,10 +63,6 @@ static void parse_options(int argc, char **argv)
     
     argc -= optind;
     argv += optind;
-    
-    if (verbose)
-        sally_print(stdout, sa);
-        
 }
 
 /**
@@ -105,12 +73,6 @@ static void parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-    /* Create Sally */
-    sa = sally_create();    
-
     /* Parse options */
     parse_options(argc, argv);
-    
-    /* Destroy Sally */
-    sally_destroy(sa);
 }
