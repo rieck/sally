@@ -42,8 +42,8 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l, int d);
-static void extract_ngrams(fvec_t *, char *x, int l);
+static void extract_wgrams(fvec_t *, char *x, int l, int n, int b);
+static void extract_ngrams(fvec_t *, char *x, int l, int n, int b);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
@@ -63,8 +63,9 @@ static char delim[256] = { DELIM_NOT_INIT };
 fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
-    int d;
-    assert(x && sa && l >= 0);
+    long nlen, bits;
+    const char *dlm_str, *cfg_str;
+    assert(x && l >= 0);
 
     /* Allocate feature vector */
     fv = calloc(1, sizeof(fvec_t));
@@ -89,29 +90,39 @@ fvec_t *fvec_extract(char *x, int l)
         fvec_destroy(fv);
         return NULL;
     }
-
-    /* Find first delimiter symbol */
-    for (d = 0; !DELIM(sa, d) && d < 256; d++);
     
-    /* Check for byte or word n-grams */
-    if (d == 256)
-        extract_ngrams(fv, x, l, sa);
-    else
-        extract_wgrams(fv, x, l, d, sa);
+
+    /* Get configuration */
+    config_lookup_int(&cfg, "features.nlen", (long *) &nlen);
+    config_lookup_int(&cfg, "features.bits", (long *) &bits);
+    config_lookup_string(&cfg, "features.delim", &dlm_str);
+
+    /* N-grams of bytes */
+    if (!dlm_str || strlen(dlm_str) == 0) {
+        /* Feature extraction */
+        extract_ngrams(fv, x, l, nlen, bits);
+    } else {
+        if (delim[0] == DELIM_NOT_INIT) {
+            memset(delim, 0, 256);
+            decode_delim(dlm_str);
+        }
+
+        /* Feature extraction */
+        extract_wgrams(fv, x, l, nlen, bits);
+    }
 
     /* Sort extracted features */
     qsort(fv->dim, fv->len, sizeof(feat_t), cmp_feat);
 
     /* Count features  */
     count_feat(fv);
-    
-    /* Binarize if requested */
-    if (sa->embed == EMBED_BIN)
-        fvec_binarize(fv);
 
-    /* Compute normalization */
-    fvec_norm(fv, sa->norm);    
-    
+    /* Compute embedding and normalization */
+    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    fvec_embed(fv, cfg_str);
+    config_lookup_string(&cfg, "features.norm", &cfg_str);
+    fvec_norm(fv, cfg_str);
+
     return fv;
 }
 
@@ -119,11 +130,10 @@ fvec_t *fvec_extract(char *x, int l)
  * Caches a feature for later addition to the feature hash table
  * @param c Pointer to cache
  * @param fv Feature vector
- * @param sa Sally configuration
  * @param t Pointer to feature
  * @param l Length of feature
  */
-static void cache_put(fentry_t *c, fvec_t *fv, sally_t *sa, char *t, int l) 
+static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l) 
 {
     c[fv->len].len = l;
     c[fv->len].key = fv->dim[fv->len];
@@ -138,9 +148,8 @@ static void cache_put(fentry_t *c, fvec_t *fv, sally_t *sa, char *t, int l)
  * Flushs all features from the cache to the feature hash table.
  * @param c Pointer to cache
  * @param fv Feature vector
- * @param sa Sally configuration
  */
-static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa) 
+static void cache_flush(fentry_t *c, fvec_t *fv) 
 {
     int i; 
     
@@ -148,7 +157,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa)
 #pragma omp critical
     {
         for (i = 0; i < fv->len; i++) {
-            fhash_put(sa->fhash, c[i].key, c[i].data, c[i].len);
+            fhash_put(c[i].key, c[i].data, c[i].len);
             free(c[i].data);
         }
     }
@@ -160,13 +169,14 @@ static void cache_flush(fentry_t *c, fvec_t *fv, sally_t *sa)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
+ * @param n N-gram length
+ * @param b Bit of hash
  * @param d First delimiter
- * @param sa Sally configuration 
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
+static void extract_wgrams(fvec_t *fv, char *x, int l, int n, int b)
 {
-    assert(fv && x &&  sa && l > 0);
-    unsigned int i, j = l, k = 0, s = 0, n = 0, o = 0;
+    assert(fv && x && l > 0);
+    unsigned int i, j = l, k = 0, s = 0, q = 0, d;
     char *t = malloc(l + 1);
     fentry_t *cache = NULL;
 #ifdef ENABLE_MD5HASH    
@@ -174,15 +184,18 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
 #endif    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (sa->bits - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (b - 1)) - 1; 
 
-    if (sa->fhash)
+    if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
+
+    /* Find first delimiter symbol */
+    for (d = 0; !delim[(unsigned char) d] && d < 256; d++);
 
     /* Remove redundant delimiters */
     for (i = 0, j = 0; i < l; i++) {
-        if (DELIM(sa, x[i])) {
-            if (j == 0 || DELIM(sa, t[j - 1]))
+        if (delim[(unsigned char) x[i]]) {
+            if (j == 0 || delim[(unsigned char) t[j - 1]])
                 continue;
             t[j++] = (char) d;
         } else {
@@ -199,18 +212,13 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
         t[j++] = (char) d;
 
     /* Extract n-grams */
-    for (k = i = o = 0; i < j; i++) {
-    
-        /* Count delimiters */
-        if (t[i] == d) {
-            n++;
-            if (n == 1)          /* Remember first starting point */
+    for (k = i = 0; i < j; i++) {
+        /* Count delimiters and remember start poisition*/
+        if (t[i] == d && ++q == 1)      
                 s = i;
-            o = i;               /* Remember word starting point */
-        } 
         
         /* Store n-gram */
-        if (n == sa->nlen && i - k > 0) {
+        if (q == n && i - k > 0) {
 
 #ifdef ENABLE_MD5HASH        
             MD5((unsigned char *) (t + k), i - k, buf);
@@ -222,10 +230,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
-            if (sa->fhash) 
-                cache_put(cache, fv, sa, (t + k) , i - k);
+            if (fhash_enabled()) 
+                cache_put(cache, fv, t + k, i - k);
             
-            k = s + 1, i = s, n = 0, o = s;
+            k = s + 1, i = s, q = 0;
             fv->len++;
         }
     }
@@ -234,11 +242,11 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
     /* Save extracted n-grams */
     fv->total = fv->len;
     
-    if (!sa->fhash)
+    if (!fhash_enabled())
         return;
 
     /* Flush cache */
-    cache_flush(cache, fv, sa);
+    cache_flush(cache, fv);
     free(cache);    
 }
 
@@ -249,11 +257,12 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int d, sally_t *sa)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param sa Sally structure
+ * @param n N-gram length
+ * @param b Bits for hash
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *sa)
+static void extract_ngrams(fvec_t *fv, char *x, int l, int n, int b)
 {
-    assert(fv && x && sa);
+    assert(fv && x);
 
     unsigned int i = 0;
     char *t = x;
@@ -263,38 +272,38 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, sally_t *sa)
 #endif    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (sa->bits - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (b - 1)) - 1; 
 
-    if (sa->fhash)
+    if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
-        if (t + sa->nlen > x + l)
+        if (t + n > x + l)
             break;
 
 #ifdef ENABLE_MD5HASH        
-        MD5((unsigned char *) t, sa->nlen, buf);
+        MD5((unsigned char *) t, n, buf);
         memcpy(fv->dim + fv->len, buf, sizeof(feat_t));
 #else            
-        fv->dim[fv->len] = MurmurHash64B(t, sa->nlen, 0x12345678); 
+        fv->dim[fv->len] = MurmurHash64B(t, n, 0x12345678); 
 #endif    
         fv->dim[fv->len] &= hash_mask; 
         fv->val[fv->len] = 1;
         
         /* Cache feature */
-        if (sa->fhash)
-            cache_put(cache, fv, sa, t, sa->nlen);
+        if (fhash_enabled())
+            cache_put(cache, fv, t, n);
                 
         t++;
         fv->len++;
     }
     
-    if (!sa->fhash)
+    if (!fhash_enabled())
         return;
 
     /* Flush cache */
-    cache_flush(cache, fv, sa);
+    cache_flush(cache, fv);
     free(cache);   
 }
 
@@ -398,50 +407,6 @@ void fvec_destroy(fvec_t *fv)
         free(fv->src);        
     free(fv);
 }
-/**
- * Clones a feature vector
- * @param o Feature vector
- * @return Cloned feature vector
- */
-fvec_t *fvec_clone(fvec_t *o)
-{
-    assert(o);
-    fvec_t *fv;
-    unsigned int i;
-
-    /* Allocate feature vector */
-    fv = calloc(1, sizeof(fvec_t));
-    if (!fv) {
-        error("Could not clone feature vector");
-        return NULL;
-    }
-
-    /* Clone structure */
-    fv->len = o->len;
-    fv->total = o->total;
-
-    if (o->src)
-        fv->src = strdup(o->src);
-
-    /* Check for empty sequence */
-    if (o->len == 0)
-        return fv;
-
-    fv->dim = (feat_t *) malloc(o->len * sizeof(feat_t));
-    fv->val = (float *) malloc(o->len * sizeof(float));
-    if (!fv->dim || !fv->val) {
-        error("Could not allocate feature vector");
-        fvec_destroy(fv);
-        return NULL;
-    }
-
-    for (i = 0; i < o->len; i++) {
-        fv->dim[i] = o->dim[i];
-        fv->val[i] = o->val[i];
-    }
-
-    return fv;
-}
 
 /**
  * Sets the source of a feature vector
@@ -467,22 +432,21 @@ void fvec_set_label(fvec_t *fv, float l)
  * Print the content of a feature vector
  * @param f File pointer
  * @param fv feature vector
- * @param sa Sally configuration
  */
-void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
+void fvec_print(FILE *f, fvec_t *fv)
 {
     assert(fv);
     int i, j;
 
-    fprintf(f, "# Feature vector [src: %s, label: %g, len: %lu, total: %lu]\n", 
+    fprintf(f, "Feature vector [src: %s, label: %g, len: %lu, total: %lu]\n", 
            fv->src, fv->label, fv->len, fv->total);
            
     for (i = 0; i < fv->len; i++) {
-        fprintf(f, "#   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
+        fprintf(f, "   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
                fv->val[i]);
 
-        if (sa && sa->fhash) {
-            fentry_t *fe = fhash_get(sa->fhash, fv->dim[i]);        
+        if (fhash_enabled()) {
+            fentry_t *fe = fhash_get(fv->dim[i]);        
             for (j = 0; f && j < fe->len; j++) {
                 if (isprint(fe->data[j]) || fe->data[j] == '%')
                     fprintf(f, "%c", fe->data[j]);
@@ -500,11 +464,11 @@ void fvec_print(FILE *f, fvec_t *fv, sally_t *sa)
  * @param z File pointer
  * @return Feature vector
  */
-fvec_t *fvec_load(FILE *z)
+fvec_t *fvec_load(gzFile *z)
 {
     assert(z);
     fvec_t *f;
-    char buf[512];
+    char buf[512], str[512];
     int i, r;
 
     /* Allocate feature vector (zero'd) */
@@ -514,17 +478,18 @@ fvec_t *fvec_load(FILE *z)
         return NULL;
     }
 
-    fgets(buf, 512, z);
-    r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%g\n",
+    gzgets(z, buf, 512);
+    r = sscanf(buf, "fvec: len=%lu, total=%lu, label=%g, src=%s\n",
                (unsigned long *) &f->len, (unsigned long *) &f->total,
-               (float *) &f->label);
-    if (r != 3) 
+               (float *) &f->label, str);
+    if (r != 4) 
         goto err;
 
-    /* Load src string */
-    f->src = calloc(sizeof(char), 256);
-    if (fscanf(z, "  %255[^\n]\n", f->src) != 1) 
-        goto err;
+    /* Set source */
+    if (!strcmp(str, "(null)"))
+        f->src = NULL;
+    else
+        f->src = strdup(str);
 
     /* Empty feature vector */
     if (f->len == 0)
@@ -541,8 +506,8 @@ fvec_t *fvec_load(FILE *z)
     
     /* Load features */
     for (i = 0; i < f->len; i++) {
-        fgets(buf, 512, z);
-        r = sscanf(buf, "  %llx:%g\n", (unsigned long long *) &f->dim[i],
+        gzgets(z, buf, 512);
+        r = sscanf(buf, "  feat=%llx:%g\n", (unsigned long long *) &f->dim[i],
                    (float *) &f->val[i]);
         if (r != 2) 
             goto err;
@@ -561,18 +526,53 @@ err:
  * @param f Feature vector
  * @param z File pointer
  */
-void fvec_save(fvec_t *f, FILE * z)
+void fvec_save(fvec_t *f, gzFile * z)
 {
     assert(f && z);
     int i;
 
-    fprintf(z, "fvec: len=%lu, total=%lu, label=%g\n",
-             f->len, f->total, f->label);
-    fprintf(z, "  %s\n", f->src);
+    gzprintf(z, "fvec: len=%lu, total=%lu, label=%g, src=%s\n",
+             f->len, f->total, f->label, f->src);
     for (i = 0; i < f->len; i++)
-        fprintf(z, "  %.16llx:%.16g\n", (unsigned long long) f->dim[i],
+        gzprintf(z, "  feat=%.16llx:%.16g\n", (unsigned long long) f->dim[i],
                  (float) f->val[i]);
 }
 
+
+/**
+ * Decodes a string containing delimiters to a global array
+ * @param s String containing delimiters
+ */
+static void decode_delim(const char *s)
+{
+    char buf[5] = "0x00";
+    unsigned int i, j;
+
+    for (i = 0; i < strlen(s); i++) {
+        if (s[i] != '%') {
+            delim[(unsigned int) s[i]] = 1;
+            continue;
+        }
+
+        /* Skip truncated sequence */
+        if (strlen(s) - i < 2)
+            break;
+
+        buf[2] = s[++i];
+        buf[3] = s[++i];
+        sscanf(buf, "%x", (unsigned int *) &j);
+        delim[j] = 1;
+    }
+}
+
+/**
+ * Resets delimiters table. There is a global table of delimiter 
+ * symbols which is only initialized once the first sequence is 
+ * processed. This functions is used to trigger a re-initialization.
+ */
+void fvec_reset_delim()
+{
+    delim[0] = DELIM_NOT_INIT;
+}
 
 /** @} */

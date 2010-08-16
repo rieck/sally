@@ -31,28 +31,36 @@ extern int verbose;
 /* Local functions */
 static int decode_string(char *str);
 
+/* Hash table */
+static fentry_t *fhash = NULL;
+static int enabled = FALSE;
+static unsigned long collisions = 0;
+static unsigned long insertions = 0;
+
 /**
  * Adds a feature and its key to the hash table. The function clones all 
  * input arguments: new memory is allocated and the data is copied.
- * @param fh Feature hash 
  * @param k Key for feature
  * @param x Data of feature
  * @param l Length of feature
  */
-void fhash_put(fhash_t *fh, feat_t k, char *x, int l)
+void fhash_put(feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
 
-    fh->ins++;
+    if (!enabled)
+        return;
 
+    insertions++;
+ 
     /* Check for duplicate */
-    HASH_FIND(hh, fh->hash, &k, sizeof(feat_t), g);
+    HASH_FIND(hh, fhash, &k, sizeof(feat_t), g);
 
     /* Check for collision */
     if (g) {
         if (l != g->len || memcmp(x, g->data, l))
-            fh->cols++;
+            collisions++;
         return;
     }
 
@@ -67,54 +75,53 @@ void fhash_put(fhash_t *fh, feat_t k, char *x, int l)
         error("Could not allocate feature data");
 
     /* Add to hash and count insertion */
-    HASH_ADD(hh, fh->hash, key, sizeof(feat_t), h);
+    HASH_ADD(hh, fhash, key, sizeof(feat_t), h);
 }
 
 /**
  * Gets an entry from the hash table. 
  * @warning The returned memory must not be freed.
- * @param fh Feature hash
  * @param key Feature key
  * @return feature table entry
  */
-fentry_t *fhash_get(fhash_t *fh, feat_t key)
+fentry_t *fhash_get(feat_t key)
 {
     fentry_t *f;
-    HASH_FIND(hh, fh->hash, &key, sizeof(feat_t), f);
+    HASH_FIND(hh, fhash, &key, sizeof(feat_t), f);
     return f;
 }
 
 /**
  * Creates and allocates the feature hash table.
- * @return Feature hash
  */
-fhash_t *fhash_create()
+void fhash_init()
 {
-    fhash_t *fh = malloc(sizeof(fhash_t));
+    if (fhash)
+        fhash_destroy();
 
     /* Initialize hash fields */
-    fh->hash = NULL;
-    fh->cols = 0;
-    fh->ins = 0;
-    return fh;
+    enabled = TRUE;
+    collisions = 0;
+    insertions = 0;
 }
 
 /**
  * Destroys the feature hash table.
- * @param fh Feature hash
  */
-void fhash_destroy(fhash_t *fh)
+void fhash_destroy()
 {
     fentry_t *f;
 
-    while (fh->hash) {
-        f = fh->hash;
-        HASH_DEL(fh->hash, f);
+    while (fhash) {
+        f = fhash;
+        HASH_DEL(fhash, f);
         free(f->data);
         free(f);
     }
-    
-    free(fh);
+
+    enabled = FALSE;
+    collisions = 0;
+    insertions = 0;
 }
 
 /**
@@ -122,10 +129,11 @@ void fhash_destroy(fhash_t *fh)
  * @param f File pointer
  * @param fh Feature hash
  */
-void fhash_print(FILE *f, fhash_t *fh)
+void fhash_print(FILE *f)
 {
-    fprintf(f, "# Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
-             fhash_size(fh), fh->ins, fh->cols, (fh->cols * 100.0) / fh->ins);
+    fprintf(f, "Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
+             fhash_size(), insertions, collisions, 
+             (collisions * 100.0) / insertions);
 }
 
 /**
@@ -133,9 +141,9 @@ void fhash_print(FILE *f, fhash_t *fh)
  * @param fh Feature hash
  * @return size of table
  */
-unsigned long fhash_size(fhash_t *fh)
+unsigned long fhash_size()
 {
-    return HASH_COUNT(fh->hash);
+    return HASH_COUNT(fhash);
 }
 
 /**
@@ -172,68 +180,71 @@ static int decode_string(char *str)
 
 /**
  * Saves the feature hash table to a file stream.
- * @param fh Feature hash
  * @param z File pointer
  */
-void fhash_save(fhash_t *fh, FILE *z)
+void fhash_save(gzFile *z)
 {
     fentry_t *f;
     int i;
 
-    fprintf(z, "fhash: len=%u\n", HASH_COUNT(fh->hash));
-    for (f = fh->hash; f != NULL; f = f->hh.next) {
-        fprintf(z, "  %.16llx: ", (long long unsigned int) f->key);
+    gzprintf(z, "fhash: len=%u\n", HASH_COUNT(fhash));
+    for (f = fhash; f != NULL; f = f->hh.next) {
+        gzprintf(z, "  bin=%.16llx: ", (long long unsigned int) f->key);
         for (i = 0; i < f->len; i++) {
             if (isprint(f->data[i]) || f->data[i] == '%')
-                fprintf(z, "%c", f->data[i]);
+                gzprintf(z, "%c", f->data[i]);
             else
-                fprintf(z, "%%%.2x", f->data[i]);
+                gzprintf(z, "%%%.2x", f->data[i]);
         }
-        fprintf(z, "\n");
+        gzprintf(z, "\n");
     }
 }
 
 /**
  * Loads the feature hash table from a file stream
  * @param z File pointer
- * @return Feature hash
  */
-fhash_t *fhash_load(FILE *z)
+void fhash_load(gzFile *z)
 {
     int i, r;
     unsigned long len;
     char buf[512], str[512];
     feat_t key;
-    fhash_t *fh;
     
-    fh = calloc(1, sizeof(fhash_t));
-
-    fgets(buf, 512, z);
+    fhash_init();
+    
+    gzgets(z, buf, 512);
     r = sscanf(buf, "fhash: len=%lu\n", (unsigned long *) &len);
     if (r != 1) {
         error("Could not parse feature map");
-        free(fh);
-        return NULL;
+        return;
     }
 
     for (i = 0; i < len; i++) {
-        fgets(buf, 512, z);
-        r = sscanf(buf, "  %llx:%511s\n", (unsigned long long *) &key,
+        gzgets(z, buf, 512);
+        r = sscanf(buf, "  bin=%llx:%511s\n", (unsigned long long *) &key,
                    (char *) str);
         if (r != 2) {
             error("Could not parse feature map contents");
-            free(fh);
-            return NULL;
+            return;
         }
 
         /* Decode string */
         r = decode_string(str);
 
         /* Put string to table */
-        fhash_put(fh, key, str, r);
+        fhash_put(key, str, r);
     }
-    
-    return fh;
+}
+
+
+/**
+ * Returns true if the feature table is enabled
+ * @return true if enabled false otherwise
+ */
+int fhash_enabled()
+{
+    return enabled;
 }
 
 /** @} */

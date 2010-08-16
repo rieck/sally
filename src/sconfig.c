@@ -29,9 +29,9 @@ static config_default_t defaults[] = {
     { "input", "format", CONFIG_TYPE_STRING, { .str = "dir" } },
     { "input", "block", CONFIG_TYPE_INT, { .num = 1024 } },
     { "features", "nlen", CONFIG_TYPE_INT, { .num = 2 } },
-    { "features", "delim", CONFIG_TYPE_INT, { .str = "%0a%0d%20" } },
-    { "features", "embed", CONFIG_TYPE_STR, { .str = "cnt" } },
-    { "features", "norm", CONFIG_TYPE_STR, { .str = "l1" } },
+    { "features", "delim", CONFIG_TYPE_STRING, { .str = "%0a%0d%20" } },
+    { "features", "embed", CONFIG_TYPE_STRING, { .str = "cnt" } },
+    { "features", "norm", CONFIG_TYPE_STRING, { .str = "l1" } },
     { "features", "bits", CONFIG_TYPE_INT, { .num = 26 } },
     { "output", "format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
     { NULL }

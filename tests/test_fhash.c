@@ -52,14 +52,14 @@ int test_static()
     test_printf("Maintenance of feature hash table");
 
     /* Initialize table */
-    fhash_t *fh = fhash_create();
+    fhash_init();
     for (i = 0; tests[i].s != 0; i++)
-        fhash_put(fh, tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
+        fhash_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
 
     /* Randomly query elements */
     for (j = 0; j < 100; j++) {
         k = rand() % i;
-        f = fhash_get(fh, tests[k].f);
+        f = fhash_get(tests[k].f);
 
         /* Check for correct feature string */
         if (memcmp(f->data, tests[k].s, f->len)) {
@@ -72,7 +72,7 @@ int test_static()
     test_return(err, 100);
 
     /* Destroy table */
-    fhash_destroy(fh);
+    fhash_destroy();
     return err;
 }
 
@@ -89,7 +89,7 @@ int test_stress()
     test_printf("Stress test of feature hash table");
 
     /* Initialize table */
-    fhash_t *fh = fhash_create();
+    fhash_init();
 
     for (i = 0; i < STRESS_RUNS; i++) {
         /* Create random key and string */
@@ -101,18 +101,18 @@ int test_stress()
         switch (rand() % 2) {
         case 0:
             /* Insert random string */
-            fhash_put(fh, key, buf, strlen(buf));
+            fhash_put(key, buf, strlen(buf));
             break;
         case 1:
             /* Query for string */
-            f = fhash_get(fh, key);
+            f = fhash_get(key);
             break;
         }
     }
 
     test_return(err, STRESS_RUNS);
     
-    fhash_destroy(fh);    
+    fhash_destroy();    
     return err;
 }
 
@@ -122,33 +122,33 @@ int test_stress()
 int test_load_save()
 {
     int i, j, err = 0;
-    FILE *z;
+    gzFile *z;
     fentry_t *f;
 
     test_printf("Loading and saving of feature hash table");
 
     /* Create map */
-    fhash_t *fh = fhash_create();
+    fhash_init();
     for (i = 0; tests[i].s != 0; i++)
-        fhash_put(fh, tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
+        fhash_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
 
     /* Create and save feature vectors */
-    if (!(z = fopen(TEST_FILE, "w"))) {
+    if (!(z = gzopen(TEST_FILE, "w9"))) {
         printf("Could not create file (ignoring)\n");
         return FALSE;
     }
-    fhash_save(fh, z);
-    fclose(z);
-    fhash_destroy(fh);
+    fhash_save(z);
+    gzclose(z);
+    fhash_destroy();
 
     /* Create and load */
-    z = fopen(TEST_FILE, "r");
-    fh = fhash_load(z);
-    fclose(z);
+    z = gzopen(TEST_FILE, "r");
+    fhash_load(z);
+    gzclose(z);
 
     /* Check elements */
     for (j = 0; j < i; j++) {
-        f = fhash_get(fh, tests[j].f);
+        f = fhash_get(tests[j].f);
 
         /* Check for correct feature string */
         if (memcmp(f->data, tests[j].s, f->len)) {
@@ -158,7 +158,7 @@ int test_load_save()
     }
 
     /* Destroy table */
-    fhash_destroy(fh);
+    fhash_destroy();
     unlink(TEST_FILE);
 
     test_return(err, i);

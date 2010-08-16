@@ -14,7 +14,7 @@
 #include "sally.h"
 
 extern int verbose;
-exter cfg_t cfg;
+extern config_t cfg;
 
 /**
  * Print usage of command line tool

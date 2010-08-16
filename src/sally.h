@@ -12,10 +12,6 @@
 #ifndef SALLY_H
 #define SALLY_H
 
-/* Convenience macro */
-#define DELIM(s, i)    ((char *) s->delim)[(unsigned int) i]
-
 void sally_version(FILE *f, char *);
-void sally_set_delim(sally_t *, char *);
 
 #endif                          /* SALLY_H */

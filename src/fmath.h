@@ -14,7 +14,10 @@
 
 #include "fvec.h"
 
-void fvec_norm(fvec_t *fv, norm_t e);
+void fvec_norm(fvec_t *fv, const char *);
+void fvec_embed(fvec_t *fv, const char *);
 void fvec_binarize(fvec_t *fv);
+fvec_t *fvec_clone(fvec_t *);
+
 
 #endif                          /* FMATH_H */

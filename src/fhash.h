@@ -34,24 +34,15 @@ typedef struct {
     UT_hash_handle hh;     /**< Uthash handle */
 } fentry_t;
 
-
-/**
- * Structure of feature hash
- */
-typedef struct {
-    fentry_t *hash;         /**< Hash table */
-    unsigned long cols;     /**< Collisions */
-    unsigned long ins;      /**< Insertions */
-} fhash_t;
-
 /* Global functions */
-fhash_t *fhash_create();
-void fhash_destroy(fhash_t *);
-void fhash_put(fhash_t *, feat_t, char *, int);
-fentry_t *fhash_get(fhash_t *, feat_t);
-unsigned long fhash_size(fhash_t *);
-void fhash_print(FILE *, fhash_t *);
-void fhash_save(fhash_t *, FILE *f);
-fhash_t *fhash_load(FILE *f);
+void fhash_init();
+void fhash_destroy();
+void fhash_put(feat_t, char *, int);
+fentry_t *fhash_get(feat_t);
+unsigned long fhash_size();
+void fhash_print(FILE *);
+void fhash_save(gzFile *f);
+void fhash_load(gzFile *f);
+int fhash_enabled();
 
 #endif                          /* FHASH_H */

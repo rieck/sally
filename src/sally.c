@@ -42,34 +42,4 @@ void sally_version(FILE *f, char *p)
                PACKAGE_VERSION, p, p);
 }
 
-/**
- * Decodes a string containing delimiters to global delimiter array
- * @param sa sally structure
- * @param s String containing delimiters
- */
-void sally_set_delim(sally_t *sa, char *s)
-{
-    char buf[5] = "0x00";
-    unsigned int i, j;
-    
-    /* Reset delimiters */
-    memset(sa->delim, 0, 256);
-    
-    for (i = 0; i < strlen(s); i++) {
-        if (s[i] != '%') {
-            DELIM(sa, s[i]) = 1;
-            continue;
-        }
-        
-        /* Skip truncated sequence */   
-        if (strlen(s) - i < 2)
-            break;
-        
-        buf[2] = s[++i];
-        buf[3] = s[++i];
-        sscanf(buf, "%x", (unsigned int *) &j);
-        DELIM(sa, j) = 1;
-    }
-}
-
 /** @} */
