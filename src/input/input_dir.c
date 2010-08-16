@@ -66,7 +66,7 @@ int input_dir_open(char *p)
  */
 int input_dir_read(char **strs, int *sizes, char **names, int len)
 {
-    assert(data && sizes && names);
+    assert(strs && sizes && names);
     int i, j = 0;
  
     /* Determine maximum path length and allocate buffer */

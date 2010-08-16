@@ -76,26 +76,28 @@ int input_arc_open(char *name)
  */
 int input_arc_read(char **strs, int *sizes, char **desc, int len)
 {
-    assert(data && sizes && desc);
+    assert(strs && sizes && desc);
     struct archive_entry *entry;
     int i, j = 0;
     
     /* Load block of files (no OpenMP here)*/
     for (i = 0; i < len; i++) {    
-        /* Perform reading of archive */
-        archive_read_next_header(a, &entry);
-        const struct stat *s = archive_entry_stat(entry);
-        if (!S_ISREG(s->st_mode)) {
-            archive_read_data_skip(a);
-            continue;
+#pragma omp critical
+        {    
+            /* Perform reading of archive */
+            archive_read_next_header(a, &entry);
+            const struct stat *s = archive_entry_stat(entry);
+            if (!S_ISREG(s->st_mode)) {
+                archive_read_data_skip(a);
+            } else {
+                /* Add entry */
+                strs[j] = malloc(s->st_size * sizeof(char));
+                archive_read_data(a, strs[j], s->st_size);
+                desc[j] = strdup(archive_entry_pathname(entry));
+                sizes[j] = s->st_size;
+                j++;
+            }
         }
-        
-        /* Add entry */
-        strs[j] = malloc(s->st_size * sizeof(char));
-        archive_read_data(a, strs[j], s->st_size);
-        desc[j] = strdup(archive_entry_pathname(entry));
-        sizes[j] = s->st_size;
-        j++;
     }
     
     return j;
