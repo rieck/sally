@@ -9,25 +9,11 @@
  * warranty. See the GNU General Public License for more details. 
  */
 
-/** 
- * @defgroup sally Sally interface
- *
- * Functions and structures for interfacing with Sally. This file 
- * contains the main code for using Sally from within other projects.
- *
- * @author Konrad Rieck (konrad@mlsec.org)
- * @{
- */
-
 #include "config.h"
 #include "common.h"
 #include "sally.h"
-#include "util.h"
-#include "fhash.h"
-#include "sally.h"
 
-/* Global verbosity */
-int verbose = 0;
+int verbose;
 config_t cfg;
 
 /**
@@ -42,4 +28,63 @@ void sally_version(FILE *f, char *p)
                p, PACKAGE_VERSION, p);
 }
 
-/** @} */
+/**
+ * Print usage of command line tool
+ */  
+static void print_usage(void)
+{
+    printf("Usage: sally [options] <config> <input> <output>\n"
+           "Options:\n"
+           "  -v             Increase verbosity.\n"
+           "  -V             Print version and copyright.\n"
+           "  -h             Print this help screen.\n");
+}
+
+/**
+ * Print version of Sally tool
+ */
+static void print_version(void)
+{
+    sally_version(stdout, "");
+}
+
+/**
+ * Parse command line options
+ * @param argc Number of arguments
+ * @param argv Argument values
+ */
+static void parse_options(int argc, char **argv)
+{
+    int ch;
+    while ((ch = getopt(argc, argv, "hvV")) != -1) {
+        switch (ch) {
+            case 'v':
+                verbose++;
+                break;
+            case 'V':
+                print_version();
+                exit(EXIT_SUCCESS);
+                break;
+            case 'h':
+            case '?':
+                print_usage();
+                exit(EXIT_SUCCESS);
+                break;
+        }
+    }
+    
+    argc -= optind;
+    argv += optind;
+}
+
+/**
+ * Main function of Sally tool 
+ * @param argc Number of arguments
+ * @param argv Argument values
+ * @return exit code
+ */
+int main(int argc, char **argv)
+{
+    /* Parse options */
+    parse_options(argc, argv);
+}

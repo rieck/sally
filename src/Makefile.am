@@ -3,15 +3,9 @@
 
 SUBDIRS 		= input .
 
-lib_LTLIBRARIES         = libsally.la
-include_HEADERS         = sally.h
 bin_PROGRAMS		= sally
-
-libsally_la_SOURCES	= sally.c sally.h util.c util.h murmur.c murmur.h \
+sally_SOURCES		= sally.c sally.h util.c util.h murmur.c murmur.h \
 			  fhash.c fhash.h fvec.c fvec.h md5.c md5.h uthash.h \
 			  common.h fmath.c fmath.h sconfig.c sconfig.h
-libsally_la_LIBADD	= input/libinput.la
-
-sally_SOURCES		= tool.c tool.h
-sally_LDADD             = libsally.la
+sally_LDADD		= input/libinput.la
 sally_LDFLAGS           = -all-static
