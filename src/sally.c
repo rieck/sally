@@ -39,7 +39,7 @@ void sally_version(FILE *f, char *p)
 {
     fprintf(f, "%s Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
                "%s Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
-               PACKAGE_VERSION, p, p);
+               p, PACKAGE_VERSION, p);
 }
 
 /** @} */

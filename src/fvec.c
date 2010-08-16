@@ -93,9 +93,9 @@ fvec_t *fvec_extract(char *x, int l)
     
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.nlen", (long *) &nlen);
-    config_lookup_int(&cfg, "features.bits", (long *) &bits);
-    config_lookup_string(&cfg, "features.delim", &dlm_str);
+    config_lookup_int(&cfg, "features.ngram_len", (long *) &nlen);
+    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
+    config_lookup_int(&cfg, "features.hash_bits", (long *) &bits);
 
     /* N-grams of bytes */
     if (!dlm_str || strlen(dlm_str) == 0) {
@@ -118,9 +118,9 @@ fvec_t *fvec_extract(char *x, int l)
     count_feat(fv);
 
     /* Compute embedding and normalization */
-    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     fvec_embed(fv, cfg_str);
-    config_lookup_string(&cfg, "features.norm", &cfg_str);
+    config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
     fvec_norm(fv, cfg_str);
 
     return fv;

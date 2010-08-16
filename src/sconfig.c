@@ -27,12 +27,12 @@ extern int verbose;
 /* Default configuration */
 static config_default_t defaults[] = {
     { "input", "format", CONFIG_TYPE_STRING, { .str = "dir" } },
-    { "input", "block", CONFIG_TYPE_INT, { .num = 1024 } },
-    { "features", "nlen", CONFIG_TYPE_INT, { .num = 2 } },
-    { "features", "delim", CONFIG_TYPE_STRING, { .str = "%0a%0d%20" } },
-    { "features", "embed", CONFIG_TYPE_STRING, { .str = "cnt" } },
-    { "features", "norm", CONFIG_TYPE_STRING, { .str = "l1" } },
-    { "features", "bits", CONFIG_TYPE_INT, { .num = 26 } },
+    { "input", "block_size", CONFIG_TYPE_INT, { .num = 1024 } },
+    { "features", "ngram_len", CONFIG_TYPE_INT, { .num = 2 } },
+    { "features", "ngram_delim", CONFIG_TYPE_STRING, { .str = "%0a%0d%20" } },
+    { "features", "vect_embed", CONFIG_TYPE_STRING, { .str = "cnt" } },
+    { "features", "vect_norm", CONFIG_TYPE_STRING, { .str = "l1" } },
+    { "features", "hash_bits", CONFIG_TYPE_INT, { .num = 26 } },
     { "output", "format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
     { NULL }
 };
