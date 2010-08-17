@@ -35,7 +35,7 @@ static float get_label(char *desc);
 /**
  * Opens an archive for reading files. 
  * @param name Archive name
- * @return number of regular files
+ * @return number of regular files or -1 on error
  */
 int input_arc_open(char *name) 
 {
@@ -48,7 +48,7 @@ int input_arc_open(char *name)
     int r = archive_read_open_filename(a, name, 4096);
     if (r != 0) {
         error("%s", archive_error_string(a));
-        return 0;
+        return -1;
     }
 
     /* Count regular files in archive */

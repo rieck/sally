@@ -250,7 +250,7 @@ void fhash_load(gzFile *z)
  * @param f File pointer
  * @param fe Feature hash entry
  */
-void fhash_write_entry(FILE *f, fentry_t *fe) 
+void fhash_print_entry(FILE *f, fentry_t *fe) 
 {
     int j;
     

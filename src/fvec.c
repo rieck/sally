@@ -446,7 +446,7 @@ void fvec_print(FILE *f, fvec_t *fv)
                fv->val[i]);
 
         if (fhash_enabled()) 
-            fhash_write_entry(f, fhash_get(fv->dim[i]));
+            fhash_print_entry(f, fhash_get(fv->dim[i]));
         
         fprintf(f, "]\n");        
     }    

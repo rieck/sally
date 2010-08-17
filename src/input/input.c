@@ -38,12 +38,11 @@ typedef struct {
 } func_t;
 static func_t func;
 
-
 /** 
  * Configure the input of Sally
  * @param format Name of input format
  */
-void input_config(char *format)
+void input_config(const char *format)
 {
     if (!strcasecmp(format, "dir")) {
         func.input_open = input_dir_open;
@@ -64,7 +63,7 @@ void input_config(char *format)
 /**
  * Wrapper for opening the input source.
  * @param name Name of input source, e.g., directory or file name
- * @return Number of available entries.
+ * @return Number of available entries or -1 on error
  */
 int input_open(char *name) 
 {

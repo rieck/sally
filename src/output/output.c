@@ -41,7 +41,7 @@ static func_t func;
  * Configure the output of Sally
  * @param format Name of output format
  */
-void output_config(char *format)
+void output_config(const char *format)
 {
     if (!strcasecmp(format, "libsvm")) {
         func.output_open = output_libsvm_open;

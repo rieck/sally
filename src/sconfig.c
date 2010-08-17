@@ -33,6 +33,7 @@ static config_default_t defaults[] = {
     { "features", "vect_embed", CONFIG_TYPE_STRING, { .str = "cnt" } },
     { "features", "vect_norm", CONFIG_TYPE_STRING, { .str = "l1" } },
     { "features", "hash_bits", CONFIG_TYPE_INT, { .num = 26 } },
+    { "features", "explicit_hash", CONFIG_TYPE_INT, { .num = 0 } },
     { "output", "format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
     { NULL }
 };

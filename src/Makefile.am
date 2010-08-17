@@ -2,6 +2,8 @@
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 SUBDIRS 		= input output .
+INCLUDES                = -I$(top_srcdir)/src/input \
+			  -I$(top_srcdir)/src/output 
 
 bin_PROGRAMS		= sally
 sally_SOURCES		= sally.c sally.h util.c util.h murmur.c murmur.h \

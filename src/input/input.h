@@ -23,7 +23,7 @@ typedef struct {
 } string_t;
 
 /* Configuration */
-void input_config(char *);
+void input_config(const char *);
 
 /* Generic interface */
 int input_open(char *);

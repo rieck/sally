@@ -42,9 +42,9 @@ void fhash_put(feat_t, char *, int);
 fentry_t *fhash_get(feat_t);
 unsigned long fhash_size();
 void fhash_print(FILE *);
+void fhash_print_entry(FILE *f, fentry_t *fe); 
 void fhash_save(gzFile *f);
 void fhash_load(gzFile *f);
 int fhash_enabled();
-void fhash_write_entry(FILE *f, fentry_t *fe); 
 
 #endif                          /* FHASH_H */

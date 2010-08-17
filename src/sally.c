@@ -12,9 +12,22 @@
 #include "config.h"
 #include "common.h"
 #include "sally.h"
+#include "input.h"
+#include "output.h"
+#include "fvec.h"
+#include "util.h"
+#include "sconfig.h"
+#include "fhash.h"
 
+/* Global variables */
 int verbose;
 config_t cfg;
+
+/* Local variables */
+static char *cfg_file = NULL;
+static char *input = NULL;
+static char *output = NULL;
+static long entries = 0;
 
 /**
  * Prints version and copyright information to a file stream
@@ -24,9 +37,15 @@ config_t cfg;
 void sally_version(FILE *f, char *p)
 {
     fprintf(f, "%s Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-               "%s Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
-               p, PACKAGE_VERSION, p);
+            "%s Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+            p, PACKAGE_VERSION, p);
 }
+
+/**
+ * Main processing function
+ * @param in Input file
+ * @param out Output file
+ */
 
 /**
  * Print usage of command line tool
@@ -75,6 +94,115 @@ static void parse_options(int argc, char **argv)
     
     argc -= optind;
     argv += optind;
+    
+    /* Check remaining arguments */
+    if (argc != 3) {
+        print_usage();
+        exit(EXIT_FAILURE);    
+    }
+    
+    cfg_file = argv[0];
+    input = argv[1];
+    output = argv[2];
+}
+
+static void sally_init(int argc, char **argv)
+{
+    long ehash;
+    const char *cfg_str;
+    
+    /* Parse options */
+    parse_options(argc, argv);
+    
+    /* Init and load configuration */
+    config_init(&cfg);
+    if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
+        fatal("Could not read configuration (%s in line %d)",
+              config_error_text(&cfg), config_error_line(&cfg));
+    
+    /* Check configuration */
+    config_check(&cfg);
+    if (verbose > 1)
+        config_print(&cfg);
+    
+    /* Check for feature hash table */
+    config_lookup_int(&cfg, "features.explicit_hash", &ehash);
+    if (ehash)
+        fhash_init();
+    
+    /* Configure input and output */
+    config_lookup_string(&cfg, "input.format", &cfg_str);
+    input_config(cfg_str);
+    config_lookup_string(&cfg, "output.format", &cfg_str);
+    output_config(cfg_str);    
+    
+    /* Open input and output */
+    entries = input_open(input);
+    if (entries < 0)
+        fatal("Could not open input source");
+    if (!output_open(output))
+        fatal("Coult not open output destination");
+}
+
+static void sally_process()
+{
+    long num, read, i = 0, j, block;
+    
+    /* Get block size */
+    config_lookup_int(&cfg, "input.block_size", &block);
+    
+    fvec_t **fvec = malloc(sizeof(fvec_t *) * block);
+    string_t *strs = malloc(sizeof(string_t) * block);
+    
+    if (!fvec || !strs) 
+        fatal("Could not allocate memory for embedding");
+    
+    while (i < num) {
+        read = input_read(strs, block);
+        if (!read) 
+            fatal("Failed to read strings from input '%s'", input);
+        
+        for (j = 0; j < read; j++) {
+            fvec[j] = fvec_extract(strs[j].str, strs[j].len);
+            fvec_set_label(fvec[j], strs[j].label);
+            fvec_set_source(fvec[j], strs[j].src);
+        }
+        
+        if (!output_write(fvec, block))
+            fatal("Failed to write vectors to output '%s'", output);
+        
+        for (j = 0; j < read; j++) {
+            if (strs[j].src)
+                free(strs[j].src);
+            if (strs[j].str)
+                free(strs[j].str);
+            fvec_destroy(fvec[j]);
+        }
+        
+        fhash_reset();
+        i += read;
+    }
+    
+    free(strs);
+    free(fvec);
+}
+
+static void sally_exit()
+{
+    long ehash;
+    
+    /* Close input and output */
+    input_close();
+    output_close();
+    
+    /* Check for feature hash table */
+    config_lookup_int(&cfg, "features.explicit_hash", &ehash);
+    if (ehash)
+        fhash_destroy();
+    
+    /* Destroy configuration */
+    config_destroy(&cfg);
+    
 }
 
 /**
@@ -85,6 +213,8 @@ static void parse_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-    /* Parse options */
-    parse_options(argc, argv);
+    
+    sally_init(argc, argv);
+    sally_process();
+    sally_exit();
 }

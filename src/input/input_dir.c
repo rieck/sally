@@ -32,7 +32,7 @@ static char *path = NULL;
 /**
  * Opens a directory for reading files. 
  * @param p Directory name
- * @return number of regular files
+ * @return number of regular files or -1 on error
  */
 int input_dir_open(char *p) 
 {
@@ -44,7 +44,7 @@ int input_dir_open(char *p)
     dir = opendir(path);
     if (!dir) {
         error("Could not open directory '%s'", path);
-        return 0;
+        return -1;
     }
 
     /* Count files */

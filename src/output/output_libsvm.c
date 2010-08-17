@@ -19,7 +19,8 @@
 #include "common.h"
 #include "util.h"
 #include "output.h"
-#include "murmur.h"
+#include "sally.h"
+#include "fhash.h"
 
 /* External variables */
 extern config_t cfg;
@@ -32,7 +33,7 @@ static FILE *f = NULL;
  * @param fn File name
  * @return number of regular files
  */
-int input_libsvm_open(char *fn) 
+int output_libsvm_open(char *fn) 
 {
     assert(fn);    
     
@@ -62,7 +63,7 @@ int output_libsvm_write(fvec_t **x, int len)
 
     for (j = 0; j < len; j++) {
         /* Print feature vector */
-        fprintf(f, "%u ", x[j]->label);
+        fprintf(f, "%g ", x[j]->label);
         for (i = 0; i < x[j]->len; i++) 
             fprintf(f, "%llu:%f ", (long long unsigned int)  x[j]->dim[i] + 1, 
                     x[j]->val[i]);
@@ -76,7 +77,7 @@ int output_libsvm_write(fvec_t **x, int len)
         if (fhash_enabled()) {
             fprintf(f, "[");
             for (i = 0 ; i < x[j]->len; i++) {
-                fhash_write_entry(f, fhash_get(x[j]->dim[i]));
+                fhash_print_entry(f, fhash_get(x[j]->dim[i]));
                 if (i < x[j]->len - 1)
                     fprintf(f, " ");
             }
@@ -85,6 +86,8 @@ int output_libsvm_write(fvec_t **x, int len)
     
         fprintf(f, "\n");
     }
+    
+    return TRUE;
 }
 
 /**

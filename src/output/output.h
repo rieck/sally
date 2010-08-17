@@ -15,7 +15,7 @@
 #include "fvec.h"
 
 /* Configuration */
-void output_config(char *);
+void output_config(const char *);
 
 /* Generic interface */
 int output_open(char *);
