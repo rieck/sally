@@ -14,8 +14,7 @@
 
 /* Directoy module */
 int input_dir_open(char *);
-int input_dir_read(char **, int *, char **, int);
+int input_dir_read(string_t *, int);
 void input_dir_close(void);
-float input_dir_desc2label(char *);
 
 #endif                          /* INPUT_DIR_H */

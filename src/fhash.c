@@ -106,6 +106,14 @@ void fhash_init()
 }
 
 /**
+ * Reset feature hash table.
+ */
+void fhash_reset()
+{
+    fhash_init();
+}
+
+/**
  * Destroys the feature hash table.
  */
 void fhash_destroy()
@@ -191,7 +199,7 @@ void fhash_save(gzFile *z)
     for (f = fhash; f != NULL; f = f->hh.next) {
         gzprintf(z, "  bin=%.16llx: ", (long long unsigned int) f->key);
         for (i = 0; i < f->len; i++) {
-            if (isprint(f->data[i]) || f->data[i] == '%')
+            if (f->data[i] != '%' && f->data[i] != ' ' && isprint(f->data[i]))
                 gzprintf(z, "%c", f->data[i]);
             else
                 gzprintf(z, "%%%.2x", f->data[i]);
@@ -237,6 +245,27 @@ void fhash_load(gzFile *z)
     }
 }
 
+/**
+ * Writes the string of an entry to a file. The string is encoded.
+ * @param f File pointer
+ * @param fe Feature hash entry
+ */
+void fhash_write_entry(FILE *f, fentry_t *fe) 
+{
+    int j;
+    
+    if (!fe) {
+        fprintf(f, "<NULL>");
+        return;
+    }
+    
+    for (j = 0; f && j < fe->len; j++) {
+        if (fe->data[j] != ' ' && fe->data[j] != '%' && isprint(fe->data[j]))
+            fprintf(f, "%c", fe->data[j]);
+        else
+            fprintf(f, "%%%.2x", fe->data[j]);
+    }
+}
 
 /**
  * Returns true if the feature table is enabled

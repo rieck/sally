@@ -9,25 +9,17 @@
  * warranty. See the GNU General Public License for more details. 
  */
  
-#ifndef INPUT_H
-#define INPUT_H
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-/**
- * Structure for a string
- */
-typedef struct {
-    char *str;      /* String data (not necessary c-style) */
-    int len;        /* Length of string */
-    char *src;      /* Optional description of source */
-    float label;    /* Optional label of string */
-} string_t;
+#include "fvec.h"
 
 /* Configuration */
-void input_config(char *);
+void output_config(char *);
 
 /* Generic interface */
-int input_open(char *);
-int input_read(string_t *, int);
-void input_close(void);
+int output_open(char *);
+int output_write(fvec_t **, int);
+void output_close(void);
 
-#endif                          /* INPUT_H */
+#endif                          /* OUTPUT_H */

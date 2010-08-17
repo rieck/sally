@@ -29,6 +29,9 @@
 /* Local variables */
 static struct archive *a = NULL;
 
+/* Local functions */
+static float get_label(char *desc);
+
 /**
  * Opens an archive for reading files. 
  * @param name Archive name
@@ -69,14 +72,12 @@ int input_arc_open(char *name)
 /**
  * Reads a block of files into memory.
  * @param strs Array for data
- * @param sizes Array for sizes
- * @param desc Array for descriptions
  * @param len Length of block
  * @return number of read files
  */
-int input_arc_read(char **strs, int *sizes, char **desc, int len)
+int input_arc_read(string_t *strs, int len)
 {
-    assert(strs && sizes && desc);
+    assert(strs && len > 0);
     struct archive_entry *entry;
     int i, j = 0;
     
@@ -91,10 +92,11 @@ int input_arc_read(char **strs, int *sizes, char **desc, int len)
                 archive_read_data_skip(a);
             } else {
                 /* Add entry */
-                strs[j] = malloc(s->st_size * sizeof(char));
-                archive_read_data(a, strs[j], s->st_size);
-                desc[j] = strdup(archive_entry_pathname(entry));
-                sizes[j] = s->st_size;
+                strs[j].str = malloc(s->st_size * sizeof(char));
+                archive_read_data(a, strs[j].str, s->st_size);
+                strs[j].src = strdup(archive_entry_pathname(entry));
+                strs[j].len = s->st_size;
+                strs[j].label = get_label(strs[j].src);
                 j++;
             }
         }
@@ -111,6 +113,7 @@ void input_arc_close()
     archive_read_finish(a);
 }
 
+
 /** 
  * Converts a file name to a label. The label is computed from the 
  * file's suffix; either directly if the suffix is a number or 
@@ -118,7 +121,7 @@ void input_arc_close()
  * @param desc Description (file name) 
  * @return label value.
  */
-float input_arc_desc2label(char *desc)
+static float get_label(char *desc)
 {
     char *endptr;
     char *name = desc + strlen(desc) - 1;
@@ -140,6 +143,7 @@ float input_arc_desc2label(char *desc)
     
     return f;
 } 
+
 
 #endif
 

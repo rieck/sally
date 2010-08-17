@@ -136,6 +136,7 @@ AC_CONFIG_FILES([
    Makefile \
    src/Makefile \
    src/input/Makefile \
+   src/output/Makefile \
    doc/Makefile \
    tests/Makefile \
 ])

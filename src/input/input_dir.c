@@ -23,6 +23,7 @@
 
 /* Local functions */
 static char *load_file(char *path, char *name, int *size);
+static float get_label(char *desc);
 
 /* Local variables */
 static DIR *dir = NULL;
@@ -59,15 +60,13 @@ int input_dir_open(char *p)
 /**
  * Reads a block of files into memory.
  * @param strs Array for file data
- * @param sizes Array of file sizes
- * @param names Array of file names
  * @param len Length of block
  * @return number of read files
  */
-int input_dir_read(char **strs, int *sizes, char **names, int len)
+int input_dir_read(string_t *strs, int len)
 {
-    assert(strs && sizes && names);
-    int i, j = 0;
+    assert(strs && len > 0);
+    int i, j = 0, l;
  
     /* Determine maximum path length and allocate buffer */
     int maxlen = fpathconf(dirfd(dir), _PC_NAME_MAX);
@@ -89,8 +88,10 @@ int input_dir_read(char **strs, int *sizes, char **names, int len)
 
 #pragma omp critical
         {
-            names[j] = strdup(dp->d_name);
-            strs[j] = load_file(path, dp->d_name, sizes + j);
+            strs[j].str = load_file(path, dp->d_name, &l);
+            strs[j].src = strdup(dp->d_name);
+            strs[j].len = l;
+            strs[j].label = get_label(strs[j].src);
             j++;
         }
 skip:
@@ -162,7 +163,7 @@ static char *load_file(char *path, char *name, int *size)
  * @param desc Description (file name) 
  * @return label value.
  */
-float input_dir_desc2label(char *desc)
+static float get_label(char *desc)
 {
     char *endptr;
     char *name = desc + strlen(desc) - 1;

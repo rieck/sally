@@ -9,14 +9,12 @@
  * warranty. See the GNU General Public License for more details. 
  */
  
-#ifndef INPUT_ARC_H
-#define INPUT_ARC_H
+#ifndef OUTPUT_LIBSVM_H
+#define OUTPUT_LIBSVM_H
 
-#ifdef ENABLE_LIBARCHIVE
-/* Archive module */
-int input_arc_open(char *);
-int input_arc_read(string_t *, int);
-void input_arc_close(void);
-#endif
+/* Libsvm output module */
+int output_libsvm_open(char *);
+int output_libsvm_write(fvec_t **, int);
+void output_libsvm_close(void);
 
-#endif                          /* INPUT_ARC_H */
+#endif                          /* OUTPUT_LIBSVM_H */

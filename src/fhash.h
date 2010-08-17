@@ -36,6 +36,7 @@ typedef struct {
 
 /* Global functions */
 void fhash_init();
+void fhash_reset();
 void fhash_destroy();
 void fhash_put(feat_t, char *, int);
 fentry_t *fhash_get(feat_t);
@@ -44,5 +45,6 @@ void fhash_print(FILE *);
 void fhash_save(gzFile *f);
 void fhash_load(gzFile *f);
 int fhash_enabled();
+void fhash_write_entry(FILE *f, fentry_t *fe); 
 
 #endif                          /* FHASH_H */
