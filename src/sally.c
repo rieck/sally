@@ -146,7 +146,7 @@ static void sally_init(int argc, char **argv)
 
 static void sally_process()
 {
-    long num, read, i = 0, j, block;
+    long read, i = 0, j, block;
     
     /* Get block size */
     config_lookup_int(&cfg, "input.block_size", &block);
@@ -157,7 +157,7 @@ static void sally_process()
     if (!fvec || !strs) 
         fatal("Could not allocate memory for embedding");
     
-    while (i < num) {
+    while (i < entries) {
         read = input_read(strs, block);
         if (!read) 
             fatal("Failed to read strings from input '%s'", input);

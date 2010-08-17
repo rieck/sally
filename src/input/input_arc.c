@@ -80,25 +80,23 @@ int input_arc_read(string_t *strs, int len)
     assert(strs && len > 0);
     struct archive_entry *entry;
     int i, j = 0;
+
     
     /* Load block of files (no OpenMP here)*/
     for (i = 0; i < len; i++) {    
-#pragma omp critical
-        {    
-            /* Perform reading of archive */
-            archive_read_next_header(a, &entry);
-            const struct stat *s = archive_entry_stat(entry);
-            if (!S_ISREG(s->st_mode)) {
-                archive_read_data_skip(a);
-            } else {
-                /* Add entry */
-                strs[j].str = malloc(s->st_size * sizeof(char));
-                archive_read_data(a, strs[j].str, s->st_size);
-                strs[j].src = strdup(archive_entry_pathname(entry));
-                strs[j].len = s->st_size;
-                strs[j].label = get_label(strs[j].src);
-                j++;
-            }
+        /* Perform reading of archive */
+        archive_read_next_header(a, &entry);
+        const struct stat *s = archive_entry_stat(entry);
+        if (!S_ISREG(s->st_mode)) {
+            archive_read_data_skip(a);
+        } else {
+            /* Add entry */
+            strs[j].str = malloc(s->st_size * sizeof(char));
+            archive_read_data(a, strs[j].str, s->st_size);
+            strs[j].src = strdup(archive_entry_pathname(entry));
+            strs[j].len = s->st_size;
+            strs[j].label = get_label(strs[j].src);
+            j++;
         }
     }
     

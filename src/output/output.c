@@ -69,7 +69,7 @@ int output_open(char *name)
  * @param len Length of arrays
  * @return Number of written vectors
  */
-int output_read(fvec_t **x, int len)
+int output_write(fvec_t **x, int len)
 {
     return func.output_write(x, len);
 }
