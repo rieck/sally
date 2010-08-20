@@ -161,14 +161,15 @@ static void sally_process()
         read = input_read(strs, block);
         if (!read) 
             fatal("Failed to read strings from input '%s'", input);
+
         
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
             fvec_set_source(fvec[j], strs[j].src);
         }
-        
-        if (!output_write(fvec, block))
+
+        if (!output_write(fvec, read))
             fatal("Failed to write vectors to output '%s'", output);
         
         for (j = 0; j < read; j++) {
@@ -179,7 +180,8 @@ static void sally_process()
             fvec_destroy(fvec[j]);
         }
         
-        fhash_reset();
+        if (fhash_enabled())
+            fhash_reset();
         i += read;
     }
     

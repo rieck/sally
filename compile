@@ -23,8 +23,8 @@ case $arg in
        echo "Configuration: Twoface/Rieck"
        CC="gcc-mp-4.4" \
        CXX="g++-mp-4.4" \
-       CFLAGS="-march=native -DDEBUG -g -pedantic -pipe -O2" \
-       CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe -O2" \
+       CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
+       CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 

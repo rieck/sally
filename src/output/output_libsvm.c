@@ -81,7 +81,7 @@ int output_libsvm_write(fvec_t **x, int len)
                 if (i < x[j]->len - 1)
                     fprintf(f, " ");
             }
-            fprintf(f, "]\n");
+            fprintf(f, "]");
         }
     
         fprintf(f, "\n");

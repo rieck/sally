@@ -298,6 +298,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int n, int b)
         t++;
         fv->len++;
     }
+    fv->total = fv->len;
     
     if (!fhash_enabled())
         return;

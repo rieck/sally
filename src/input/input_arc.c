@@ -80,7 +80,6 @@ int input_arc_read(string_t *strs, int len)
     assert(strs && len > 0);
     struct archive_entry *entry;
     int i, j = 0;
-
     
     /* Load block of files (no OpenMP here)*/
     for (i = 0; i < len; i++) {    

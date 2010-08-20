@@ -263,7 +263,7 @@ void fhash_print_entry(FILE *f, fentry_t *fe)
         if (fe->data[j] != ' ' && fe->data[j] != '%' && isprint(fe->data[j]))
             fprintf(f, "%c", fe->data[j]);
         else
-            fprintf(f, "%%%.2x", fe->data[j]);
+            fprintf(f, "%%%.2x", (unsigned char) fe->data[j]);
     }
 }
 
