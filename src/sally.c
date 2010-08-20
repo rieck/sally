@@ -127,20 +127,22 @@ static void sally_init(int argc, char **argv)
     
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
-    if (ehash)
+    if (ehash) {
+        info_msg(1, "Enabling feature hash table.");
         fhash_init();
+    }
     
     /* Open input */
     config_lookup_string(&cfg, "input.format", &cfg_str);
     input_config(cfg_str);
-    info_msg(1, "Opening input'%s' [format: %s]", input, cfg_str);
+    info_msg(1, "Opening input %s [format: %s].", input, cfg_str);
     entries = input_open(input);
     if (entries < 0)
         fatal("Could not open input source");
 
     config_lookup_string(&cfg, "output.format", &cfg_str);
     output_config(cfg_str);    
-    info_msg(1, "Opening output'%s' [format: %s]", output, cfg_str);
+    info_msg(1, "Opening output %s [format: %s].", output, cfg_str);
     if (!output_open(output))
         fatal("Coult not open output destination");
 }
@@ -158,12 +160,13 @@ static void sally_process()
     if (!fvec || !strs) 
         fatal("Could not allocate memory for embedding");
     
+    info_msg(1, "Processing %d entries in blocks of %d.", entries, block);
+    
     while (i < entries) {
         read = input_read(strs, block);
         if (!read) 
             fatal("Failed to read strings from input '%s'", input);
 
-        
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
@@ -184,6 +187,8 @@ static void sally_process()
         if (fhash_enabled())
             fhash_reset();
         i += read;
+        
+        info_msg(1, "Completed %8d entries [%5.1f%%]", i, i * 100.0 / entries);
     }
     
     free(strs);
@@ -194,7 +199,7 @@ static void sally_exit()
 {
     long ehash;
     
-    /* Close input and output */
+    info_msg(1, "Closing input and output.");
     input_close();
     output_close();
     
