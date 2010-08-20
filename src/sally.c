@@ -130,16 +130,17 @@ static void sally_init(int argc, char **argv)
     if (ehash)
         fhash_init();
     
-    /* Configure input and output */
+    /* Open input */
     config_lookup_string(&cfg, "input.format", &cfg_str);
     input_config(cfg_str);
-    config_lookup_string(&cfg, "output.format", &cfg_str);
-    output_config(cfg_str);    
-    
-    /* Open input and output */
+    info_msg(1, "Opening input'%s' [format: %s]", input, cfg_str);
     entries = input_open(input);
     if (entries < 0)
         fatal("Could not open input source");
+
+    config_lookup_string(&cfg, "output.format", &cfg_str);
+    output_config(cfg_str);    
+    info_msg(1, "Opening output'%s' [format: %s]", output, cfg_str);
     if (!output_open(output))
         fatal("Coult not open output destination");
 }
