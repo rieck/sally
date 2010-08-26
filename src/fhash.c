@@ -199,7 +199,7 @@ void fhash_save(gzFile *z)
     for (f = fhash; f != NULL; f = f->hh.next) {
         gzprintf(z, "  bin=%.16llx: ", (long long unsigned int) f->key);
         for (i = 0; i < f->len; i++) {
-            if (f->data[i] != '%' && f->data[i] != ' ' && isprint(f->data[i]))
+            if (!strchr("% ", f->data[i]) && isprint(f->data[i]))
                 gzprintf(z, "%c", f->data[i]);
             else
                 gzprintf(z, "%%%.2x", f->data[i]);

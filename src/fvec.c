@@ -507,7 +507,7 @@ fvec_t *fvec_load(gzFile *z)
     /* Load features */
     for (i = 0; i < f->len; i++) {
         gzgets(z, buf, 512);
-        r = sscanf(buf, "  feat=%llx:%g\n", (unsigned long long *) &f->dim[i],
+        r = sscanf(buf, "  feat=%llx:%f\n", (unsigned long long *) &f->dim[i],
                    (float *) &f->val[i]);
         if (r != 2) 
             goto err;
@@ -526,16 +526,16 @@ err:
  * @param f Feature vector
  * @param z File pointer
  */
-void fvec_save(fvec_t *f, gzFile * z)
+void fvec_save(fvec_t *f, gzFile *z)
 {
     assert(f && z);
     int i;
 
-    gzprintf(z, "fvec: len=%lu, total=%lu, label=%g, src=%s\n",
-             f->len, f->total, f->label, f->src);
+    gzprintf(z, "fvec: len=%lu, total=%lu, label=%12.10f, src=lala\n",
+             f->len, f->total, f->label, f->src ? f->src : "(null)");
     for (i = 0; i < f->len; i++)
-        gzprintf(z, "  feat=%.16llx:%.16g\n", (unsigned long long) f->dim[i],
-                 (float) f->val[i]);
+        gzprintf(z, "  feat=%.16llx:%12.10f\n", (unsigned long long) f->dim[i],
+                 (double) f->val[i]);
 }
 
 

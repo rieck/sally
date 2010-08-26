@@ -47,7 +47,7 @@ test_t tests[] = {
 /* Number of stress runs */
 #define STRESS_RUNS             1000
 /* String length */
-#define STR_LENGTH              4095
+#define STR_LENGTH              1024
 
 /* 
  * A simple static test for the feature vectors
@@ -189,8 +189,9 @@ int test_load_save()
                 test_error("(%d) f->dim[%d] != g->dim[%d]", i, j, j);
                 break;
             }
-            if (fabs(f->val[j] - g->val[j]) > 10e-10) {
-                test_error("(%d) f->val[%d] != g->val[%d]", i, j, j);
+            if (fabs(f->val[j] - g->val[j]) > 10e-9) {
+                test_error("(%d) f->val[%d] %f != g->val[%d] %f", i, j, 
+                           f->val[j], j, g->val[j]);
                 break;
             }
         }

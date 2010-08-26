@@ -30,7 +30,7 @@ case $arg in
 
    *)    
        echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -O3" \
+       CFLAGS="-g -pedantic -pipe -DDEBUG" \
        ./configure 
        ;;
 esac

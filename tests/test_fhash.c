@@ -17,9 +17,9 @@
 /* Test file */
 #define TEST_FILE               "test.fh"
 /* Number of stress runs */
-#define STRESS_RUNS             10000
+#define STRESS_RUNS             4096
 /* String length */
-#define STR_LENGTH              4095
+#define STR_LENGTH              1024
 
 /* Global variables */
 int verbose = 5;
