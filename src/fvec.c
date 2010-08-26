@@ -437,7 +437,7 @@ void fvec_set_label(fvec_t *fv, float l)
 void fvec_print(FILE *f, fvec_t *fv)
 {
     assert(fv);
-    int i;
+    int i, j;
 
     fprintf(f, "Feature vector [src: %s, label: %g, len: %lu, total: %lu]\n", 
            fv->src, fv->label, fv->len, fv->total);
@@ -446,8 +446,14 @@ void fvec_print(FILE *f, fvec_t *fv)
         fprintf(f, "   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i], 
                fv->val[i]);
 
-        if (fhash_enabled()) 
-            fhash_print_entry(f, fhash_get(fv->dim[i]));
+        if (fhash_enabled()) {
+            fentry_t *fe = fhash_get(fv->dim[i]);
+            for (j = 0; fe && j < fe->len; j++) 
+                if (isprint(fe->data[j]) && !strchr("% ", fe->data[j]))
+                    fprintf(f, "%c", fe->data[j]);
+                else
+                    fprintf(f, "%%%.2x", (unsigned char) fe->data[j]);
+        }        
         
         fprintf(f, "]\n");        
     }    

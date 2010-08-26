@@ -84,5 +84,6 @@ double time_stamp()
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec / 1e6;
 }
+ 
 
 /** @} */

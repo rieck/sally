@@ -29,11 +29,11 @@ extern config_t cfg;
 static FILE *f = NULL;
 
 /**
- * Opens a file for writing libsvm format
+ * Opens a file for writing list format
  * @param fn File name
  * @return number of regular files
  */
-int output_libsvm_open(char *fn) 
+int output_list_open(char *fn) 
 {
     assert(fn);    
     
@@ -45,7 +45,7 @@ int output_libsvm_open(char *fn)
     
     /* Write sally header */
     sally_version(f, "#");
-    fprintf(f, "# Output module for LibSVM format\n");
+    fprintf(f, "# Output module for list format\n");
     
     return TRUE;
 }
@@ -56,21 +56,34 @@ int output_libsvm_open(char *fn)
  * @param len Length of block
  * @return number of written files
  */
-int output_libsvm_write(fvec_t **x, int len)
+int output_list_write(fvec_t **x, int len)
 {
     assert(x && len > 0);
-    int j, i;
+    int j, i, k;
 
     for (j = 0; j < len; j++) {
-        /* Print feature vector */
         fprintf(f, "%g ", x[j]->label);
-        for (i = 0; i < x[j]->len; i++) 
-            fprintf(f, "%llu:%g ", (long long unsigned int)  x[j]->dim[i] + 1, 
-                    x[j]->val[i]);
+        for (i = 0; i < x[j]->len; i++) {
+
+            /* Print feature (hash and string) */
+            fentry_t *fe = fhash_get(x[j]->dim[i]);
+            fprintf(f, "%llu:", (long long unsigned int)  x[j]->dim[i]);
+            for (k = 0; fe && k < fe->len; k++) {
+                if (isprint(fe->data[k]) && !strchr("%: ", fe->data[k])) 
+                    fprintf(f, "%c", fe->data[k]);
+                else
+                    fprintf(f, "%%%.2x", (unsigned char) fe->data[k]);
+            }
+
+            /* Print value of feature */
+            fprintf(f, ":%g", x[j]->val[i]);
+            if (i < x[j]->len - 1)
+                fprintf(f, ",");
+        }
 
         /* Print source of string */
         if (x[j]->src)
-            fprintf(f, "# %s", x[j]->src);
+            fprintf(f, " %s", x[j]->src);
     
         fprintf(f, "\n");
     }
@@ -81,7 +94,7 @@ int output_libsvm_write(fvec_t **x, int len)
 /**
  * Closes an open output file.
  */
-void output_libsvm_close()
+void output_list_close()
 {
     if (f)
         fclose(f);

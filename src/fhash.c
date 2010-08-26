@@ -246,28 +246,6 @@ void fhash_load(gzFile *z)
 }
 
 /**
- * Writes the string of an entry to a file. The string is encoded.
- * @param f File pointer
- * @param fe Feature hash entry
- */
-void fhash_print_entry(FILE *f, fentry_t *fe) 
-{
-    int j;
-    
-    if (!fe) {
-        fprintf(f, "<NULL>");
-        return;
-    }
-    
-    for (j = 0; f && j < fe->len; j++) {
-        if (fe->data[j] != ' ' && fe->data[j] != '%' && isprint(fe->data[j]))
-            fprintf(f, "%c", fe->data[j]);
-        else
-            fprintf(f, "%%%.2x", (unsigned char) fe->data[j]);
-    }
-}
-
-/**
  * Returns true if the feature table is enabled
  * @return true if enabled false otherwise
  */
