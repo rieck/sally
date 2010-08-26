@@ -31,8 +31,9 @@ void fvec_norm(fvec_t *fv, const char *n)
     int i;
     double s = 0;
     
-    
-    if (!strcasecmp(n, "l1")) {
+    if (!strcasecmp(n, "none")) {
+        return;
+    } else if (!strcasecmp(n, "l1")) {
         for (i = 0; i < fv->len; i++)
             s += fv->val[i];
         for (i = 0; i < fv->len; i++)

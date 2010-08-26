@@ -221,7 +221,6 @@ static void sally_exit()
  */
 int main(int argc, char **argv)
 {
-    
     sally_init(argc, argv);
     sally_process();
     sally_exit();
