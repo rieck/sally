@@ -58,7 +58,7 @@ int output_libsvm_open(char *fn)
  */
 int output_libsvm_write(fvec_t **x, int len)
 {
-    assert(x && len > 0);
+    assert(x && len >= 0);
     int j, i;
 
     for (j = 0; j < len; j++) {

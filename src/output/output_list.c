@@ -58,7 +58,7 @@ int output_list_open(char *fn)
  */
 int output_list_write(fvec_t **x, int len)
 {
-    assert(x && len > 0);
+    assert(x && len >= 0);
     int j, i, k;
 
     for (j = 0; j < len; j++) {

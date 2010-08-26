@@ -153,7 +153,8 @@ static void sally_process()
     
     /* Get block size */
     config_lookup_int(&cfg, "input.block_size", &block);
-    
+
+    /* Allocate space */    
     fvec_t **fvec = malloc(sizeof(fvec_t *) * block);
     string_t *strs = malloc(sizeof(string_t) * block);
     
@@ -165,7 +166,7 @@ static void sally_process()
     while (i < entries) {
         read = input_read(strs, block);
         if (!read) 
-            fatal("Failed to read strings from input '%s'", input);
+            warning("Failed to read strings from input '%s'", input);
 
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
