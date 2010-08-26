@@ -84,7 +84,10 @@ int input_arc_read(string_t *strs, int len)
     /* Load block of files (no OpenMP here)*/
     for (i = 0; i < len; i++) {    
         /* Perform reading of archive */
-        archive_read_next_header(a, &entry);
+        int r = archive_read_next_header(a, &entry);
+        if (r != ARCHIVE_OK)
+            break;
+        
         const struct stat *s = archive_entry_stat(entry);
         if (!S_ISREG(s->st_mode)) {
             archive_read_data_skip(a);

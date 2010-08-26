@@ -28,6 +28,12 @@ case $arg in
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
+   ubuntu)    
+       echo "Configuration: Standard"
+       CFLAGS="-g -pedantic -pipe -DDEBUG"  \
+       ./configure --enable-libarchive --enable-openmp
+       ;;
+
    *)    
        echo "Configuration: Standard"
        CFLAGS="-g -pedantic -pipe -DDEBUG" \
