@@ -149,22 +149,22 @@ static void sally_init(int argc, char **argv)
 
 static void sally_process()
 {
-    long read, i = 0, j, block;
+    long read, i = 0, j, chunk;
     
-    /* Get block size */
-    config_lookup_int(&cfg, "input.block_size", &block);
+    /* Get chunk size */
+    config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */    
-    fvec_t **fvec = malloc(sizeof(fvec_t *) * block);
-    string_t *strs = malloc(sizeof(string_t) * block);
+    fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
+    string_t *strs = malloc(sizeof(string_t) * chunk);
     
     if (!fvec || !strs) 
         fatal("Could not allocate memory for embedding");
     
-    info_msg(1, "Processing %d entries in blocks of %d.", entries, block);
+    info_msg(1, "Processing %d entries in chunks of %d.", entries, chunk);
     
     while (i < entries) {
-        read = input_read(strs, block);
+        read = input_read(strs, chunk);
         if (!read) 
             warning("Failed to read strings from input '%s'", input);
 
@@ -189,7 +189,7 @@ static void sally_process()
             fhash_reset();
         i += read;
         
-        info_msg(1, "Completed %8d entries [%5.1f%%]", i, i * 100.0 / entries);
+        info_msg(1, "Completed %.8d entries [%5.1f%%]", i, i * 100.0 / entries);
     }
     
     free(strs);
