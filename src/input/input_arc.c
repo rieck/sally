@@ -11,8 +11,8 @@
 
 /** 
  * @addtogroup input 
- *
- * Module <em>arc</em>: The strings are stored as files in an archive.
+ * Module 'arc'.
+ * <b>'arc'</b>: The strings are stored as files in an archive.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{

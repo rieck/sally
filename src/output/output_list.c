@@ -10,7 +10,15 @@
  */
 
 /** 
- * @defgroup output 
+ * @addtogroup output 
+ * Module 'list'.
+ * <b>'list'</b>: The vectors are exported in a sparse 
+ * text format. Each vector is represented as a list of dimensions
+ * which are written to a text file in the following form
+ * <pre> dimension:feature:value,... source </pre>
+ * If parameter <code>explicit_hash</code> is not enabled in the
+ * configuration, the field <code>feature</code> will be empty.
+ * 
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */

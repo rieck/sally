@@ -10,9 +10,9 @@
  */
 
 /** 
- * @addtogroup input 
- *
- * Module <em>lines</em>: The strings are stored as text lines in a file.
+ * @addtogroup input
+ * Module 'lines'.
+ * <b>'lines'</b>: The strings are stored as text lines in a file.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{

@@ -15,7 +15,6 @@
  * Generic implementation of functions for reading strings in various 
  * formats. 
  *
- * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 

@@ -11,8 +11,8 @@
 
 /** 
  * @addtogroup input 
- *
- * Module <em>dir</em>: The strings are stored as files in a directory.
+ * Module 'dir'.
+ * <b>'dir'</b>: The strings are stored as files in a directory.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{

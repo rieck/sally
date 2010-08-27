@@ -12,10 +12,9 @@
 /** 
  * @defgroup output Output interface
  *
- * Generic implementation of functions for writing vectors in various
- * formats, such as libsvm or matlab format.
+ * Generic implementation of functions for writing sparse vectors in 
+ * various formats.
  *
- * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 

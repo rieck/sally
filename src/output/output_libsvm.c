@@ -10,7 +10,13 @@
  */
 
 /** 
- * @defgroup output 
+ * @addtogroup output 
+ * Module 'libsvm'.
+ * <b>'libsvm'</b>: The vectors are exported in a sparse text
+ * format which is used by LibSVM and SVMlight. Each vector is 
+ * represented as a text line of the form
+ * <pre> label dimension:value ... # source </pre>
+ *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
