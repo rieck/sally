@@ -65,13 +65,13 @@ int input_lines_open(char *name)
 int input_lines_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
-    int i = 0, j = 0;
+    int read, i = 0, j = 0;
     size_t size;
     char buf[32], *line = NULL;
 
     for (i = 0; i < len; i++) {
-        line = NULL;
-        int read = getline(&line, &size, in);
+        line = NULL;        
+        read = getline(&line, &size, in);
         if (read == -1)  {
             free(line);
             break;

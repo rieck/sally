@@ -101,9 +101,11 @@ fvec_t *fvec_extract(char *x, int l)
         /* Feature extraction */
         extract_ngrams(fv, x, l, nlen, bits);
     } else {
-        if (delim[0] == DELIM_NOT_INIT) {
-            memset(delim, 0, 256);
-            decode_delim(dlm_str);
+    
+#pragma omp critical (delim) 
+        {
+            if (delim[0] == DELIM_NOT_INIT) 
+                decode_delim(dlm_str);
         }
 
         /* Feature extraction */
@@ -545,7 +547,8 @@ static void decode_delim(const char *s)
 {
     char buf[5] = "0x00";
     unsigned int i, j;
-
+    
+    memset(delim, 0, 256);
     for (i = 0; i < strlen(s); i++) {
         if (s[i] != '%') {
             delim[(unsigned int) s[i]] = 1;

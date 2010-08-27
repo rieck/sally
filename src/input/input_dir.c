@@ -53,7 +53,7 @@ int input_dir_open(char *p)
     /* Count files */
     int num_files = 0;
     while (dir && (dp = readdir(dir)) != NULL) {
-        if (dp->d_type == DT_REG)
+        if (dp->d_type == DT_REG || dp->d_type == DT_LNK)
             num_files++;
     }
     rewinddir(dir);
@@ -86,8 +86,8 @@ int input_dir_read(string_t *strs, int len)
             return j;
         }
         
-        /* Skip all entries except for regular files */
-        if (dp->d_type != DT_REG) 
+        /* Skip all entries except for regular files and symlinks */
+        if (dp->d_type != DT_REG && dp->d_type != DT_LNK) 
             goto skip;
         
         strs[j].str = load_file(path, dp->d_name, &l);

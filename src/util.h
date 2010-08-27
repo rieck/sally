@@ -15,6 +15,13 @@
 
 #include "config.h"
 
+/* Progress bar stuff */
+#define PROGBAR_LEN     52
+#define PROGBAR_EMPTY   ':'
+#define PROGBAR_FULL    '#'
+#define PROGBAR_DONE    '#'
+#define PROGBAR_FRONT   '|'
+
 /* Fatal message */
 #ifndef fatal
 #define fatal(...)     {err_msg("Error", __func__, __VA_ARGS__); exit(-1);}
@@ -32,5 +39,6 @@
 void err_msg(char *, const char *, char *, ...);
 void info_msg(int, char *, ...);
 double time_stamp();
+void prog_bar(long, long, long);
 
 #endif                          /* UTIL_H */

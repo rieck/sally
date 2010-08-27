@@ -24,6 +24,10 @@
 extern int verbose;
 /* Global variable */
 static double time_start = -1;
+/** Progress bar (with NULL) */
+static char pb_string[PROGBAR_LEN + 1];
+/** Start timestamp measured */
+static double pb_start = -1;
 
 /**
  * Print a formated info message with timestamp. 
@@ -45,7 +49,7 @@ void info_msg(int v, char *m, ...)
     vsnprintf(s, 256, m, ap);
     va_end(ap);
     
-    fprintf(stderr, "[%7.1f] %s\n", time_stamp() - time_start, s);
+    fprintf(stderr, "> %s\n", s);
     fflush(stderr);
 }
 
@@ -84,6 +88,70 @@ double time_stamp()
     gettimeofday(&tv, NULL);
     return tv.tv_sec + tv.tv_usec / 1e6;
 }
- 
+
+/**
+ * Print a progress bar in a given range.
+ * @param a Minimum value 
+ * @param b Maximum value
+ * @param c Current value
+ */
+void prog_bar(long a, long b, long c)
+{
+    int i, first, last;
+    double perc, ptime = 0, min, max, in;
+    char *descr = "";
+    
+    min = (double) a;
+    max = (double) b;
+    in = (double) c;
+
+    perc = (in - min) / (max - min);
+    first = fabs(in - min) < 1e-10;
+    last = fabs(in - max) < 1e-10;
+
+    /* Start of progress */
+    if (pb_start < 0 || (first && !last)) {
+        pb_start = time_stamp();
+        for (i = 0; i < PROGBAR_LEN; i++)
+            pb_string[i] = PROGBAR_EMPTY;
+        descr = "start";
+        perc = 0.0;
+    }
+
+    /* End of progress */
+    if (last) {
+        for (i = 0; i < PROGBAR_LEN; i++)
+            pb_string[i] = PROGBAR_FULL;
+        ptime = time_stamp() - pb_start;
+        descr = "total";
+        perc = 1.0;
+        pb_start = -1;
+    }
+
+    /* Middle of progress */
+    if (!first && !last) {
+        int len = (int) round(perc * PROGBAR_LEN);
+        for (i = 0; i < len; i++)
+            if (i < len - 1)
+                pb_string[i] = PROGBAR_DONE;
+            else
+                pb_string[i] = PROGBAR_FRONT;
+        ptime = (max - in) * (time_stamp() - pb_start) / (in - min);
+        descr = "   in";
+    }
+
+    int mins = (int) floor(ptime / 60);
+    int secs = (int) floor(ptime - mins * 60);
+    pb_string[PROGBAR_LEN] = 0;
+
+    printf("\r  [%s] %5.1f%%  %s %.2dm %.2ds ", pb_string,
+           perc * 100, descr, mins, secs);
+
+    if (last)
+        printf("\n");
+
+    fflush(stdout);
+    fflush(stderr);
+}
 
 /** @} */
