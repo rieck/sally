@@ -64,7 +64,7 @@ int input_dir_open(char *p)
  * Reads a block of files into memory.
  * @param strs Array for file data
  * @param len Length of block
- * @return number of read files or -1 on error
+ * @return number of read files 
  */
 int input_dir_read(string_t *strs, int len)
 {
@@ -81,9 +81,9 @@ int input_dir_read(string_t *strs, int len)
         
         /* Read directory entry to local buffer */
         int r = readdir_r(dir, (struct dirent *) buf, &dp);
-        if (r != 0) {
+        if (r != 0 || !dp) {
             free(buf);
-            return -1;
+            return j;
         }
         
         /* Skip all entries except for regular files */
@@ -98,6 +98,7 @@ int input_dir_read(string_t *strs, int len)
     skip:
         free(buf);	
     }
+
     return j;
 }
 

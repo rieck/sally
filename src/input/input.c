@@ -79,7 +79,7 @@ int input_open(char *name)
  * Wrapper for reading a block from the input source.
  * @param strs Allocated array for string data
  * @param len Length of allocated arrays
- * @return Number of read strings or -1 on error
+ * @return Number of read strings
  */
 int input_read(string_t *strs, int len)
 {

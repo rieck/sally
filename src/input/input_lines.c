@@ -24,7 +24,9 @@
 #include "murmur.h"
 #include "input.h"
 
-static float get_label(char *desc);
+/** Static variable */
+static FILE *in; 
+static int line_num = 0;
 
 /**
  * Opens a file for reading text lines. 
@@ -34,33 +36,24 @@ static float get_label(char *desc);
 int input_lines_open(char *name) 
 {
     assert(name);    
-    struct lineshive_entry *entry;
 
-    a = lineshive_read_new();
-    lineshive_read_support_compression_all(a);
-    lineshive_read_support_format_all(a);
-    int r = lineshive_read_open_filename(a, name, 4096);
-    if (r != 0) {
-        error("%s", lineshive_error_string(a));
+    in = fopen(name, "r");
+    if (!in) {
+        error("Could not open '%s' for reading", name);
         return -1;
     }
 
-    /* Count regular files in lineshive */
-    int num_files = 0;
-    while (lineshive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        const struct stat *s = lineshive_entry_stat(entry);
-        if (S_ISREG(s->st_mode))
-            num_files++;
-        lineshive_read_data_skip(a);
-    }
-    lineshive_read_finish(a);
-    
-    /* Open file again */
-    a = lineshive_read_new();
-    lineshive_read_support_compression_all(a);
-    lineshive_read_support_format_all(a);
-    lineshive_read_open_filename(a, name, 4096);
-    return num_files;
+    /* Count lines in file (I hope this is buffered)*/
+    int num_lines = 0;
+    while (!feof(in)) 
+        if (fgetc(in) == '\n')
+            num_lines++;
+
+    /* Prepare reading */
+    rewind(in);
+    line_num = 1;
+
+    return num_lines;
 }
 
 /**
@@ -72,28 +65,25 @@ int input_lines_open(char *name)
 int input_lines_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
-    struct lineshive_entry *entry;
-    int i, j = 0;
-    
-    /* Load block of files (no OpenMP here)*/
-    for (i = 0; i < len; i++) {    
-        /* Perform reading of lineshive */
-        int r = lineshive_read_next_header(a, &entry);
-        if (r != ARCHIVE_OK)
+    int i = 0, j = 0;
+    size_t size;
+    char buf[32], *line = NULL;
+
+    for (i = 0; i < len; i++) {
+        line = NULL;
+        int read = getline(&line, &size, in);
+        if (read == -1)  {
+            free(line);
             break;
-        
-        const struct stat *s = lineshive_entry_stat(entry);
-        if (!S_ISREG(s->st_mode)) {
-            lineshive_read_data_skip(a);
-        } else {
-            /* Add entry */
-            strs[j].str = malloc(s->st_size * sizeof(char));
-            lineshive_read_data(a, strs[j].str, s->st_size);
-            strs[j].src = strdup(lineshive_entry_pathname(entry));
-            strs[j].len = s->st_size;
-            strs[j].label = get_label(strs[j].src);
-            j++;
         }
+
+        strs[j].str = line;
+        strs[j].len = strlen(line);
+        strs[j].label = 0;
+
+        snprintf(buf, 32, "line %d", line_num++);
+        strs[j].src = strdup(buf);
+        j++;
     }
     
     return j;
@@ -104,41 +94,7 @@ int input_lines_read(string_t *strs, int len)
  */
 void input_lines_close()
 {
-    lineshive_read_finish(a);
+    fclose(in);
 }
-
-
-/** 
- * Converts a file name to a label. The label is computed from the 
- * file's suffix; either directly if the suffix is a number or 
- * indirectly by hashing.
- * @param desc Description (file name) 
- * @return label value.
- */
-static float get_label(char *desc)
-{
-    char *endptr;
-    char *name = desc + strlen(desc) - 1;
-
-    /* Determine dot in file name */
-    while (name != desc && *name != '.')
-        name--; 
-
-    /* Place pointer before '.' */
-    if (name != desc)
-        name++;
-
-    /* Test direct conversion */
-    float f = strtof(name, &endptr);
-    
-    /* Compute hash value */
-    if (!endptr || strlen(endptr) > 0) 
-        f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
-    
-    return f;
-} 
-
-
-#endif
 
 /** @} */

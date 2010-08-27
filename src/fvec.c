@@ -203,8 +203,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int n, int b)
     }
 
     /* No characters remaining */
-    if (j == 0)
-        return;
+    if (j == 0) 
+        goto clean;
 
     /* Add trailing delimiter */
     if (t[j - 1] != d)
@@ -236,17 +236,16 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int n, int b)
             fv->len++;
         }
     }
-    free(t);
 
     /* Save extracted n-grams */
     fv->total = fv->len;
-    
-    if (!fhash_enabled())
-        return;
 
-    /* Flush cache */
-    cache_flush(cache, fv);
-    free(cache);    
+clean:    
+    if (fhash_enabled()) {
+        cache_flush(cache, fv);
+        free(cache);
+    }        
+    free(t);    
 }
 
 

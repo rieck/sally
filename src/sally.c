@@ -165,7 +165,7 @@ static void sally_process()
     
     while (i < entries) {
         read = input_read(strs, chunk);
-        if (read < 0) 
+        if (read <= 0) 
             fatal("Failed to read strings from input '%s'", input);
 
         for (j = 0; j < read; j++) {

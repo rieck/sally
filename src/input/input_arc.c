@@ -76,7 +76,7 @@ int input_arc_open(char *name)
  * Reads a block of files into memory.
  * @param strs Array for data
  * @param len Length of block
- * @return number of read files or -1 on error
+ * @return number of read files
  */
 int input_arc_read(string_t *strs, int len)
 {
@@ -89,7 +89,7 @@ int input_arc_read(string_t *strs, int len)
         /* Perform reading of archive */
         int r = archive_read_next_header(a, &entry);
         if (r != ARCHIVE_OK) 
-            return -1;
+            break;
         
         const struct stat *s = archive_entry_stat(entry);
         if (!S_ISREG(s->st_mode)) {

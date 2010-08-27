@@ -16,6 +16,5 @@
 int input_lines_open(char *);
 int input_lines_read(string_t *, int);
 void input_lines_close(void);
-#endif
 
 #endif                          /* INPUT_LINES_H */
