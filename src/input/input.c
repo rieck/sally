@@ -13,7 +13,7 @@
  * @defgroup input Input interface
  *
  * Generic implementation of functions for reading strings in various 
- * formats, such as an archive of files or a directory of files.
+ * formats. 
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
@@ -27,6 +27,7 @@
 /* Modules */
 #include "input_arc.h"
 #include "input_dir.h"
+#include "input_lines.h"
 
 /**
  * Structure for input interface
@@ -48,6 +49,10 @@ void input_config(const char *format)
         func.input_open = input_dir_open;
         func.input_read = input_dir_read;
         func.input_close = input_dir_close;
+    } else if (!strcasecmp(format, "lines")) {
+        func.input_open = input_lines_open;
+        func.input_read = input_lines_read;
+        func.input_close = input_lines_close;
 #ifdef ENABLE_LIBARCHIVE
     } else if (!strcasecmp(format, "arc")) {
         func.input_open = input_arc_open;
@@ -55,8 +60,8 @@ void input_config(const char *format)
         func.input_close = input_arc_close;
 #endif
     } else {
-        error("Unknown input format '%s', using 'dir' instead.", format);
-        input_config("dir");
+        error("Unknown input format '%s', using 'lines' instead.", format);
+        input_config("lines");
     }
 } 
 
@@ -74,7 +79,7 @@ int input_open(char *name)
  * Wrapper for reading a block from the input source.
  * @param strs Allocated array for string data
  * @param len Length of allocated arrays
- * @return Number of read strings
+ * @return Number of read strings or -1 on error
  */
 int input_read(string_t *strs, int len)
 {

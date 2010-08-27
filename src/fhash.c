@@ -135,7 +135,6 @@ void fhash_destroy()
 /**
  * Prints the feature hash table. 
  * @param f File pointer
- * @param fh Feature hash
  */
 void fhash_print(FILE *f)
 {
@@ -146,7 +145,6 @@ void fhash_print(FILE *f)
 
 /**
  * Returns the size of the feature hash table
- * @param fh Feature hash
  * @return size of table
  */
 unsigned long fhash_size()

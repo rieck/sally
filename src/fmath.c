@@ -10,7 +10,7 @@
  */
 
 /** 
- * @defgroup fvec 
+ * @addtogroup fvec Feature vector
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */

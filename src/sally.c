@@ -165,8 +165,8 @@ static void sally_process()
     
     while (i < entries) {
         read = input_read(strs, chunk);
-        if (!read) 
-            warning("Failed to read strings from input '%s'", input);
+        if (read < 0) 
+            fatal("Failed to read strings from input '%s'", input);
 
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);

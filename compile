@@ -28,6 +28,13 @@ case $arg in
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
+   bane*)
+       echo "Configuration: Bane"
+       CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
+       CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
+       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
+       ;;
+
    ubuntu)    
        echo "Configuration: Standard"
        CFLAGS="-g -pedantic -pipe -DDEBUG"  \

@@ -10,7 +10,10 @@
  */
 
 /** 
- * @defgroup input 
+ * @addtogroup input 
+ *
+ * Module <em>dir</em>: The strings are stored as files in a directory.
+ *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -61,7 +64,7 @@ int input_dir_open(char *p)
  * Reads a block of files into memory.
  * @param strs Array for file data
  * @param len Length of block
- * @return number of read files
+ * @return number of read files or -1 on error
  */
 int input_dir_read(string_t *strs, int len)
 {
@@ -77,9 +80,11 @@ int input_dir_read(string_t *strs, int len)
         buf = malloc(offsetof(struct dirent, d_name) + maxlen + 1);
         
         /* Read directory entry to local buffer */
-        readdir_r(dir, (struct dirent *) buf, &dp);
-        if (!dp) 
-            goto skip;
+        int r = readdir_r(dir, (struct dirent *) buf, &dp);
+        if (r != 0) {
+            free(buf);
+            return -1;
+        }
         
         /* Skip all entries except for regular files */
         if (dp->d_type != DT_REG) 
@@ -131,7 +136,7 @@ static char *load_file(char *path, char *name, int *size)
     /* Open file */
     FILE *fptr = fopen(file, "r");
     if (!fptr) {
-        error("Could not open file '%s'", file);
+        warning("Could not open file '%s'", file);
         return NULL;
     }
     
@@ -139,7 +144,7 @@ static char *load_file(char *path, char *name, int *size)
     stat(file, &st);
     *size = st.st_size;
     if (!(x = malloc((*size + 1) * sizeof(char)))) {
-        error("Could not allocate memory for file data");
+        warning("Could not allocate memory for file data");
         return NULL;
     }
     

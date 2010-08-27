@@ -57,7 +57,6 @@ static char delim[256] = { DELIM_NOT_INIT };
  * Allocates and extracts a feature vector from a string.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
- * @param sa Sally configuration
  * @return feature vector
  */
 fvec_t *fvec_extract(char *x, int l)

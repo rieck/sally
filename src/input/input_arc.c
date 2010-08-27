@@ -10,7 +10,10 @@
  */
 
 /** 
- * @defgroup input 
+ * @addtogroup input 
+ *
+ * Module <em>arc</em>: The strings are stored as files in an archive.
+ *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -73,7 +76,7 @@ int input_arc_open(char *name)
  * Reads a block of files into memory.
  * @param strs Array for data
  * @param len Length of block
- * @return number of read files
+ * @return number of read files or -1 on error
  */
 int input_arc_read(string_t *strs, int len)
 {
@@ -85,8 +88,8 @@ int input_arc_read(string_t *strs, int len)
     for (i = 0; i < len; i++) {    
         /* Perform reading of archive */
         int r = archive_read_next_header(a, &entry);
-        if (r != ARCHIVE_OK)
-            break;
+        if (r != ARCHIVE_OK) 
+            return -1;
         
         const struct stat *s = archive_entry_stat(entry);
         if (!S_ISREG(s->st_mode)) {
