@@ -172,7 +172,6 @@ static void sally_process()
         if (read <= 0) 
             fatal("Failed to read strings from input '%s'", input);
 
-#pragma omp parallel for 
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
