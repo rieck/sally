@@ -12,7 +12,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define __USE_BSD               /* Linux: dirent stuff */
 #define _BSD_SOURCE             /* Linux: strdup() */
 #define __USE_POSIX             /* Linux: readdir_r() */
 #define _GNU_SOURCE		/* Linux: getline() */

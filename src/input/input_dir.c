@@ -27,6 +27,7 @@
 /* Local functions */
 static char *load_file(char *path, char *name, int *size);
 static float get_label(char *desc);
+static void fix_dtype(char *path, struct dirent *dp);
 
 /* Local variables */
 static DIR *dir = NULL;
@@ -53,6 +54,7 @@ int input_dir_open(char *p)
     /* Count files */
     int num_files = 0;
     while (dir && (dp = readdir(dir)) != NULL) {
+        fix_dtype(path, dp);
         if (dp->d_type == DT_REG || dp->d_type == DT_LNK)
             num_files++;
     }
@@ -87,6 +89,7 @@ int input_dir_read(string_t *strs, int len)
         }
         
         /* Skip all entries except for regular files and symlinks */
+        fix_dtype(path, dp);        
         if (dp->d_type != DT_REG && dp->d_type != DT_LNK) 
             goto skip;
         
@@ -190,4 +193,21 @@ static float get_label(char *desc)
     return f;
 } 
 
+static void fix_dtype(char *path, struct dirent *dp)
+{
+    struct stat st;
+    char buffer[512];
+
+    if (dp->d_type == DT_UNKNOWN) {
+        snprintf(buffer, 512, "%s/%s", path, dp->d_name);
+        stat(buffer, &st);
+        if (S_ISREG(st.st_mode))
+            dp->d_type = DT_REG;
+        if (S_ISLNK(st.st_mode))
+            dp->d_type = DT_LNK;
+    }
+}
+
+
 /** @} */
+
