@@ -13,10 +13,11 @@ case $arg in
    node*)
        echo "Configuration: Node"
        CC="gcc" \
+       PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
        CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
        CXXFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
-       ./configure --enable-openmp --enable-libarchive --prefix=$HOME/usr
+       ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
    twoface*|rieck*)

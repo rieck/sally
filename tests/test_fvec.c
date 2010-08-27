@@ -125,7 +125,9 @@ int test_stress_omp()
     config_set_string(&cfg, "features.ngram_delim", "0");
     fhash_init();
 
+#ifdef ENABLE_OPENMP
 #pragma omp parallel for
+#endif
     for (i = 0; i < STRESS_RUNS; i++) {
         config_set_int(&cfg, "features.ngram_len", rand() % 10 + 1);
 
@@ -221,7 +223,9 @@ int main(int argc, char **argv)
 
     err |= test_static();
     err |= test_stress();
+#ifdef ENABLE_OPENMP    
     err |= test_stress_omp();
+#endif    
     err |= test_load_save();
 
     config_destroy(&cfg);

@@ -101,8 +101,10 @@ fvec_t *fvec_extract(char *x, int l)
         /* Feature extraction */
         extract_ngrams(fv, x, l, nlen, bits);
     } else {
-    
+
+#ifdef ENABLE_OPENMP    
 #pragma omp critical (delim) 
+#endif
         {
             if (delim[0] == DELIM_NOT_INIT) 
                 decode_delim(dlm_str);
@@ -155,7 +157,9 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
     int i; 
     
     /* Flush cache and add features to hash */
+#ifdef ENABLE_OPENMP        
 #pragma omp critical
+#endif
     {
         for (i = 0; i < fv->len; i++) {
             fhash_put(c[i].key, c[i].data, c[i].len);
