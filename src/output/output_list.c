@@ -70,9 +70,7 @@ int output_list_write(fvec_t **x, int len)
     int j, i, k;
 
     for (j = 0; j < len; j++) {
-        fprintf(f, "%g ", x[j]->label);
         for (i = 0; i < x[j]->len; i++) {
-
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);
             fprintf(f, "%llu:", (long long unsigned int)  x[j]->dim[i]);
