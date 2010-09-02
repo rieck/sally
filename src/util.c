@@ -154,4 +154,46 @@ void prog_bar(long a, long b, long c)
     fflush(stderr);
 }
 
+#ifndef HAVE_FUNC_GETLINE
+
+#define BLOCK_SIZE 4096
+/**
+ * Dirty re-write of the GNU getline() function. I have been
+ * searching the Web for a couple of minutes to find a suitable 
+ * implementation. Unfortunately, I could not find anything 
+ * appropriate. Some people confused fgets() with getline(), 
+ * others were arguing on licences over and over.
+ */
+ 
+size_t getline (char **s, size_t *n, FILE *f)
+{
+      assert(f);
+      int c = 0;
+      *n = 0;      
+ 
+      if (feof(f))
+          return -1;
+      
+      while (c != '\n') { 
+          if (!*s || *n % BLOCK_SIZE == 0) {
+              *s = realloc(*s, *n + BLOCK_SIZE + 1);
+              if (!*s)
+                  return -1;
+          }   
+          
+          c = fgetc(f);   
+          if (c == EOF) 
+              break;
+          
+          (*s)[(*n)++] = c;
+      }
+      
+      (*s)[*n] = '\0';
+      return *n;
+}
+
+#endif
+
+
 /** @} */
+  

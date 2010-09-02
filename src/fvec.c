@@ -62,7 +62,7 @@ static char delim[256] = { DELIM_NOT_INIT };
 fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
-    long nlen, bits;
+    int nlen, bits;
     const char *dlm_str, *cfg_str;
     assert(x && l >= 0);
 
@@ -92,9 +92,9 @@ fvec_t *fvec_extract(char *x, int l)
     
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (long *) &nlen);
+    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-    config_lookup_int(&cfg, "features.hash_bits", (long *) &bits);
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
 
     /* N-grams of bytes */
     if (!dlm_str || strlen(dlm_str) == 0) {

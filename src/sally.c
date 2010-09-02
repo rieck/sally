@@ -112,7 +112,7 @@ static void parse_options(int argc, char **argv)
 
 static void sally_init(int argc, char **argv)
 {
-    long ehash;
+    int ehash;
     const char *cfg_str;
     
     /* Parse options */
@@ -153,7 +153,8 @@ static void sally_init(int argc, char **argv)
 
 static void sally_process()
 {
-    long read, i, j, chunk;
+    long read, i, j;
+    int chunk;
     
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
@@ -195,13 +196,15 @@ static void sally_process()
         prog_bar(0, entries, i + read);
     }
     
+    prog_bar(0, 1.0, 1.0);    
+    
     free(strs);
     free(fvec);
 }
 
 static void sally_exit()
 {
-    long ehash;
+    int ehash;
     
     info_msg(1, "Flushing. Closing input and output.");
     input_close();

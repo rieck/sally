@@ -41,4 +41,8 @@ void info_msg(int, char *, ...);
 double time_stamp();
 void prog_bar(long, long, long);
 
+#ifndef HAVE_FUNC_GETLINE
+size_t getline (char **s, size_t *n, FILE *f);
+#endif
+
 #endif                          /* UTIL_H */
