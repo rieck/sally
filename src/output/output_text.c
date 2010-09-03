@@ -11,10 +11,10 @@
 
 /** 
  * @addtogroup output 
- * Module 'list'.
- * <b>'list'</b>: The vectors are exported in a sparse 
+ * Module 'text'.
+ * <b>'text'</b>: The vectors are exported in a sparse 
  * text format. Each vector is represented as a list of dimensions
- * which are written to a text file in the following form
+ * which is written to a text file in the following form
  * <pre> dimension:feature:value,... source </pre>
  * If parameter <code>explicit_hash</code> is not enabled in the
  * configuration, the field <code>feature</code> will be empty.
@@ -37,11 +37,11 @@ extern config_t cfg;
 static FILE *f = NULL;
 
 /**
- * Opens a file for writing list format
+ * Opens a file for writing text format
  * @param fn File name
  * @return number of regular files
  */
-int output_list_open(char *fn) 
+int output_text_open(char *fn) 
 {
     assert(fn);    
     
@@ -53,7 +53,7 @@ int output_list_open(char *fn)
     
     /* Write sally header */
     sally_version(f, "#");
-    fprintf(f, "# Output module for list format\n");
+    fprintf(f, "# Output module for text format\n");
     
     return TRUE;
 }
@@ -64,7 +64,7 @@ int output_list_open(char *fn)
  * @param len Length of block
  * @return number of written files
  */
-int output_list_write(fvec_t **x, int len)
+int output_text_write(fvec_t **x, int len)
 {
     assert(x && len >= 0);
     int j, i, k;
@@ -100,7 +100,7 @@ int output_list_write(fvec_t **x, int len)
 /**
  * Closes an open output file.
  */
-void output_list_close()
+void output_text_close()
 {
     if (f)
         fclose(f);

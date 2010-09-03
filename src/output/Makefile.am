@@ -7,4 +7,4 @@ EXTRA_DIST		= README
 noinst_LIBRARIES	= liboutput.a
 
 liboutput_a_SOURCES	= output.c output.h output_libsvm.c output_libsvm.h \
-                          output_list.c output_list.h
+                          output_text.c output_text.h

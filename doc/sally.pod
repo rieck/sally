@@ -31,10 +31,10 @@ Laskov, "Linear-time computation of similarity measures for sequential
 data", Journal of Machine Learning Research, 2008.
 
     .---------.                        .----------.
-    |   dir   |                        |  libsvm  |
-    |   arc   |   \   .---------.   /  |   list   |
+    |   dir   |                        |   text   |
+    |   arc   |   \   .---------.   /  |  libsvm  |
     |  lines  |   --  |  Sally  |  --  |  matlab  |
-    |  fasta  |   /   '---------'   \  |  python  |
+    |   ...   |   /   '---------'   \  |   ...    |
     '---------'                        '----------'
        Input                              Output 
 
@@ -44,19 +44,23 @@ data", Journal of Machine Learning Research, 2008.
 
 =item B<dir> 
 
-The input strings are available as binary files in a directory. The name of
-the directory is given as I<input> to B<sally>.
+The input strings are available as binary files in a directory and the name
+of the directory is given as I<input> to B<sally>. The suffixes of the
+files are used as labels for the extracted vectors.
 
 =item B<arc> 
 
-The input strings are available as binary files in an archive, such as a zip
-or tgz archive.  The name of the archive is given as I<input> to B<sally>.
+The input strings are available as binary files in a compressed archive,
+such as a zip or tgz archive.  The name of the archive is given as I<input>
+to B<sally>.  The suffixes of the files are used as labels for the extracted
+vectors.
 
 =item B<lines> 
 
 The input strings are available as lines in a text file. The name of the
-file is given as I<input> to B<sally>. The lines need to be seperated by
-newline and may not contain the NUL character.
+file is given as I<input> to B<sally>.  No label information is supported by
+this input format.  The lines need to be seperated by newline and may not
+contain the NUL character.
 
 =back 
 
@@ -69,11 +73,11 @@ newline and may not contain the NUL character.
 The feature vectors of the embedded strings are stored in libsvm format. 
 The name of the output file is given as I<output> to B<sally>.
 
-=item B<list> 
+=item B<text> 
 
-The feature vectors of the embedded strings are stored as a list of
-dimensions, features and respective values.  The name of the output file is
-given as I<output> to B<sally>.
+The feature vectors of the embedded strings are stored as a plain text using
+a list of dimensions, features and respective values.  The name of the
+output file is given as I<output> to B<sally>.
 
 =back
 

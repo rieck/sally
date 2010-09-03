@@ -9,12 +9,12 @@
  * warranty. See the GNU General Public License for more details. 
  */
  
-#ifndef OUTPUT_LIST_H
-#define OUTPUT_LIST_H
+#ifndef OUTPUT_TEXT_H
+#define OUTPUT_TEXT_H
 
-/* list output module */
-int output_list_open(char *);
-int output_list_write(fvec_t **, int);
-void output_list_close(void);
+/* text output module */
+int output_text_open(char *);
+int output_text_write(fvec_t **, int);
+void output_text_close(void);
 
-#endif                          /* OUTPUT_LIST_H */
+#endif                          /* OUTPUT_TEXT_H */

@@ -25,7 +25,7 @@
 
 /* Modules */
 #include "output_libsvm.h"
-#include "output_list.h"
+#include "output_text.h"
 
 /**
  * Structure for output interface
@@ -48,13 +48,13 @@ void output_config(const char *format)
         func.output_open = output_libsvm_open;
         func.output_write = output_libsvm_write;
         func.output_close = output_libsvm_close;
-    } else if (!strcasecmp(format, "list")) {
-        func.output_open = output_list_open;
-        func.output_write = output_list_write;
-        func.output_close = output_list_close;
+    } else if (!strcasecmp(format, "text") || !strcasecmp(format, "list")) {
+        func.output_open = output_text_open;
+        func.output_write = output_text_write;
+        func.output_close = output_text_close;
     } else {
-        error("Unknown ouptut format '%s', using 'list' instead.", format);
-        output_config("list");
+        error("Unknown ouptut format '%s', using 'text' instead.", format);
+        output_config("text");
     }
 } 
 
