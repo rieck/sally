@@ -10,25 +10,16 @@ B<sally> [B<-hvV>] I<config> I<input> I<output>
 
 =head1 DESCRIPTION
 
-B<sally> is a tool for mapping a set of strings to a set of vectors. This
-mapping is referred to as embedding.  The conversion from strings to vectors
-allows for easily applying techniques from statistics, machine learning and
-data mining for analysis of string data.  This is the very intention of
-B<sally>.  
+B<sally> is a small tool for mapping a set of strings to a set of
+vectors. This mapping is referred to as embedding and allows for
+applying techniques from statistics, machine learning and data mining
+for analysis of string data. This is the very intention of B<sally>.
 
-B<sally> first loads a set of strings from the I<input> source.  The
-embedding is then carried out by characterizing the strings using a set of
-features.  Depending on the I<config> file, these features refer to all
-words contained in the strings, to all byte sequences of length n (byte
-n-grams) or to all word sequences of length n (word n-grams).  By counting
-the occurences of the features, B<sally> constructs a vector for each
-string.  Each dimension in the vectors corresponds to the occurences of a
-particular feature.  The resulting vectors are finally normalized and
-written to the I<output> destination.
-
-A detailed introduction to the embedding of strings is provided by Rieck &
-Laskov, "Linear-time computation of similarity measures for sequential
-data", Journal of Machine Learning Research, 2008.
+The embedding is carried out incrementally, where B<sally> first loads
+a chunk of strings from I<input>, computes the mapping to vectors and
+then writes the chunk of vectors to I<output>. The configuration of
+this process, such as the input format, the embedding type and the
+output format, are specified in the file I<config>.
 
     .---------.                        .----------.
     |   dir   |                        |   text   |
@@ -36,11 +27,49 @@ data", Journal of Machine Learning Research, 2008.
     |  lines  |   --  |  Sally  |  --  |  matlab  |
     |   ...   |   /   '---------'   \  |   ...    |
     '---------'                        '----------'
-       Input                              Output 
+       Input           Embedding          Output 
+
+
+=head2 Embedding strings
+
+B<sally> implements a standard technique for mapping strings to a
+vector space, which is often referred to as I<vector space model> or
+I<bag-of-words model>. The strings are characterized by a set of
+features, where each feature is associated with one dimension of the
+resulting vector space. B<sally> supports the following types of
+features:
+
+=over 8
+
+=item B<words>
+
+The strings are partitioned into substrings (words) using a set of
+delimiter characters. Such partitioning is typical for natural
+language processing, where the delimiters are usually defined as
+whitespace and punctation symbols.
+
+=item B<byte n-grams>
+
+The strings are characterized by all possible byte sequences of a
+fixed length n (byte n-grams). These features are frequently used if
+no information about the structure of strings is available, such as in
+bioinformatics or computer security.
+
+=item B<word n-grams>
+
+The strings are characterited by all possible word sequences of a
+fixed length n (word n-grams). These features require the definition
+of a set of delimiters and a length n. 
+
+=back
+
+A detailed introduction to the embedding of strings is provided by Rieck &
+Laskov, "Linear-time computation of similarity measures for sequential
+data", Journal of Machine Learning Research, 2008.
 
 =head2 Input formats
 
-=over 12
+=over 8
 
 =item B<dir> 
 
