@@ -8,7 +8,7 @@ sally.man: sally.pod
 	pod2man -c "User Manual" -s 1 -r "sally $(VERSION)" $< > $@
 
 readme:	sally.pod
-	pod2text -c -l $< > ../README
+	pod2text -l $< > ../README
 	rm -f ../README.bak
 
 distclean-local:
