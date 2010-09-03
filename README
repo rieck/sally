@@ -35,21 +35,24 @@ DESCRIPTION
     features, where each feature is associated with one dimension of the
     resulting vector space. sally supports the following types of features:
 
-    words   The strings are partitioned into substrings (words) using a set
-            of delimiter characters. Such partitioning is typical for
-            natural language processing, where the delimiters are usually
-            defined as whitespace and punctation symbols.
+    words           The strings are partitioned into substrings (words)
+                    using a set of delimiter characters. Such partitioning
+                    is typical for natural language processing, where the
+                    delimiters are usually defined as whitespace and
+                    punctation symbols.
 
-    byte n-grams
-            The strings are characterized by all possible byte sequences of
-            a fixed length n (byte n-grams). These features are frequently
-            used if no information about the structure of strings is
-            available, such as in bioinformatics or computer security.
+    byte n-grams    The strings are characterized by all possible byte
+                    sequences of a fixed length n (byte n-grams). These
+                    features are frequently used if no information about the
+                    structure of strings is available, such as in
+                    bioinformatics or computer security.
 
-    word n-grams
-            The strings are characterited by all possible word sequences of
-            a fixed length n (word n-grams). These features require the
-            definition of a set of delimiters and a length n.
+    word n-grams    The strings are characterited by all possible word
+                    sequences of a fixed length n (word n-grams). These
+                    features require the definition of a set of delimiters
+                    and a length n. They often used in natural language
+                    processing as a coarse way for capturing structure of
+                    text.
 
     A detailed introduction to the embedding of strings is provided by Rieck
     & Laskov, "Linear-time computation of similarity measures for sequential
@@ -57,20 +60,22 @@ DESCRIPTION
 
   Input formats
 
-    dir     The input strings are available as binary files in a directory
-            and the name of the directory is given as *input* to sally. The
-            suffixes of the files are used as labels for the extracted
-            vectors.
+    dir             The input strings are available as binary files in a
+                    directory and the name of the directory is given as
+                    *input* to sally. The suffixes of the files are used as
+                    labels for the extracted vectors.
 
-    arc     The input strings are available as binary files in a compressed
-            archive, such as a zip or tgz archive. The name of the archive
-            is given as *input* to sally. The suffixes of the files are used
-            as labels for the extracted vectors.
+    arc             The input strings are available as binary files in a
+                    compressed archive, such as a zip or tgz archive. The
+                    name of the archive is given as *input* to sally. The
+                    suffixes of the files are used as labels for the
+                    extracted vectors.
 
-    lines   The input strings are available as lines in a text file. The
-            name of the file is given as *input* to sally. No label
-            information is supported by this input format. The lines need to
-            be seperated by newline and may not contain the NUL character.
+    lines           The input strings are available as lines in a text file.
+                    The name of the file is given as *input* to sally. No
+                    label information is supported by this input format. The
+                    lines need to be seperated by newline and may not
+                    contain the NUL character.
 
   Output formats
 

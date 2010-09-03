@@ -39,7 +39,7 @@ features, where each feature is associated with one dimension of the
 resulting vector space. B<sally> supports the following types of
 features:
 
-=over 8
+=over 16
 
 =item B<words>
 
@@ -57,9 +57,10 @@ bioinformatics or computer security.
 
 =item B<word n-grams>
 
-The strings are characterited by all possible word sequences of a
-fixed length n (word n-grams). These features require the definition
-of a set of delimiters and a length n. 
+The strings are characterited by all possible word sequences of a fixed
+length n (word n-grams).  These features require the definition of a set of
+delimiters and a length n.  They often used in natural language processing
+as a coarse way for capturing structure of text.
 
 =back
 
@@ -69,7 +70,7 @@ data", Journal of Machine Learning Research, 2008.
 
 =head2 Input formats
 
-=over 8
+=over 16
 
 =item B<dir> 
 
