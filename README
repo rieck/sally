@@ -1,25 +1,28 @@
-NAME
-    sally -- a tool for embedding strings in vector spaces
+[1mNAME[0m
 
-SYNOPSIS
-    sally [-hvV] *config* *input* *output*
+    [1msally[0m -- a tool for embedding strings in vector spaces
 
-DESCRIPTION
-    sally is a tool for mapping a set of strings to a set of vectors. This
+[1mSYNOPSIS[0m
+
+    [1msally[0m [[1m-hvV[0m] [33mconfig[0m [33minput[0m [33moutput[0m
+
+[1mDESCRIPTION[0m
+
+    [1msally[0m is a tool for mapping a set of strings to a set of vectors. This
     mapping is referred to as embedding. The conversion from strings to
     vectors allows for easily applying techniques from statistics, machine
     learning and data mining for analysis of string data. This is the very
-    intention of sally.
+    intention of [1msally[0m.
 
-    sally first loads a set of strings from the *input* source. The
-    embedding is then carried out by characterizing the strings using a set
-    of features. Depending on the *config* file, these features refer to all
+    [1msally[0m first loads a set of strings from the [33minput[0m source. The embedding
+    is then carried out by characterizing the strings using a set of
+    features. Depending on the [33mconfig[0m file, these features refer to all
     words contained in the strings, to all byte sequences of length n (byte
     n-grams) or to all word sequences of length n (word n-grams). By
-    counting the occurences of the features, sally constructs a vector for
+    counting the occurences of the features, [1msally[0m constructs a vector for
     each string. Each dimension in the vectors corresponds to the occurences
     of a particular feature. The resulting vectors are finally normalized
-    and written to the *output* destination.
+    and written to the [33moutput[0m destination.
 
     A detailed introduction to the embedding of strings is provided by Rieck
     & Laskov, "Linear-time computation of similarity measures for sequential
@@ -33,36 +36,40 @@ DESCRIPTION
         '---------'                        '----------'
            Input                              Output 
 
-  Input formats
+  [1mInput formats[0m
 
-    dir         The input strings are available as binary files in a
-                directory and the name of the directory is given as *input*
-                to sally. The suffixes of the files are used as labels for
-                the extracted vectors.
+    [1mdir[0m The input strings are available as binary files in a
+                directory and the name of the directory is given as [33minput[0m to
+                [1msally[0m. The suffixes of the files are used as labels for the
+                extracted vectors.
 
-    arc         The input strings are available as binary files in a
+    [1marc[0m The input strings are available as binary files in a
                 compressed archive, such as a zip or tgz archive. The name
-                of the archive is given as *input* to sally. The suffixes of
+                of the archive is given as [33minput[0m to [1msally[0m. The suffixes of
                 the files are used as labels for the extracted vectors.
 
-    lines       The input strings are available as lines in a text file. The
-                name of the file is given as *input* to sally. No label
+    [1mlines[0m
+                The input strings are available as lines in a text file. The
+                name of the file is given as [33minput[0m to [1msally[0m. No label
                 information is supported by this input format. The lines
                 need to be seperated by newline and may not contain the NUL
                 character.
 
-  Output formats
+  [1mOutput formats[0m
 
-    libsvm      The feature vectors of the embedded strings are stored in
+    [1mlibsvm[0m
+                The feature vectors of the embedded strings are stored in
                 libsvm format. The name of the output file is given as
-                *output* to sally.
+                [33moutput[0m to [1msally[0m.
 
-    text        The feature vectors of the embedded strings are stored as a
+    [1mtext[0m
+                The feature vectors of the embedded strings are stored as a
                 plain text using a list of dimensions, features and
                 respective values. The name of the output file is given as
-                *output* to sally.
+                [33moutput[0m to [1msally[0m.
 
-COPYRIGHT
+[1mCOPYRIGHT[0m
+
     Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)
 
     This program is free software; you can redistribute it and/or modify it
