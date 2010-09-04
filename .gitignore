@@ -2,6 +2,7 @@
 *.la
 *.lo
 *.o
+.dep.inc
 .deps
 .libs
 /aclocal.m4
@@ -20,9 +21,9 @@
 /sally.xcodeproj
 /stamp-h1
 Makefile
+Makefile-sally.mk
 Makefile.in
 doc/html
+nbproject/
 src/sally
 tests/test_*
-Makefile-sally.mk
-nbproject/

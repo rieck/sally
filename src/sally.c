@@ -49,15 +49,15 @@ void sally_version(FILE *f, char *p)
 
 /**
  * Print usage of command line tool
- */  
+ */
 static void print_usage(void)
 {
     printf("Usage: sally [options] <config> <input> <output>\n"
-           "Options:\n"
-           "  -v             Increase verbosity.\n"
-           "  -q             Be quiet during processing.\n"
-           "  -V             Print version and copyright.\n"
-           "  -h             Print this help screen.\n");
+            "Options:\n"
+            "  -v             Increase verbosity.\n"
+            "  -q             Be quiet during processing.\n"
+            "  -V             Print version and copyright.\n"
+            "  -h             Print this help screen.\n");
 }
 
 /**
@@ -78,33 +78,33 @@ static void parse_options(int argc, char **argv)
     int ch;
     while ((ch = getopt(argc, argv, "hqvV")) != -1) {
         switch (ch) {
-            case 'q':
-                verbose = 0;
-                break;
-            case 'v':
-                verbose++;
-                break;
-            case 'V':
-                print_version();
-                exit(EXIT_SUCCESS);
-                break;
-            case 'h':
-            case '?':
-                print_usage();
-                exit(EXIT_SUCCESS);
-                break;
+        case 'q':
+            verbose = 0;
+            break;
+        case 'v':
+            verbose++;
+            break;
+        case 'V':
+            print_version();
+            exit(EXIT_SUCCESS);
+            break;
+        case 'h':
+        case '?':
+            print_usage();
+            exit(EXIT_SUCCESS);
+            break;
         }
     }
-    
+
     argc -= optind;
     argv += optind;
-    
+
     /* Check remaining arguments */
     if (argc != 3) {
         print_usage();
-        exit(EXIT_FAILURE);    
+        exit(EXIT_FAILURE);
     }
-    
+
     cfg_file = argv[0];
     input = argv[1];
     output = argv[2];
@@ -119,28 +119,28 @@ static void sally_init(int argc, char **argv)
 {
     int ehash;
     const char *cfg_str;
-    
+
     /* Parse options */
     parse_options(argc, argv);
-    
+
     /* Init and load configuration */
     config_init(&cfg);
     if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
         fatal("Could not read configuration (%s in line %d)",
-              config_error_text(&cfg), config_error_line(&cfg));
-    
+            config_error_text(&cfg), config_error_line(&cfg));
+
     /* Check configuration */
     config_check(&cfg);
     if (verbose > 1)
         config_print(&cfg);
-    
+
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash) {
         info_msg(1, "Enabling feature hash table.");
         fhash_init();
     }
-    
+
     /* Open input */
     config_lookup_string(&cfg, "input.format", &cfg_str);
     input_config(cfg_str);
@@ -150,35 +150,36 @@ static void sally_init(int argc, char **argv)
         fatal("Could not open input source");
 
     config_lookup_string(&cfg, "output.format", &cfg_str);
-    output_config(cfg_str);    
+    output_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
     if (!output_open(output))
         fatal("Coult not open output destination");
 }
 
 /**
- * Main processing routine of Sally
+ * Main processing routine of Sally. This function processes chunks of
+ * strings. It might be suitable for OpenMP support in a later version.
  */
 static void sally_process()
 {
     long read, i, j;
     int chunk;
-    
+
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
-    /* Allocate space */    
-    fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
-    string_t *strs = malloc(sizeof(string_t) * chunk);
-    
-    if (!fvec || !strs) 
+    /* Allocate space */
+    fvec_t **fvec = malloc(sizeof (fvec_t *) * chunk);
+    string_t *strs = malloc(sizeof (string_t) * chunk);
+
+    if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
-    
+
     info_msg(1, "Processing %d strings in chunks of %d.", entries, chunk);
 
     for (i = 0, read = 0; i < entries; i += read) {
         read = input_read(strs, chunk);
-        if (read <= 0) 
+        if (read <= 0)
             fatal("Failed to read strings from input '%s'", input);
 
         for (j = 0; j < read; j++) {
@@ -197,37 +198,37 @@ static void sally_process()
                 free(strs[j].str);
             fvec_destroy(fvec[j]);
         }
-        
+
         if (fhash_enabled())
             fhash_reset();
-        
+
         prog_bar(0, entries, i + read);
     }
-    prog_bar(0, 1.0, 1.0);    
-    
+    prog_bar(0, 1.0, 1.0);
+
     free(strs);
     free(fvec);
 }
 
 /**
- * Exist the Sally tool
+ * Exit Sally tool. Close open files and free memory.
  */
 static void sally_exit()
 {
     int ehash;
-    
+
     info_msg(1, "Flushing. Closing input and output.");
     input_close();
     output_close();
-    
+
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash)
         fhash_destroy();
-    
+
     /* Destroy configuration */
     config_destroy(&cfg);
-    
+
 }
 
 /**
