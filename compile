@@ -16,23 +16,19 @@ case $arg in
        PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
        CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
-       CXXFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
    twoface*|rieck*)
        echo "Configuration: Twoface/Rieck"
-       CC="gcc-mp-4.4" \
-       CXX="g++-mp-4.4" \
+       CC="gcc" \
        CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
-       CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
    bane*)
        echo "Configuration: Bane"
        CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
-       CXXFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 

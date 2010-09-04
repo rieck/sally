@@ -24,3 +24,5 @@ Makefile.in
 doc/html
 src/sally
 tests/test_*
+Makefile-sally.mk
+nbproject/

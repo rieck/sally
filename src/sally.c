@@ -110,6 +110,11 @@ static void parse_options(int argc, char **argv)
     output = argv[2];
 }
 
+/**
+ * Init the Sally tool
+ * @param argc number of arguments
+ * @param argv arguments
+ */
 static void sally_init(int argc, char **argv)
 {
     int ehash;
@@ -151,6 +156,9 @@ static void sally_init(int argc, char **argv)
         fatal("Coult not open output destination");
 }
 
+/**
+ * Main processing routine of Sally
+ */
 static void sally_process()
 {
     long read, i, j;
@@ -195,13 +203,15 @@ static void sally_process()
         
         prog_bar(0, entries, i + read);
     }
-    
     prog_bar(0, 1.0, 1.0);    
     
     free(strs);
     free(fvec);
 }
 
+/**
+ * Exist the Sally tool
+ */
 static void sally_exit()
 {
     int ehash;
