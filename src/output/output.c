@@ -26,6 +26,7 @@
 /* Modules */
 #include "output_libsvm.h"
 #include "output_text.h"
+#include "output_matlab.h"
 
 /**
  * Structure for output interface
@@ -52,6 +53,10 @@ void output_config(const char *format)
         func.output_open = output_text_open;
         func.output_write = output_text_write;
         func.output_close = output_text_close;
+    } else if (!strcasecmp(format, "matlab")) {
+        func.output_open = output_matlab_open;
+        func.output_write = output_matlab_write;
+        func.output_close = output_matlab_close;
     } else {
         error("Unknown ouptut format '%s', using 'text' instead.", format);
         output_config("text");
