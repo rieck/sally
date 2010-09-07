@@ -64,6 +64,13 @@ processing as a coarse way for capturing structure of text.
 
 =back
 
+Sally proceeds by counting the occurences of these features in each
+string and generating a vector of count values.  Notice that the vector is
+always sparse, as only a limited number of features can be present in a
+given string and hence the vast majority of dimensions is zero and does not
+need to be stored.  Sally then normalizes the vector and outputs it in the
+specified format, such as LibSVM or Matlab data files.
+
 A detailed introduction to the embedding of strings is provided by Rieck &
 Laskov, "Linear-time computation of similarity measures for sequential
 data", Journal of Machine Learning Research, 2008.
