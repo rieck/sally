@@ -57,10 +57,10 @@ bioinformatics or computer security.
 
 =item B<word n-grams>
 
-The strings are characterited by all possible word sequences of a fixed
+The strings are characterized by all possible word sequences of a fixed
 length n (word n-grams).  These features require the definition of a set of
-delimiters and a length n.  They often used in natural language processing
-as a coarse way for capturing structure of text.
+delimiters and a length n.  They are often used in natural language
+processing as a coarse way for capturing structure of text.
 
 =back
 
