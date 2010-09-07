@@ -84,7 +84,9 @@ void fvec_binarize(fvec_t *fv)
 
 
 /**
- * Clones a feature vector
+ * Clones a feature vector. This function is useful for evaluation of
+ * equations, e.g. x = y + 0, implies that x is a clone of y and not a
+ * a reference.
  * @param o Feature vector
  * @return Cloned feature vector
  */
