@@ -79,14 +79,21 @@ DESCRIPTION
 
   Output formats
 
-    libsvm      The feature vectors of the embedded strings are stored in
-                libsvm format. The name of the output file is given as
-                *output* to sally.
+    libsvm          The feature vectors of the embedded strings are stored
+                    in libsvm format. The name of the output file is given
+                    as *output* to sally.
 
-    text        The feature vectors of the embedded strings are stored as a
-                plain text using a list of dimensions, features and
-                respective values. The name of the output file is given as
-                *output* to sally.
+    text            The feature vectors of the embedded strings are stored
+                    as a plain text using a list of dimensions, features and
+                    respective values. The name of the output file is given
+                    as *output* to sally.
+
+    matlab          The feature vectors of the embedded strings are stored
+                    in matlab format (v5). The vectors are stored as a cell
+                    array with 2 x n dimensions, where the first row holds
+                    the source of each vector and the second the vector
+                    itself as a sparse array. The name of the output file is
+                    given as *output* to sally.
 
 COPYRIGHT
 

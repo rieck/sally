@@ -96,7 +96,7 @@ contain the NUL character.
 
 =head2 Output formats
 
-=over 12
+=over 16
 
 =item B<libsvm> 
 
@@ -108,6 +108,14 @@ The name of the output file is given as I<output> to B<sally>.
 The feature vectors of the embedded strings are stored as a plain text using
 a list of dimensions, features and respective values.  The name of the
 output file is given as I<output> to B<sally>.
+
+=item B<matlab>
+
+The feature vectors of the embedded strings are stored in matlab format
+(v5).  The vectors are stored as a cell array with 2 x n dimensions, where
+the first row holds the source of each vector and the second the vector
+itself as a sparse array.  The name of the output file is given as I<output>
+to B<sally>.
 
 =back
 
