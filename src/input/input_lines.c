@@ -86,7 +86,7 @@ int input_lines_read(string_t *strs, int len)
         j++;
     }
     
-    return j;
+    return j - 1;
 }
 
 /**

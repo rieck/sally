@@ -33,14 +33,12 @@ static long entries = 0;
  * Prints version and copyright information to a file stream
  * @param f File pointer
  * @param p Prefix character
+ * @param m Message
  * @return number of written characters
  */
-int sally_version(FILE *f, char *p)
+int sally_version(FILE *f, char *p, char *m)
 {
-    return fprintf(f,
-            "%sSally %s - A Tool for Embedding Strings in Vector Spaces\n"
-            "%sCopyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
-            p, PACKAGE_VERSION, p);
+    return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }
 
 /**
@@ -67,7 +65,9 @@ static void print_usage(void)
  */
 static void print_version(void)
 {
-    sally_version(stdout, "");
+    printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
+           "Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+            PACKAGE_VERSION);
 }
 
 /**
@@ -206,7 +206,6 @@ static void sally_process()
 
         prog_bar(0, entries, i + read);
     }
-    prog_bar(0, 1.0, 1.0);
 
     free(strs);
     free(fvec);

@@ -13,15 +13,23 @@
 #define OUTPUT_MATLAB_H
 
 #define MAT_TYPE_INT8       1
+#define MAT_TYPE_UINT8      2
+#define MAT_TYPE_INT16      3
+#define MAT_TYPE_UINT16     4
 #define MAT_TYPE_INT32      5
 #define MAT_TYPE_UINT32     6
 #define MAT_TYPE_SINGLE     7
 #define MAT_TYPE_DOUBLE     9
+#define MAT_TYPE_INT64      12
 #define MAT_TYPE_UINT64     13
 #define MAT_TYPE_ARRAY      14
 
 #define MAT_CLASS_CELL      1
+#define MAT_CLASS_STRUCT    2
+#define MAT_CLASS_OBJ       3
+#define MAT_CLASS_CHAR      4
 #define MAT_CLASS_SPARSE    5
+#define MAT_CLASS_INT8      8
 #define MAT_CLASS_UINT32    13
 
 /* matlab output module */

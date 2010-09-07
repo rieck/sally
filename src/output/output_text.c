@@ -52,8 +52,7 @@ int output_text_open(char *fn)
     }
     
     /* Write sally header */
-    sally_version(f, "# ");
-    fprintf(f, "# Output module for text format\n");
+    sally_version(f, "# ", "Output module for text format");
     
     return TRUE;
 }
