@@ -33,11 +33,13 @@ static long entries = 0;
  * Prints version and copyright information to a file stream
  * @param f File pointer
  * @param p Prefix character
+ * @return number of written characters
  */
-void sally_version(FILE *f, char *p)
+int sally_version(FILE *f, char *p)
 {
-    fprintf(f, "%s Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-            "%s Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+    return fprintf(f,
+            "%sSally %s - A Tool for Embedding Strings in Vector Spaces\n"
+            "%sCopyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
             p, PACKAGE_VERSION, p);
 }
 

@@ -50,7 +50,7 @@ int output_libsvm_open(char *fn)
     }
     
     /* Write sally header */
-    sally_version(f, "#");
+    sally_version(f, "# ");
     fprintf(f, "# Output module for LibSVM format\n");
     
     return TRUE;

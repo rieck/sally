@@ -12,6 +12,18 @@
 #ifndef OUTPUT_MATLAB_H
 #define OUTPUT_MATLAB_H
 
+#define MAT_TYPE_INT8       1
+#define MAT_TYPE_INT32      5
+#define MAT_TYPE_UINT32     6
+#define MAT_TYPE_SINGLE     7
+#define MAT_TYPE_DOUBLE     9
+#define MAT_TYPE_UINT64     13
+#define MAT_TYPE_ARRAY      14
+
+#define MAT_CLASS_CELL      1
+#define MAT_CLASS_SPARSE    5
+#define MAT_CLASS_UINT32    13
+
 /* matlab output module */
 int output_matlab_open(char *);
 int output_matlab_write(fvec_t **, int);

@@ -12,6 +12,6 @@
 #ifndef SALLY_H
 #define SALLY_H
 
-void sally_version(FILE *, char *);
+int sally_version(FILE *, char *);
 
 #endif
