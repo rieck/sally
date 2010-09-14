@@ -61,7 +61,7 @@ void fvec_embed(fvec_t *fv, const char *n)
     
     if (!strcasecmp(n, "cnt")) {
         /* Nothing */
-    } else if (!strcasecmp(n, "l2")) {
+    } else if (!strcasecmp(n, "bin")) {
         for (i = 0; i < fv->len; i++)
             fv->val[i] = 1;
     } else {
