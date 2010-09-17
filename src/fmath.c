@@ -130,5 +130,201 @@ fvec_t *fvec_clone(fvec_t *o)
     return fv;
 }
 
+/** 
+ * Adds one feature vector to another (a = a + b)
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+void fvec_add(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0, len = 0;
+    assert(fa && fb);
+    feat_t *dim;
+    float *val;
+    
+    /* Allocate arrays */
+    dim = (feat_t *) malloc((fa->len + fb->len) * sizeof(feat_t));
+    val = (float *) malloc((fa->len + fb->len) * sizeof(float));
+    if (!dim || !val) {
+        error("Could not allocate feature vector contents");
+        return;
+    }
+    
+    /* Loop over features in a and b */
+    while (i < fa->len && j < fb->len) {
+        if (fa->dim[i] > fb->dim[j]) {
+            dim[len] = fb->dim[j];
+            val[len++] = (float) (fb->val[j++]);
+        } else if (fa->dim[i] < fb->dim[j]) {
+            dim[len] = fa->dim[i];
+            val[len++] = fa->val[i++];
+        } else {
+            dim[len] = fa->dim[i];
+            val[len++] = (float) (fa->val[i++] + fb->val[j++]);
+        }
+    }
+    
+    /* Loop over remaining features  */
+    while (j < fb->len) {
+        dim[len] = fb->dim[j];
+        val[len++] = (float) fb->val[j++];
+    }
+    while (i < fa->len) {
+        dim[len] = fa->dim[i];
+        val[len++] = fa->val[i++];
+    }
+    
+    /* Free old memory */
+    free(fa->dim);
+    free(fa->val);
+    
+    /* Update */
+    fa->dim = dim;
+    fa->val = val;
+    fa->len = len;
+    
+    /* Reallocate memory */
+    fvec_realloc(fa);
+}
+
+/** 
+ * Element-wise multiplication of one feature vector with another (a = a x b)
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+void fvec_times(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0, p, q, k;
+    
+    /* Loop over dimensions fa */
+    for (i = 0, j = 0; j < fa->len; j++) {
+        /* Binary search */
+        p = i, q = fb->len;
+        do {
+            k = i, i = ((q - p) >> 1) + p;
+            if (fb->dim[i] > fa->dim[j]) {
+                q = i;
+            } else if (fb->dim[i] < fa->dim[j]) {
+                p = i;
+            } else {
+                fa->val[j] = fb->val[i] * fa->val[j];
+                break;
+            }
+        } while (i != k);
+        
+        /* No match */
+        if (i == k)
+            fa->val[j] = 0;
+    }
+}
+
+
+/** 
+ * Dot product between two feature vectors (s = <a,b>). The function 
+ * uses a binary search to sum over all dimensions.
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ * @return s Inner product
+ */
+static double fvec_dot_bsearch(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0, p, q, k;
+    double s = 0;
+    
+    /* Check if fa is larger than fb */
+    if (fa->len < fb->len) {
+        fvec_t *tmp = fa;
+        fa = fb, fb = tmp;
+    }
+    
+    /* Loop over dimensions fb */
+    for (i = 0, j = 0; j < fb->len; j++) {
+        /* Binary search */
+        p = i, q = fa->len;
+        do {
+            k = i, i = ((q - p) >> 1) + p;
+            if (fa->dim[i] > fb->dim[j]) {
+                q = i;
+            } else if (fa->dim[i] < fb->dim[j]) {
+                p = i;
+            } else {
+                s += fa->val[i] * fb->val[j];
+                break;
+            }
+        } while (i != k);
+    }
+    
+    return s;
+}
+
+/** 
+ * Dot product between two feature vectors (s = <a,b>). The function 
+ * uses a loop to sum over all dimensions.
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ * @return s Inner product
+ */
+static double fvec_dot_loop(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0;
+    double s = 0;
+    
+    /* Loop over features in a and b */
+    while (i < fa->len && j < fb->len) {
+        if (fa->dim[i] > fb->dim[j]) {
+            j++;
+        } else if (fa->dim[i] < fb->dim[j]) {
+            i++;
+        } else {
+            s += fa->val[i++] * fb->val[j++];
+        }
+    }
+    
+    return s;
+}
+
+/** 
+ * Dot product between two feature vectors (s = <a,b>). The function 
+ * uses a loop or a binary search to sum over all dimensions depending
+ * on the size of the considered vectors. The vectors need to be 
+ * normalized, that is, ||a|| = 1.
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ * @return s Inner product
+ */
+double fvec_dot(fvec_t *fa, fvec_t *fb)
+{
+    assert(fa && fb);
+    double a, b;
+    
+    /* Sort vectors according to size */
+    if (fa->len > fb->len) {
+        a = (double) fa->len, b = (double) fb->len;
+    } else {
+        b = (double) fa->len, a = (double) fb->len;
+    }
+    
+    /* Choose dot functions */
+    if (a + b > ceil(b * log2(a)))
+        return fvec_dot_bsearch(fa, fb);
+    else
+        return fvec_dot_loop(fa, fb);
+}
+
+
+/**
+ * Multiplies vector with a scalar (f = s * f)
+ * @param f Feature vector 
+ * @param s Scalar value
+ */
+void fvec_mul(fvec_t *f, double s)
+{
+    int i = 0;
+    assert(f);
+    
+    for (i = 0; i < f->len; i++)
+        f->val[i] = (float) (f->val[i] * s);
+}
+
 
 /** @} */

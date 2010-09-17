@@ -18,6 +18,9 @@ void fvec_norm(fvec_t *fv, const char *);
 void fvec_embed(fvec_t *fv, const char *);
 void fvec_binarize(fvec_t *fv);
 fvec_t *fvec_clone(fvec_t *);
-
+double fvec_dot(fvec_t *fa, fvec_t *fb);
+void fvec_add(fvec_t *fa, fvec_t *fb);
+void fvec_times(fvec_t *fa, fvec_t *fb);
+void fvec_mul(fvec_t *f, double s);
 
 #endif                          /* FMATH_H */
