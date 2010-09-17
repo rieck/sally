@@ -101,6 +101,9 @@ void prog_bar(long a, long b, long c)
     double perc, ptime = 0, min, max, in;
     char *descr = "";
     
+    if (verbose == 0)
+        return;
+    
     min = (double) a;
     max = (double) b;
     in = (double) c;
