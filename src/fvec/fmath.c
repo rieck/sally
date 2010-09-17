@@ -283,13 +283,13 @@ void fvec_mul(fvec_t *f, double s)
  * Logarithm of the vector elements (f = log(f))
  * @param f Feature vector 
  */
-void fvec_log(fvec_t *f)
+void fvec_log2(fvec_t *f)
 {
     int i = 0;
     assert(f);
     
     for (i = 0; i < f->len; i++)
-        f->val[i] = (float) log(f->val[i]);
+        f->val[i] = (float) log2(f->val[i]);
 }
 
 /**

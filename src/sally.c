@@ -135,7 +135,7 @@ static void sally_init(int argc, char **argv)
     if (verbose > 1)
         config_print(&cfg);
 
-    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     if (!strcasecmp(cfg_str, "tfidf")) 
         idf_create(input);
 
@@ -219,7 +219,7 @@ static void sally_exit()
     input_close();
     output_close();
     
-    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     if (!strcasecmp(cfg_str, "tfidf")) 
         idf_destroy(input);
 

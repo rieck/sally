@@ -114,7 +114,7 @@ void idf_create(char *input)
     /* Finish computation */
     fvec_invert(idf_weights);
     fvec_mul(idf_weights, entries);
-    fvec_log(idf_weights);
+    fvec_log2(idf_weights);
     
     info_msg(1, "Saving IDF weights to '%s'.", tfidf_file);
     fvec_save(idf_weights, (char *) tfidf_file);

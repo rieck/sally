@@ -94,7 +94,7 @@ void output_close(void)
 
 /** 
  * Frees a chunk of output feature vectors
- * @param fv Feature vectors
+ * @param x Feature vectors
  * @param len Number of vectors
  */
 void output_free(fvec_t **x, int len)
