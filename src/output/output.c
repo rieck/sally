@@ -92,4 +92,18 @@ void output_close(void)
     func.output_close();
 }
 
+/** 
+ * Frees a chunk of output feature vectors
+ * @param fv Feature vectors
+ * @param len Number of vectors
+ */
+void output_free(fvec_t **x, int len)
+{
+    assert(x);
+    
+    int j;
+    for (j = 0; j < len; j++)
+        fvec_destroy(x[j]);
+}
+
 /** @} */

@@ -8,19 +8,12 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
-#ifndef OUTPUT_H
-#define OUTPUT_H
+
+#ifndef NORM_H
+#define NORM_H
 
 #include "fvec.h"
 
-/* Configuration */
-void output_config(const char *);
-void output_free(fvec_t **x, int len);
+void fvec_norm(fvec_t *fv, const char *);
 
-/* Generic interface */
-int output_open(char *);
-int output_write(fvec_t **, int);
-void output_close(void);
-
-#endif                          /* OUTPUT_H */
+#endif                          /* NORM_H */

@@ -24,6 +24,7 @@ typedef struct {
 
 /* Configuration */
 void input_config(const char *);
+void input_free(string_t *strs, int len);
 
 /* Generic interface */
 int input_open(char *);

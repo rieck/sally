@@ -17,7 +17,6 @@
 #include "fvec.h"
 #include "util.h"
 #include "sconfig.h"
-#include "fhash.h"
 
 /* Global variables */
 int verbose = 1;
@@ -136,6 +135,10 @@ static void sally_init(int argc, char **argv)
     if (verbose > 1)
         config_print(&cfg);
 
+    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    if (!strcasecmp(cfg_str, "tfidf")) 
+        idf_create(input);
+
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash) {
@@ -171,8 +174,8 @@ static void sally_process()
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */
-    fvec_t **fvec = malloc(sizeof (fvec_t *) * chunk);
-    string_t *strs = malloc(sizeof (string_t) * chunk);
+    fvec_t **fvec = alloca(sizeof (fvec_t *) * chunk);
+    string_t *strs = alloca(sizeof (string_t) * chunk);
 
     if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
@@ -193,22 +196,15 @@ static void sally_process()
         if (!output_write(fvec, read))
             fatal("Failed to write vectors to output '%s'", output);
 
-        for (j = 0; j < read; j++) {
-            if (strs[j].src)
-                free(strs[j].src);
-            if (strs[j].str)
-                free(strs[j].str);
-            fvec_destroy(fvec[j]);
-        }
+        /* Free memory */
+        input_free(strs, read);
+        output_free(fvec, read);
 
         if (fhash_enabled())
             fhash_reset();
 
         prog_bar(0, entries, i + read);
     }
-
-    free(strs);
-    free(fvec);
 }
 
 /**
@@ -217,10 +213,15 @@ static void sally_process()
 static void sally_exit()
 {
     int ehash;
+    const char *cfg_str;
 
     info_msg(1, "Flushing. Closing input and output.");
     input_close();
     output_close();
+    
+    config_lookup_string(&cfg, "features.embed", &cfg_str);
+    if (!strcasecmp(cfg_str, "tfidf")) 
+        idf_destroy(input);
 
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);

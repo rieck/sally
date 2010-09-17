@@ -42,8 +42,16 @@ void fvec_print(FILE *, fvec_t *);
 void fvec_realloc(fvec_t *);
 void fvec_set_label(fvec_t *fv, float l);
 void fvec_set_source(fvec_t *fv, char *s);
-void fvec_save(fvec_t *f, gzFile * z);
-fvec_t *fvec_load(gzFile *);
+void fvec_write(fvec_t *f, gzFile * z);
+fvec_t *fvec_zero();
+fvec_t *fvec_read(gzFile *);
+void fvec_save(fvec_t *fv, char *f);
+fvec_t *fvec_load(char *);
 void fvec_reset_delim();
+
+#include "fmath.h"
+#include "norm.h"
+#include "embed.h"
+#include "fhash.h"
 
 #endif                          /* FVEC_H */

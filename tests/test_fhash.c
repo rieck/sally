@@ -117,33 +117,34 @@ int test_stress()
 }
 
 /* 
- * A test for loading and saving the feature table
+ * A test for reading and saving the feature table
  */
-int test_load_save()
+int test_read_write()
 {
     int i, j, err = 0;
     gzFile *z;
     fentry_t *f;
 
-    test_printf("Loading and saving of feature hash table");
+    test_printf("reading and saving of feature hash table");
 
     /* Create map */
     fhash_init();
     for (i = 0; tests[i].s != 0; i++)
         fhash_put(tests[i].f, tests[i].s, strlen(tests[i].s) + 1);
 
-    /* Create and save feature vectors */
+    /* Create and write feature vectors */
     if (!(z = gzopen(TEST_FILE, "w9"))) {
         printf("Could not create file (ignoring)\n");
         return FALSE;
     }
-    fhash_save(z);
+    
+    fhash_write(z);
     gzclose(z);
     fhash_destroy();
 
-    /* Create and load */
+    /* Create and read */
     z = gzopen(TEST_FILE, "r");
-    fhash_load(z);
+    fhash_read(z);
     gzclose(z);
 
     /* Check elements */
@@ -175,7 +176,7 @@ int main(int argc, char **argv)
 
     err |= test_static();
     err |= test_stress();
-    err |= test_load_save();
+    err |= test_read_write();
     
     return err;
 }

@@ -139,6 +139,7 @@ AC_CONFIG_FILES([
    src/Makefile \
    src/input/Makefile \
    src/output/Makefile \
+   src/fvec/Makefile \
    doc/Makefile \
    tests/Makefile \
 ])

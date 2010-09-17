@@ -185,10 +185,10 @@ static int decode_string(char *str)
 }
 
 /**
- * Saves the feature hash table to a file stream.
+ * Writes the feature hash table to a file stream.
  * @param z File pointer
  */
-void fhash_save(gzFile *z)
+void fhash_write(gzFile *z)
 {
     fentry_t *f;
     int i;
@@ -207,10 +207,10 @@ void fhash_save(gzFile *z)
 }
 
 /**
- * Loads the feature hash table from a file stream
+ * Reads the feature hash table from a file stream
  * @param z File pointer
  */
-void fhash_load(gzFile *z)
+void fhash_read(gzFile *z)
 {
     int i, r;
     unsigned long len;

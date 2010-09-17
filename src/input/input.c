@@ -93,5 +93,21 @@ void input_close(void)
     func.input_close();
 }
 
+/**
+ * Free a chunk of input strings
+ */
+void input_free(string_t *strs, int len)
+{
+    assert(strs);
+    
+    int j;
+    for (j = 0; j < len; j++) {
+        if (strs[j].src)
+            free(strs[j].src);
+        if (strs[j].str)
+            free(strs[j].str);
+    }    
+}
+
 
 /** @} */

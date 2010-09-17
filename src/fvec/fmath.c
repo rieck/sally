@@ -20,54 +20,7 @@
 #include "fvec.h"
 #include "fmath.h"
 #include "util.h"
-
-/**
- * Normalizes a feature vector using a given normalization.
- * @param fv Feature vector
- * @param n normalization mode
- */
-void fvec_norm(fvec_t *fv, const char *n)
-{
-    int i;
-    double s = 0;
-    
-    if (!strcasecmp(n, "none")) {
-        return;
-    } else if (!strcasecmp(n, "l1")) {
-        for (i = 0; i < fv->len; i++)
-            s += fv->val[i];
-        for (i = 0; i < fv->len; i++)
-            fv->val[i] = fv->val[i] / s;
-    } else if (!strcasecmp(n, "l2")) {
-        for (i = 0; i < fv->len; i++)
-            s += pow(fv->val[i], 2);
-        for (i = 0; i < fv->len; i++)
-            fv->val[i] = fv->val[i] / sqrt(s);
-    } else {
-        warning("Unknown normalization mode '%s', using 'l1'.", n);
-        for (i = 0; i < fv->len; i++)
-            fv->val[i] = fv->val[i] / fv->total;    
-    }
-} 
-
-/**
- * Embeds a feature vector using a given normalization.
- * @param fv Feature vector
- * @param n normalization mode
- */
-void fvec_embed(fvec_t *fv, const char *n)
-{
-    int i;
-    
-    if (!strcasecmp(n, "cnt")) {
-        /* Nothing */
-    } else if (!strcasecmp(n, "bin")) {
-        for (i = 0; i < fv->len; i++)
-            fv->val[i] = 1;
-    } else {
-        warning("Unknown embedding mode '%s', using 'cnt.", n);
-    }
-} 
+#include "input.h"
 
 /**
  * Binarizes the components of a feature vector.
@@ -326,5 +279,30 @@ void fvec_mul(fvec_t *f, double s)
         f->val[i] = (float) (f->val[i] * s);
 }
 
+/**
+ * Logarithm of the vector elements (f = log(f))
+ * @param f Feature vector 
+ */
+void fvec_log(fvec_t *f)
+{
+    int i = 0;
+    assert(f);
+    
+    for (i = 0; i < f->len; i++)
+        f->val[i] = (float) log(f->val[i]);
+}
+
+/**
+ * Inverts the vector elements (f = 1 / f)
+ * @param f Feature vector 
+ */
+void fvec_invert(fvec_t *f)
+{
+    int i = 0;
+    assert(f);
+    
+    for (i = 0; i < f->len; i++)
+        f->val[i] = (float) 1.0 / f->val[i];
+}
 
 /** @} */

@@ -8,19 +8,14 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
-#ifndef OUTPUT_H
-#define OUTPUT_H
+
+#ifndef EMBED_H
+#define EMBED_H
 
 #include "fvec.h"
 
-/* Configuration */
-void output_config(const char *);
-void output_free(fvec_t **x, int len);
+void fvec_embed(fvec_t *fv, const char *);
+void idf_create(char *input);
+void idf_destroy();
 
-/* Generic interface */
-int output_open(char *);
-int output_write(fvec_t **, int);
-void output_close(void);
-
-#endif                          /* OUTPUT_H */
+#endif                          /* EMBED */

@@ -36,6 +36,8 @@
 #include "md5.h"
 #include "murmur.h"
 #include "sally.h"
+#include "norm.h"
+#include "embed.h"
 
 /* External variables */
 extern int verbose;
@@ -127,6 +129,15 @@ fvec_t *fvec_extract(char *x, int l)
     fvec_norm(fv, cfg_str);
 
     return fv;
+}
+
+/**
+ * Allocates and extracts an empty feature vector
+ * @return feature vector
+ */
+fvec_t *fvec_zero() 
+{
+    return fvec_extract("", 0);
 }
 
 /**
@@ -464,11 +475,11 @@ void fvec_print(FILE *f, fvec_t *fv)
 }
 
 /**
- * Loads a feature vector form a file stream
+ * Reads a feature vector form a file stream
  * @param z File pointer
  * @return Feature vector
  */
-fvec_t *fvec_load(gzFile *z)
+fvec_t *fvec_read(gzFile *z)
 {
     assert(z);
     fvec_t *f;
@@ -526,11 +537,11 @@ err:
 
 
 /**
- * Saves a feature vector to a file stream
+ * Writes a feature vector to a file stream
  * @param f Feature vector
  * @param z File pointer
  */
-void fvec_save(fvec_t *f, gzFile *z)
+void fvec_write(fvec_t *f, gzFile *z)
 {
     assert(f && z);
     int i;
@@ -542,6 +553,41 @@ void fvec_save(fvec_t *f, gzFile *z)
                  (double) f->val[i]);
 }
 
+/**
+ * Loads a feature vector from a file 
+ * @param f File name
+ * @return feature vector
+ */
+fvec_t *fvec_load(char *f)
+{
+    gzFile *z = gzopen(f, "r");
+    if (!z) {
+        error("Could not open '%s' for reading.", f);
+        return NULL;
+    }
+    
+    fvec_t *fv = fvec_read(z);
+    gzclose(z);
+    
+    return fv;
+}
+
+/**
+ * Saves a feature vector to a file 
+ * @param fv Feature vector
+ * @param f File name
+ */
+void fvec_save(fvec_t *fv, char *f)
+{
+    gzFile *z = gzopen(f, "w9");
+    if (!z) {
+        error("Could not open '%s' for writing.", f);
+        return;
+    }
+    
+    fvec_write(fv, z);
+    gzclose(z);
+}
 
 /**
  * Decodes a string containing delimiters to a global array

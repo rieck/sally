@@ -150,21 +150,21 @@ int test_stress_omp()
 
 
 /* 
- * A simple load and save test case
+ * A simple read and write test case
  */
-int test_load_save()
+int test_read_write()
 {
     int i, j, err = 0;
     fvec_t *f, *g;
     gzFile *z;
 
-    test_printf("Loading and saving of feature vectors");
+    test_printf("reading and saving of feature vectors");
 
     fvec_reset_delim();
     config_set_string(&cfg, "features.ngram_delim", " ");
     config_set_int(&cfg, "features.ngram_len", 2);
 
-    /* Create and save feature vectors */
+    /* Create and write feature vectors */
     z = gzopen(TEST_FILE, "w9");
     if (!z) {
         printf("Could not create file (ignoring)\n");
@@ -173,17 +173,17 @@ int test_load_save()
 
     for (i = 0; tests[i].str; i++) {
         f = fvec_extract(tests[i].str, strlen(tests[i].str));
-        fvec_save(f, z);
+        fvec_write(f, z);
         fvec_destroy(f);
     }
     gzclose(z);
 
-    /* Load and compare feature vectors */
+    /* read and compare feature vectors */
     z = gzopen(TEST_FILE, "r");
 
     for (i = 0; tests[i].str; i++) {
         f = fvec_extract(tests[i].str, strlen(tests[i].str));
-        g = fvec_load(z);
+        g = fvec_read(z);
 
         /* Check dimensions and values */
         for (j = 0; j < f->len && j < g->len; j++) {
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
 #ifdef ENABLE_OPENMP    
     err |= test_stress_omp();
 #endif    
-    err |= test_load_save();
+    err |= test_read_write();
 
     config_destroy(&cfg);
     return err;
