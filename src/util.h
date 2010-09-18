@@ -13,6 +13,7 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <zlib.h>
 #include "config.h"
 
 /* Progress bar stuff */
@@ -40,9 +41,6 @@ void err_msg(char *, const char *, char *, ...);
 void info_msg(int, char *, ...);
 double time_stamp();
 void prog_bar(long, long, long);
-
-#ifndef HAVE_FUNC_GETLINE
-size_t getline (char **s, size_t *n, FILE *f);
-#endif
+size_t gzgetline (char **s, size_t *n, gzFile *f);
 
 #endif                          /* UTIL_H */

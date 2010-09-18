@@ -25,7 +25,7 @@
 #include "input.h"
 
 /** Static variable */
-static FILE *in; 
+static gzFile *in; 
 static int line_num = 0;
 
 /**
@@ -37,20 +37,22 @@ int input_lines_open(char *name)
 {
     assert(name);    
 
-    in = fopen(name, "r");
+    in = gzopen(name, "r");
     if (!in) {
         error("Could not open '%s' for reading", name);
         return -1;
     }
 
     /* Count lines in file (I hope this is buffered)*/
-    int num_lines = 0;
-    while (!feof(in)) 
-        if (fgetc(in) == '\n')
+    int c, num_lines = 0;
+    do {
+        c = gzgetc(in);
+        if (c == '\n')
             num_lines++;
+    } while(c != -1);
 
     /* Prepare reading */
-    rewind(in);
+    gzrewind(in);
     line_num = 1;
 
     return num_lines;
@@ -71,7 +73,7 @@ int input_lines_read(string_t *strs, int len)
 
     for (i = 0; i < len; i++) {
         line = NULL;        
-        read = getline(&line, &size, in);
+        read = gzgetline(&line, &size, in);
         if (read == -1)  {
             free(line);
             break;
@@ -86,7 +88,7 @@ int input_lines_read(string_t *strs, int len)
         j++;
     }
     
-    return j - 1;
+    return j;
 }
 
 /**
@@ -94,7 +96,7 @@ int input_lines_read(string_t *strs, int len)
  */
 void input_lines_close()
 {
-    fclose(in);
+    gzclose(in);
 }
 
 /** @} */
