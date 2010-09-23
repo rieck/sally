@@ -189,8 +189,37 @@ size_t gzgetline(char **s, size_t *n, gzFile *f)
           (*s)[(*n)++] = c;
       }
       
-      (*s)[*n] = '\0';
+      (*s)[*n] = 0;
       return *n;
+}
+
+/** 
+ * Another dirty function to trim strings from leading and trailing 
+ * blanks. The original string is modified in place.
+ * @param x Input string
+ */
+void strtrim(char *x) 
+{
+    assert(x);
+    int i = 0, j = 0, l = strlen(x);
+
+    if (l == 0)
+        return;
+
+    for (i = 0; i <  l; i++) 
+        if (!isspace(x[i]))
+            break;
+
+    for (j = l; j > 0; j--) 
+        if (!isspace(x[j - 1]))
+            break;
+
+    if (j > i) {
+        memmove(x, x + i, j - i);
+        x[j - i] = 0;
+    } else {
+        x[0] = 0;
+    }
 }
 
 /** @} */

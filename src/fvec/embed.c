@@ -87,6 +87,11 @@ void idf_create(char *input)
     /* Open input */
     input_config(in_format);
     entries = input_open(input);
+    
+    if (entries <= 0) {
+        error("Could not open input for computing IDF weights");
+        return;
+    }
 
     info_msg(1, "Computing IDF weights from %d strings in chunks of %d.", 
                 entries, chunk);

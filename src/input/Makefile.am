@@ -7,4 +7,5 @@ EXTRA_DIST		= README
 noinst_LTLIBRARIES	= libinput.la
 
 libinput_la_SOURCES	= input.h input.c input_arc.c input_arc.h \
-			  input_dir.c input_dir.h input_lines.c input_lines.h
+			  input_dir.c input_dir.h input_lines.c input_lines.h \
+                          input_fasta.c input_fasta.h

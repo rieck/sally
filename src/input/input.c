@@ -27,6 +27,7 @@
 #include "input_arc.h"
 #include "input_dir.h"
 #include "input_lines.h"
+#include "input_fasta.h"
 
 /**
  * Structure for input interface
@@ -51,6 +52,10 @@ void input_config(const char *format)
     } else if (!strcasecmp(format, "lines")) {
         func.input_open = input_lines_open;
         func.input_read = input_lines_read;
+        func.input_close = input_lines_close;
+    } else if (!strcasecmp(format, "fasta")) {
+        func.input_open = input_fasta_open;
+        func.input_read = input_fasta_read;
         func.input_close = input_lines_close;
 #ifdef ENABLE_LIBARCHIVE
     } else if (!strcasecmp(format, "arc")) {

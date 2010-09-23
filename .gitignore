@@ -27,3 +27,4 @@ doc/html
 nbproject/
 src/sally
 tests/test_*
+.DS_Store
