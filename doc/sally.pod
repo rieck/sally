@@ -10,10 +10,12 @@ B<sally> [B<-hvV>] I<config> I<input> I<output>
 
 =head1 DESCRIPTION
 
-B<sally> is a small tool for mapping a set of strings to a set of
-vectors. This mapping is referred to as embedding and allows for
-applying techniques from statistics, machine learning and data mining
-for analysis of string data. This is the very intention of B<sally>.
+B<sally> is a small tool for mapping a set of strings to a set of vectors. This
+mapping is referred to as embedding and allows for applying techniques of
+machine learning and data mining for analysis of string data. B<sally> can
+applied to several types of string data, such as text documents, DNA
+sequences or log files, where it can handle common formats such as
+directories, archives and text files of string data.
 
 The embedding is carried out incrementally, where B<sally> first loads
 a chunk of strings from I<input>, computes the mapping to vectors and
@@ -32,58 +34,18 @@ output format, are specified in the file I<config>.
 
 =head2 Embedding strings
 
-B<sally> implements a standard technique for mapping strings to a
-vector space, which is often referred to as I<vector space model> or
-I<bag-of-words model>. The strings are characterized by a set of
-features, where each feature is associated with one dimension of the
-resulting vector space. B<sally> supports the following types of
-features:
+B<sally> implements a standard technique for mapping strings to a vector space
+that is often referred to as vector space model or bag-of-words model.  The
+strings are characterized by a set of features, where each feature is
+associated with one dimension of the vector space.  The following types of
+features are supported by B<sally>: bytes, words, n-grams of bytes and n-grams
+of words.
 
-=over 14
-
-=item B<words>
-
-The strings are partitioned into substrings (words) using a set of
-delimiter characters. Such partitioning is typical for natural
-language processing, where the delimiters are usually defined as
-whitespace and punctation symbols. 
-
-An embedding using words is selected by defining a set of delimiter
-characters and setting the n-gram length to 1.
-
-=item B<byte n-grams>
-
-The strings are characterized by all possible byte sequences of a
-fixed length n (byte n-grams). These features are frequently used if
-no information about the structure of strings is available, such as in
-bioinformatics or computer security.
-
-An embedding using byte n-grams is selected by defining the n-gram length 
-and setting the delimiters to an empty string.
-
-=item B<word n-grams>
-
-The strings are characterized by all possible word sequences of a fixed
-length n (word n-grams).  These features require the definition of a set of
-delimiters and a length n.  They are often used in natural language
-processing as a coarse way for capturing structure of text.
-
-An embedding using word n-grams is selected by defining a set of delimiter
-characters and choosing an n-gram length.
-
-
-=back
-
-Sally proceeds by counting the occurences of these features in each
-string and generating a vector of count values.  Notice that the vector is
-always sparse, as only a limited number of features can be present in a
-given string and hence the vast majority of dimensions is zero and does not
-need to be stored.  Sally then normalizes the vector and outputs it in the
-specified format, such as LibSVM or Matlab data files.
-
-A detailed introduction to the embedding of strings is provided by Rieck &
-Laskov, "Linear-time computation of similarity measures for sequential
-data", Journal of Machine Learning Research, 2008.
+B<sally> proceeds by counting the occurrences of the specified features in each
+string and generating a sparse vector of count values.  Alternatively,
+binary or TF-IDF values can be computed and stored in the vectors.  B<sally>
+then normalizes the vector, for example using the L1 or L2 norm, and outputs
+it in a specified format, such as plain text or in LibSVM or Matlab format.
 
 =head2 Input formats
 
@@ -109,7 +71,15 @@ file is given as I<input> to B<sally>.  No label information is supported by
 this input format.  The lines need to be seperated by newline and may not
 contain the NUL character.
 
+=item B<fasta>
+
+The input strings are available in FASTA format. The name of the file is
+given as I<input> to B<sally>. Labels are extracted from the description
+of each sequence using a regular expression. Comments are allowed if they
+are preceeded by either ';' or '>'.
+
 =back 
+
 
 =head2 Output formats
 
