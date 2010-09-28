@@ -1,20 +1,12 @@
 
+New embeddings:
+
+Implement support for Sparse Kernel Feature Analysis or Accelerated Kernel
+Feature Analysis. Both provide a non-linear dimension reduction using
+kernels with sparse expansions.
+
+
 New input formats: 
-
-FASTA format
-
-A sequence file in FASTA format can contain several sequences.  Each
-sequence in FASTA format begins with a single-line description, followed by
-lines of sequence data.  The description line must begin with a greater-than
-(">") symbol in the first column.
-
->AB000263 |acc=AB000263|descr=Homo sapiens mRNA for prepro cortistatin like peptide, complete cds.|len=368\
-ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC
-CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC
-CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG
-AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC
-CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG
-TTTAATTACAGACCTGAA
 
 IG format
 
@@ -33,3 +25,9 @@ CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG
 AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC
 CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG
 TTTAATTACAGACCTGAA1
+
+
+New output formats:
+
+Add support for further mathematical working environments, such as
+Python's numpy and R toolboxes.
