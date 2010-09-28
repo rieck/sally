@@ -47,6 +47,9 @@ DESCRIPTION
 
   Input formats
 
+    Following is a list of input formats supported by sally. See the
+    configuration section for more details.
+
     dir           The input strings are available as binary files in a
                   directory and the name of the directory is given as
                   *input* to sally. The suffixes of the files are used as
@@ -69,7 +72,41 @@ DESCRIPTION
                   regular expression. Comments are allowed if they are
                   preceeded by either ';' or '>'.
 
+  Feature Sets
+
+    Following is a list of features supported by sally. See the
+    configuration section for more details.
+
+    words         The strings are partitioned into substrings (words) using
+                  a set of delimiter characters. Such partitioning is
+                  typical for natural language processing, where the
+                  delimiters are usually defined as whitespace and
+                  punctation symbols. An embedding using words is selected
+                  by defining a set of delimiter characters and setting the
+                  n-gram length to 1. See the configuration section.
+
+    byte n-grams  The strings are characterized by all possible byte
+                  sequences of a fixed length n (byte n-grams). These
+                  features are frequently used if no information about the
+                  structure of strings is available, such as in
+                  bioinformatics or computer security. An embedding using
+                  byte n-grams is selected by defining the n-gram length and
+                  setting the delimiters to an empty string. See the
+                  configuration section.
+
+    word n-grams  The strings are characterized by all possible word
+                  sequences of a fixed length n (word n-grams). These
+                  features require the definition of a set of delimiters and
+                  a length n. They are often used in natural language
+                  processing as a coarse way for capturing structure of
+                  text. An embedding using word n-grams is selected by
+                  defining a set of delimiter characters and choosing an
+                  n-gram length. See the configuration section.
+
   Output formats
+
+    Following is a list of output formats supported by sally. See the
+    configuration section for more details.
 
     libsvm        The feature vectors of the embedded strings are stored in
                   libsvm format. The name of the output file is given as
@@ -86,6 +123,10 @@ DESCRIPTION
                   source of each vector and the second the vector itself as
                   a sparse array. The name of the output file is given as
                   *output* to sally.
+
+CONFIGURATION
+
+    *TODO*
 
 COPYRIGHT
 
