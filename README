@@ -83,7 +83,7 @@ DESCRIPTION
                   delimiters are usually defined as whitespace and
                   punctation symbols. An embedding using words is selected
                   by defining a set of delimiter characters and setting the
-                  n-gram length to 1. See the configuration section.
+                  n-gram length to 1.
 
     byte n-grams  The strings are characterized by all possible byte
                   sequences of a fixed length n (byte n-grams). These
@@ -91,8 +91,7 @@ DESCRIPTION
                   structure of strings is available, such as in
                   bioinformatics or computer security. An embedding using
                   byte n-grams is selected by defining the n-gram length and
-                  setting the delimiters to an empty string. See the
-                  configuration section.
+                  setting the delimiters to an empty string.
 
     word n-grams  The strings are characterized by all possible word
                   sequences of a fixed length n (word n-grams). These
@@ -101,7 +100,7 @@ DESCRIPTION
                   processing as a coarse way for capturing structure of
                   text. An embedding using word n-grams is selected by
                   defining a set of delimiter characters and choosing an
-                  n-gram length. See the configuration section.
+                  n-gram length.
 
   Output formats
 

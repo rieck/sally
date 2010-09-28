@@ -96,8 +96,7 @@ The strings are partitioned into substrings (words) using a set of delimiter
 characters.  Such partitioning is typical for natural language processing,
 where the delimiters are usually defined as whitespace and punctation
 symbols.  An embedding using words is selected by defining a set of
-delimiter characters and setting the n-gram length to 1.  See the
-configuration section.
+delimiter characters and setting the n-gram length to 1.  
 
 =item B<byte n-grams>
 
@@ -106,7 +105,7 @@ length n (byte n-grams).  These features are frequently used if no
 information about the structure of strings is available, such as in
 bioinformatics or computer security.  An embedding using byte n-grams is
 selected by defining the n-gram length and setting the delimiters to an
-empty string.  See the configuration section.
+empty string.  
 
 =item B<word n-grams>
 
@@ -115,7 +114,7 @@ length n (word n-grams).  These features require the definition of a set of
 delimiters and a length n.  They are often used in natural language
 processing as a coarse way for capturing structure of text.  An embedding
 using word n-grams is selected by defining a set of delimiter characters and
-choosing an n-gram length.  See the configuration section.
+choosing an n-gram length.  
 
 =back
 
