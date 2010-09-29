@@ -71,7 +71,7 @@ vectors.
 
 The input strings are available as lines in a text file. The name of the
 file is given as I<input> to B<sally>.  No label information is supported by
-this input format.  The lines need to be seperated by newline and may not
+this input format.  The lines need to be separated by newline and may not
 contain the NUL character.
 
 =item B<fasta>
@@ -79,7 +79,7 @@ contain the NUL character.
 The input strings are available in FASTA format. The name of the file is
 given as I<input> to B<sally>. Labels are extracted from the description
 of each sequence using a regular expression. Comments are allowed if they
-are preceeded by either ';' or '>'.
+are preceded by either ';' or '>'.
 
 =back 
 
@@ -94,7 +94,7 @@ configuration section for more details.
 
 The strings are partitioned into substrings (words) using a set of delimiter
 characters.  Such partitioning is typical for natural language processing,
-where the delimiters are usually defined as whitespace and punctation
+where the delimiters are usually defined as white-space and punctuation
 symbols.  An embedding using words is selected by defining a set of
 delimiter characters and setting the n-gram length to 1.  
 
