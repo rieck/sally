@@ -179,7 +179,7 @@ int input_fasta_read(string_t *strs, int len)
         /* Append line to sequence */
         alloc += strlen(line);
         seq = realloc(seq, alloc * sizeof(char));
-        strlcat(seq, line, alloc);        
+        strncat(seq, line, strlen(line));        
                 
 skip:        
         free(line);
