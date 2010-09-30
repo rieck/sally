@@ -1,139 +1,66 @@
-NAME
 
-    sally -- a tool for embedding strings in vector spaces
+.Oo Sally - A Tool for Embedding Strings in Vector Spaces
+    Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
-SYNOPSIS
+Introduction
+-- 
+  Sally is a small tool for mapping a set of strings to a set of vectors.
+  This mapping is referred to as embedding and allows for applying
+  techniques of machine learning and data mining for analysis of string
+  data.  Sally can applied to several types of string data, such as text
+  documents, DNA sequences or log files, where it can handle common formats
+  such as directories, archives and text files of string data.
 
-    sally [-hvV] *config* *input* *output*
+  Sally implements a standard technique for mapping strings to a vector
+  space that is often referred to as vector space model or bag-of-words
+  model.  The strings are characterized by a set of features, where each
+  feature is associated with one dimension of the vector space.  The
+  following types of features are supported by Sally: bytes, words, n-grams
+  of bytes and n-grams of words.
 
-DESCRIPTION
+  Sally proceeds by counting the occurrences of the specified features in
+  each string and generating a sparse vector of count values. 
+  Alternatively, binary or TF-IDF values can be computed and stored in the
+  vectors.  Sally then normalizes the vector, for example using the L1 or L2
+  norm, and outputs it in a specified format, such as plain text or in
+  LibSVM or Matlab format.
 
-    sally is a small tool for mapping a set of strings to a set of vectors.
-    This mapping is referred to as embedding and allows for applying
-    techniques of machine learning and data mining for analysis of string
-    data. sally can applied to several types of string data, such as text
-    documents, DNA sequences or log files, where it can handle common
-    formats such as directories, archives and text files of string data.
+  Consult the manual page of Sally for more information.
 
-    The embedding is carried out incrementally, where sally first loads a
-    chunk of strings from *input*, computes the mapping to vectors and then
-    writes the chunk of vectors to *output*. The configuration of this
-    process, such as the input format, the embedding type and the output
-    format, are specified in the file *config*.
+Dependencies
+--
+  >= libconfig-1.4
+  >= libarchive-2.70
 
-        .---------.                        .----------.
-        |   dir   |                        |   text   |
-        |   arc   |   \   .---------.   /  |  libsvm  |
-        |  lines  |   --  |  Sally  |  --  |  matlab  |
-        |   ...   |   /   '---------'   \  |   ...    |
-        '---------'                        '----------'
-           Input           Embedding          Output 
+Compilation & Installation
+--
+  $ ./configure [options]
+  $ make
+  $ make check
+  $ make install
 
-  Embedding strings
+  --prefix=PATH           Set directory prefix for installation
 
-    sally implements a standard technique for mapping strings to a vector
-    space that is often referred to as vector space model or bag-of-words
-    model. The strings are characterized by a set of features, where each
-    feature is associated with one dimension of the vector space. The
-    following types of features are supported by sally: bytes, words,
-    n-grams of bytes and n-grams of words.
+  By default Sally is installed into /usr/local. If you prefer a
+  different location, use this option to select an installation
+  directory.
 
-    sally proceeds by counting the occurrences of the specified features in
-    each string and generating a sparse vector of count values.
-    Alternatively, binary or TF-IDF values can be computed and stored in the
-    vectors. sally then normalizes the vector, for example using the L1 or
-    L2 norm, and outputs it in a specified format, such as plain text or in
-    LibSVM or Matlab format.
+  --enable-libarchive     Enable support for loading archives
+     
+  If this feature is enabled, Sally can also be applied to read the
+  contents of archives, such as .tgz and .zip.  This allows for
+  processing string data in compressed form and may drastically save
+  storage space.
 
-  Input formats
+  --enable-openmp         Enable support for OpenMP (experimental)
+    
+  This feature enables support for OpenMP in Sally. It is still
+  experimental.  Sally will execute certain parts of the processing in
+  parallel making use of multi-core architectures where possible.
+ 
+  --enable-md5hash        Enable MD5 as alternative hash
 
-    Following is a list of input formats supported by sally. See the
-    configuration section for more details.
-
-    dir           The input strings are available as binary files in a
-                  directory and the name of the directory is given as
-                  *input* to sally. The suffixes of the files are used as
-                  labels for the extracted vectors.
-
-    arc           The input strings are available as binary files in a
-                  compressed archive, such as a zip or tgz archive. The name
-                  of the archive is given as *input* to sally. The suffixes
-                  of the files are used as labels for the extracted vectors.
-
-    lines         The input strings are available as lines in a text file.
-                  The name of the file is given as *input* to sally. No
-                  label information is supported by this input format. The
-                  lines need to be separated by newline and may not contain
-                  the NUL character.
-
-    fasta         The input strings are available in FASTA format. The name
-                  of the file is given as *input* to sally. Labels are
-                  extracted from the description of each sequence using a
-                  regular expression. Comments are allowed if they are
-                  preceded by either ';' or '>'.
-
-  Feature Sets
-
-    Following is a list of features supported by sally. See the
-    configuration section for more details.
-
-    words         The strings are partitioned into substrings (words) using
-                  a set of delimiter characters. Such partitioning is
-                  typical for natural language processing, where the
-                  delimiters are usually defined as white-space and
-                  punctuation symbols. An embedding using words is selected
-                  by defining a set of delimiter characters and setting the
-                  n-gram length to 1.
-
-    byte n-grams  The strings are characterized by all possible byte
-                  sequences of a fixed length n (byte n-grams). These
-                  features are frequently used if no information about the
-                  structure of strings is available, such as in
-                  bioinformatics or computer security. An embedding using
-                  byte n-grams is selected by defining the n-gram length and
-                  setting the delimiters to an empty string.
-
-    word n-grams  The strings are characterized by all possible word
-                  sequences of a fixed length n (word n-grams). These
-                  features require the definition of a set of delimiters and
-                  a length n. They are often used in natural language
-                  processing as a coarse way for capturing structure of
-                  text. An embedding using word n-grams is selected by
-                  defining a set of delimiter characters and choosing an
-                  n-gram length.
-
-  Output formats
-
-    Following is a list of output formats supported by sally. See the
-    configuration section for more details.
-
-    libsvm        The feature vectors of the embedded strings are stored in
-                  libsvm format. The name of the output file is given as
-                  *output* to sally.
-
-    text          The feature vectors of the embedded strings are stored as
-                  a plain text using a list of dimensions, features and
-                  respective values. The name of the output file is given as
-                  *output* to sally.
-
-    matlab        The feature vectors of the embedded strings are stored in
-                  matlab format (v5). The vectors are stored as a cell array
-                  with 2 x n dimensions, where the first row holds the
-                  source of each vector and the second the vector itself as
-                  a sparse array. The name of the output file is given as
-                  *output* to sally.
-
-CONFIGURATION
-
-    *TODO*
-
-COPYRIGHT
-
-    Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)
-
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the
-    Free Software Foundation; either version 3 of the License, or (at your
-    option) any later version. This program is distributed without any
-    warranty. See the GNU General Public License for more details.
-
+  Sally uses a hash function for mapping different features to
+  different dimensions in the vector space.  By default the very
+  efficient Murmur hash is used for this task.  In certain critical
+  cases it may be useful to use a cryptographical hash as MD5.

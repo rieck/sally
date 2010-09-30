@@ -1,0 +1,139 @@
+NAME
+
+    sally -- a tool for embedding strings in vector spaces
+
+SYNOPSIS
+
+    sally [-hvV] *config* *input* *output*
+
+DESCRIPTION
+
+    sally is a small tool for mapping a set of strings to a set of vectors.
+    This mapping is referred to as embedding and allows for applying
+    techniques of machine learning and data mining for analysis of string
+    data. sally can applied to several types of string data, such as text
+    documents, DNA sequences or log files, where it can handle common
+    formats such as directories, archives and text files of string data.
+
+    The embedding is carried out incrementally, where sally first loads a
+    chunk of strings from *input*, computes the mapping to vectors and then
+    writes the chunk of vectors to *output*. The configuration of this
+    process, such as the input format, the embedding type and the output
+    format, are specified in the file *config*.
+
+        .---------.                        .----------.
+        |   dir   |                        |   text   |
+        |   arc   |   \   .---------.   /  |  libsvm  |
+        |  lines  |   --  |  Sally  |  --  |  matlab  |
+        |   ...   |   /   '---------'   \  |   ...    |
+        '---------'                        '----------'
+           Input           Embedding          Output 
+
+  Embedding strings
+
+    sally implements a standard technique for mapping strings to a vector
+    space that is often referred to as vector space model or bag-of-words
+    model. The strings are characterized by a set of features, where each
+    feature is associated with one dimension of the vector space. The
+    following types of features are supported by sally: bytes, words,
+    n-grams of bytes and n-grams of words.
+
+    sally proceeds by counting the occurrences of the specified features in
+    each string and generating a sparse vector of count values.
+    Alternatively, binary or TF-IDF values can be computed and stored in the
+    vectors. sally then normalizes the vector, for example using the L1 or
+    L2 norm, and outputs it in a specified format, such as plain text or in
+    LibSVM or Matlab format.
+
+  Input formats
+
+    Following is a list of input formats supported by sally. See the
+    configuration section for more details.
+
+    dir           The input strings are available as binary files in a
+                  directory and the name of the directory is given as
+                  *input* to sally. The suffixes of the files are used as
+                  labels for the extracted vectors.
+
+    arc           The input strings are available as binary files in a
+                  compressed archive, such as a zip or tgz archive. The name
+                  of the archive is given as *input* to sally. The suffixes
+                  of the files are used as labels for the extracted vectors.
+
+    lines         The input strings are available as lines in a text file.
+                  The name of the file is given as *input* to sally. No
+                  label information is supported by this input format. The
+                  lines need to be separated by newline and may not contain
+                  the NUL character.
+
+    fasta         The input strings are available in FASTA format. The name
+                  of the file is given as *input* to sally. Labels are
+                  extracted from the description of each sequence using a
+                  regular expression. Comments are allowed if they are
+                  preceded by either ';' or '>'.
+
+  Feature Sets
+
+    Following is a list of features supported by sally. See the
+    configuration section for more details.
+
+    words         The strings are partitioned into substrings (words) using
+                  a set of delimiter characters. Such partitioning is
+                  typical for natural language processing, where the
+                  delimiters are usually defined as white-space and
+                  punctuation symbols. An embedding using words is selected
+                  by defining a set of delimiter characters and setting the
+                  n-gram length to 1.
+
+    byte n-grams  The strings are characterized by all possible byte
+                  sequences of a fixed length n (byte n-grams). These
+                  features are frequently used if no information about the
+                  structure of strings is available, such as in
+                  bioinformatics or computer security. An embedding using
+                  byte n-grams is selected by defining the n-gram length and
+                  setting the delimiters to an empty string.
+
+    word n-grams  The strings are characterized by all possible word
+                  sequences of a fixed length n (word n-grams). These
+                  features require the definition of a set of delimiters and
+                  a length n. They are often used in natural language
+                  processing as a coarse way for capturing structure of
+                  text. An embedding using word n-grams is selected by
+                  defining a set of delimiter characters and choosing an
+                  n-gram length.
+
+  Output formats
+
+    Following is a list of output formats supported by sally. See the
+    configuration section for more details.
+
+    libsvm        The feature vectors of the embedded strings are stored in
+                  libsvm format. The name of the output file is given as
+                  *output* to sally.
+
+    text          The feature vectors of the embedded strings are stored as
+                  a plain text using a list of dimensions, features and
+                  respective values. The name of the output file is given as
+                  *output* to sally.
+
+    matlab        The feature vectors of the embedded strings are stored in
+                  matlab format (v5). The vectors are stored as a cell array
+                  with 2 x n dimensions, where the first row holds the
+                  source of each vector and the second the vector itself as
+                  a sparse array. The name of the output file is given as
+                  *output* to sally.
+
+CONFIGURATION
+
+    *TODO*
+
+COPYRIGHT
+
+    Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version. This program is distributed without any
+    warranty. See the GNU General Public License for more details.
+

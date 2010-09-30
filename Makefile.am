@@ -2,9 +2,9 @@
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = src doc tests
+SUBDIRS = src doc tests .
 ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = README COPYING
+EXTRA_DIST = README MANPAGE COPYING CHANGES
 
 clean-local:
 	rm -f *~
