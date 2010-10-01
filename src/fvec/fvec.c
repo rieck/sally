@@ -65,6 +65,7 @@ fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
     int nlen, bits;
+    double mi, ma;
     const char *dlm_str, *cfg_str;
     assert(x && l >= 0);
 
@@ -127,6 +128,11 @@ fvec_t *fvec_extract(char *x, int l)
     fvec_embed(fv, cfg_str);
     config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
     fvec_norm(fv, cfg_str);
+
+    /* Cut-off values if requested */
+    config_lookup_float(&cfg, "features.trim_min", (double *) &mi);
+    config_lookup_float(&cfg, "features.trim_max", (double *) &ma);    
+    fvec_trim(fv, mi, ma);
 
     return fv;
 }
