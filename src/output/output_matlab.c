@@ -11,13 +11,11 @@
 
 /** 
  * @addtogroup output 
- * Module 'matlab'.
- * <b>'matlab'</b>: The vectors are exported as a matlab file 
+ * <hr>
+ * <em>matlab</em>: The vectors are exported as a matlab file 
  * version 5. The vectors are stored in an 2 x n cell array, where
  * the first row holds the source of each vector and the second row
  * a sparse array containing the vector entries.
- * 
- * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 

@@ -11,10 +11,9 @@
 
 /** 
  * @addtogroup input
- * Module 'lines'.
- * <b>'lines'</b>: The strings are stored as text lines in a file.
- *
- * @author Konrad Rieck (konrad@mlsec.org)
+ * <hr>
+ * <em>lines</em>: The strings are stored as text lines in a file. Labels
+ * are not supported by this input format.
  * @{
  */
 

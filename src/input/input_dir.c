@@ -11,10 +11,11 @@
 
 /** 
  * @addtogroup input 
- * Module 'dir'.
- * <b>'dir'</b>: The strings are stored as files in a directory.
- *
- * @author Konrad Rieck (konrad@mlsec.org)
+ * <hr>
+ * <em>dir</em>: The strings are stored as files in a directory. The directory
+ * is not processed recursively. The suffixes of the files are used as labels. 
+ * If the suffixes are numbers, they are directly intepreted as labels, 
+ * otherwise they are hashed.
  * @{
  */
 

@@ -10,14 +10,14 @@
  */
 
 /** 
- * @addtogroup output 
- * Module 'libsvm'.
- * <b>'libsvm'</b>: The vectors are exported in a sparse text
+ * @addtogroup output
+ * <hr> 
+ * <em>libsvm</em>: The vectors are exported in a sparse text
  * format which is used by LibSVM and SVMlight. Each vector is 
  * represented as a text line of the form
  * <pre> label dimension:value ... # source </pre>
- *
- * @author Konrad Rieck (konrad@mlsec.org)
+ * Some version of LibSVM do not support comments, hence the comment
+ * field may be manually cut off in a postprocessing step.
  * @{
  */
 

@@ -11,10 +11,11 @@
 
 /** 
  * @addtogroup input 
- * Module 'arc'.
- * <b>'arc'</b>: The strings are stored as files in an archive.
- *
- * @author Konrad Rieck (konrad@mlsec.org)
+ * <hr>
+ * <em>arc</em>: The strings are stored as files in an archive. The archive
+ * is processed recursively and all files are processed by Sally. The suffixes
+ * of the files are used as labels. If the suffixes are numbers, they are 
+ * directly intepreted as labels, otherwise they are hashed.
  * @{
  */
 

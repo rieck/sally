@@ -11,10 +11,11 @@
 
 /** 
  * @addtogroup input
- * Module 'fasta'.
- * <b>'fasta'</b>: The strings are stored in FASTA format.
- *
- * @author Konrad Rieck (konrad@mlsec.org)
+ * <hr>
+ * <em>fasta</em>: The strings are stored in FASTA format. A detailed 
+ * description is available here http://en.wikipedia.org/wiki/FASTA_format. 
+ * Labels can be extracted from the description of each sequence using
+ * a regular expression.
  * @{
  */
 
