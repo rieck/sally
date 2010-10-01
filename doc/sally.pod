@@ -139,10 +139,9 @@ output file is given as I<output> to B<sally>.
 =item B<matlab>
 
 The feature vectors of the embedded strings are stored in matlab format
-(v5).  The vectors are stored as a cell array with 2 x n dimensions, where
-the first row holds the source of each vector and the second the vector
-itself as a sparse array.  The name of the output file is given as I<output>
-to B<sally>.
+(v5).  The vectors are stored as a 1 x n struct array  with the
+fields: data, src, label and feat. The name of the output file is given as
+I<output> to B<sally>.
 
 =back
 
