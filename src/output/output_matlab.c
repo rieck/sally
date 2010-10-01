@@ -13,9 +13,11 @@
  * @addtogroup output 
  * <hr>
  * <em>matlab</em>: The vectors are exported as a matlab file 
- * version 5. The vectors are stored in an 2 x n cell array, where
- * the first row holds the source of each vector and the second row
- * a sparse array containing the vector entries.
+ * version 5. The vectors are stored in an 1 x n struct array with the
+ * fields: data, src, label and feat. If the configuration parameter 
+ * <code>explicit_hash</code> is enabled the module writes out all
+ * string features to the field feat. Note however, that in this case
+ * the matlab file can get very large. 
  * @{
  */
 
@@ -31,10 +33,16 @@
 extern config_t cfg;
 
 /* Local variables */
-static FILE *f = NULL;
-static uint32_t bytes = 0;
+FILE *f = NULL;
 static uint32_t elements = 0;
 static int bits = 0;
+static uint32_t bytes = 0;
+
+/* Fields */
+#define NUM_FIELDS  4
+#define FIELD_LEN   8
+char *fields[] = { "data", "src", "label", "feat" }; 
+
 
 /**
  * Pads the output stream
@@ -86,7 +94,7 @@ static int fwrite_double(double i, FILE *f)
 }
 
 /**
- * Writes the dimensions of an array to a mat file
+ * Writes the flags of an array to a mat file
  * @param n Flags
  * @param c Class
  * @param z Non-zero elements
@@ -119,6 +127,7 @@ static int fwrite_array_dim(uint32_t n, uint32_t m, FILE *f)
 
     return 16;
 }
+
 /**
  * Writes the name of an array to a mat file
  * @param n Name of arry
@@ -146,59 +155,47 @@ static int fwrite_array_name(char *n, FILE *f)
     }
 }
 
+
 /**
- * Opens a file for writing matlab format
- * @param fn File name
- * @return number of regular files
+ * Writes a string
+ * @param s string
+ * @param f file pointer
+ * @return number of bytes
  */
-int output_matlab_open(char *fn) 
+static int fwrite_string(char *s, FILE *f)
 {
-    assert(fn);    
-    int r = 0;
+    int r = 0, l, i;
+    if (s)
+        l = strlen(s);
+    else
+        l = 0;
 
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    if (bits > 31) {
-        error("Matlab can not handle features with more than 31 bits");
-        return FALSE;
-    }
-
-    f = fopen(fn, "w");
-    if (!f) {
-        error("Could not open output file '%s'.", fn);
-        return FALSE;
-    }
-    
-    /* Write matlab header */
-    r += sally_version(f, "", "Output module for Matlab format (v5)");
-    while (r < 124 && r > 0)
-        r += fprintf(f, " ");
-
-    /* Write version header */
-    r += fwrite_uint16(0x0100, f);
-    r += fwrite_uint16(0x4d49, f);
-
-    if (r != 128) {
-        error("Could not write header to output file '%s'.", fn);
-        return FALSE;
-    }
-
-    /* Write tag of cell array */
+    /* Tag */
     fwrite_uint32(MAT_TYPE_ARRAY, f);
-    fwrite_uint32(0, f);   
- 
-    /* Here we go. Start a cell array */
-    r = fwrite_array_flags(0, MAT_CLASS_CELL, 0, f);
-    r += fwrite_array_dim(2, 0, f);
-    r += fwrite_array_name("data", f);
+    fwrite_uint32(0, f);
 
-    bytes = r;
-    elements = 0;
+    /* Header */
+    r += fwrite_array_flags(0, MAT_CLASS_CHAR, 0, f);
+    r += fwrite_array_dim(1, l, f);
+    r += fwrite_array_name("str", f);
+    r += fwrite_uint32(MAT_TYPE_UINT16, f);
+    r += fwrite_uint32(l * 2, f);
 
-    return TRUE;
+    /* Write characters */
+    for (i = 0; i < l ; i++)
+        r += fwrite_uint16(s[i], f);
+    r += fpad(f);
+
+    /* Update size in tag */
+    fseek(f, -(r + 4), SEEK_CUR);
+    fwrite_uint32(r, f);
+    fseek(f, r, SEEK_CUR);
+
+    return r + 8;
 }
 
 /**
- * Writes a feature vector to a mat file
+ * Writes the data of a feature vector to a mat file
  * @param fv feature vector
  * @param f file pointer
  * @return number of bytes
@@ -214,7 +211,7 @@ static int fwrite_fvec_data(fvec_t *fv, FILE *f)
     /* Header */
     r += fwrite_array_flags(0, MAT_CLASS_SPARSE, fv->len, f);
     r += fwrite_array_dim(1 << bits, 1, f);
-    r += fwrite_array_name("fvec", f);
+    r += fwrite_array_name("data", f);
 
     /* Row indices */
     r += fwrite_uint32(MAT_TYPE_INT32, f);
@@ -244,6 +241,32 @@ static int fwrite_fvec_data(fvec_t *fv, FILE *f)
     return r + 8;
 }
 
+/**
+ * Writes the fields names of the main struct
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_field_names(FILE *f)
+{
+    int r = 0, i;
+
+    /* Field length */
+    r += fwrite_uint16(MAT_TYPE_INT32, f);
+    r += fwrite_uint16(4, f);
+    r += fwrite_uint32(FIELD_LEN, f);
+
+    r += fwrite_uint32(MAT_TYPE_INT8, f);
+    r += fwrite_uint32(NUM_FIELDS * FIELD_LEN, f);
+    for (i = 0; i < NUM_FIELDS; i++)  {
+        int l = strlen(fields[i]);
+        assert(i < 8);
+        fwrite(fields[i], 1, l, f);
+        r += l + fpad(f); 
+    }
+    
+    return r;
+}
+
 
 /**
  * Writes the source of a feature vector to a mat file
@@ -253,26 +276,82 @@ static int fwrite_fvec_data(fvec_t *fv, FILE *f)
  */
 static int fwrite_fvec_src(fvec_t *fv, FILE *f)
 {
-    int r = 0, l, i;
-    if (fv->src)
-        l = strlen(fv->src);
-    else
-        l = 0;
+    return fwrite_string(fv->src, f);
+}
+
+
+/**
+ * Writes the features of a feature vector to a mat file
+ * @param fv feature vector
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
+{
+    int r = 0, i, j, k;
+    char buf[4096];
 
     /* Tag */
     fwrite_uint32(MAT_TYPE_ARRAY, f);
     fwrite_uint32(0, f);
 
     /* Header */
-    r += fwrite_array_flags(0, MAT_CLASS_CHAR, 0, f);
-    r += fwrite_array_dim(1, l, f);
-    r += fwrite_array_name("src", f);
-    r += fwrite_uint32(MAT_TYPE_UINT16, f);
-    r += fwrite_uint32(l * 2, f);
+    r += fwrite_array_flags(0, MAT_CLASS_CELL, 0, f);
+    if (fhash_enabled()) 
+        r += fwrite_array_dim(1, fv->len, f);
+    else
+        r += fwrite_array_dim(1, 0, f);
+    r += fwrite_array_name("feat", f);
 
-    /* Write characters */
-    for (i = 0; i < l ; i++)
-        r += fwrite_uint16(fv->src[i], f);
+    /* Features */
+    for (i = 0; fhash_enabled() && i < fv->len; i++) {
+
+        fentry_t *fe = fhash_get(fv->dim[i]);        
+        for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
+            if (isprint(fe->data[j]) && !strchr("%", fe->data[k])) {
+                buf[k] = fe->data[j];
+                k += 1;
+            } else {
+                snprintf(buf + k, 4, "%%%.2x", (unsigned char) fe->data[j]);
+                k += 3;
+            }
+        }
+        buf[k] = 0;
+        r += fwrite_string(buf, f);
+    }
+
+    /* Update size in tag */
+    fseek(f, -(r + 4), SEEK_CUR);
+    fwrite_uint32(r, f);
+    fseek(f, r, SEEK_CUR);
+
+    return r + 8;
+}
+
+
+/**
+ * Writes the label of feature vector to a mat file
+ * @param fv feature vector
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_fvec_label(fvec_t *fv, FILE *f)
+{
+    int r = 0;
+
+    /* Tag */
+    fwrite_uint32(MAT_TYPE_ARRAY, f);
+    fwrite_uint32(0, f);
+
+    /* Header */
+    r += fwrite_array_flags(0, MAT_CLASS_DOUBLE, 0, f);
+    r += fwrite_array_dim(1, 1, f);
+    r += fwrite_array_name("feat", f);
+    r += fwrite_uint32(MAT_TYPE_DOUBLE, f);
+    r += fwrite_uint32(8, f);
+
+    /* Write float */
+    r += fwrite_double(fv->label, f);
     r += fpad(f);
 
     /* Update size in tag */
@@ -281,6 +360,59 @@ static int fwrite_fvec_src(fvec_t *fv, FILE *f)
     fseek(f, r, SEEK_CUR);
 
     return r + 8;
+}
+
+
+/**
+ * Opens a file for writing matlab format
+ * @param fn File name
+ * @return number of regular files
+ */
+int output_matlab_open(char *fn) 
+{
+    assert(fn);  
+    int r = 0;
+    
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    if (bits > 31) {
+        error("Matlab can not handle features with more than 31 bits");
+        return FALSE;
+    }
+    
+    /* Open main file */    
+    f = fopen(fn, "w");
+    if (!f) {
+        error("Could not open output file '%s'.", fn);
+        return FALSE;
+    }
+    
+    /* Write matlab header */
+    r += sally_version(f, "", "Output module for Matlab format (v5)");
+    while (r < 124 && r > 0)
+        r += fprintf(f, " ");
+    
+    /* Write version header */
+    r += fwrite_uint16(0x0100, f);
+    r += fwrite_uint16(0x4d49, f);
+    if (r != 128) {
+        error("Could not write header to output file '%s'.", fn);
+        return FALSE;
+    }
+    
+    /* Write tag of struct array */
+    fwrite_uint32(MAT_TYPE_ARRAY, f);
+    fwrite_uint32(0, f);   
+ 
+    /* Here we go. Start a struct rray */
+    r = fwrite_array_flags(0, MAT_CLASS_STRUCT, 0, f);
+    r += fwrite_array_dim(1, 0, f);
+    r += fwrite_array_name("fvec", f);
+    r += fwrite_field_names(f);
+
+    elements = 0;
+    bytes = r;
+    
+    return TRUE;
 }
 
 /**
@@ -295,8 +427,10 @@ int output_matlab_write(fvec_t **x, int len)
     int j;
 
     for (j = 0; j < len; j++) {
-        bytes += fwrite_fvec_src(x[j], f);
         bytes += fwrite_fvec_data(x[j], f);
+        bytes += fwrite_fvec_src(x[j], f);
+        bytes += fwrite_fvec_label(x[j], f);
+        bytes += fwrite_fvec_feat(x[j], f);
         elements++;
     }
     
@@ -318,7 +452,6 @@ void output_matlab_close()
     /* Fix number of elements in header */
     fseek(f, 0xa4, SEEK_SET);
     fwrite_uint32(elements, f);
-
     fclose(f);
 }
 

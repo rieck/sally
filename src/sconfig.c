@@ -37,6 +37,7 @@ static config_default_t defaults[] = {
     { "features", "explicit_hash", CONFIG_TYPE_INT, { .num = 0 } },
     { "features", "tfidf_file", CONFIG_TYPE_STRING, { .str = "tfidf.fv" } },
     { "output", "format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
+    { "output", "tmp_dir", CONFIG_TYPE_STRING, {. str = "/tmp" } },
     { NULL }
 };
 
