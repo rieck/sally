@@ -29,6 +29,7 @@
 #define MAT_CLASS_OBJ       3
 #define MAT_CLASS_CHAR      4
 #define MAT_CLASS_SPARSE    5
+#define MAT_CLASS_DOUBLE    6
 #define MAT_CLASS_INT8      8
 #define MAT_CLASS_UINT32    13
 

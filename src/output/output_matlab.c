@@ -37,9 +37,9 @@ static int bits = 0;
 static uint32_t bytes = 0;
 
 /* Fields */
-#define NUM_FIELDS  2
+#define NUM_FIELDS  3
 #define FIELD_LEN   8
-char *fields[] = { "data", "src" }; 
+char *fields[] = { "data", "src", "label" }; 
 
 
 /**
@@ -125,6 +125,7 @@ static int fwrite_array_dim(uint32_t n, uint32_t m, FILE *f)
 
     return 16;
 }
+
 /**
  * Writes the name of an array to a mat file
  * @param n Name of arry
@@ -266,6 +267,40 @@ static int fwrite_fvec_src(fvec_t *fv, FILE *f)
 
 
 /**
+ * Writes the label of a feature vector to a mat file
+ * @param fv feature vector
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_fvec_label(fvec_t *fv, FILE *f)
+{
+    int r = 0;
+
+    /* Tag */
+    fwrite_uint32(MAT_TYPE_ARRAY, f);
+    fwrite_uint32(0, f);
+
+    /* Header */
+    r += fwrite_array_flags(0, MAT_CLASS_DOUBLE, 0, f);
+    r += fwrite_array_dim(1, 1, f);
+    r += fwrite_array_name("lab", f);
+    r += fwrite_uint32(MAT_TYPE_DOUBLE, f);
+    r += fwrite_uint32(8, f);
+
+    /* Write float */
+    r += fwrite_double(fv->label, f);
+    r += fpad(f);
+
+    /* Update size in tag */
+    fseek(f, -(r + 4), SEEK_CUR);
+    fwrite_uint32(r, f);
+    fseek(f, r, SEEK_CUR);
+
+    return r + 8;
+}
+
+
+/**
  * Opens a file for writing matlab format
  * @param fn File name
  * @return number of regular files
@@ -331,12 +366,12 @@ int output_matlab_write(fvec_t **x, int len)
     for (j = 0; j < len; j++) {
         bytes += fwrite_fvec_data(x[j], f);
         bytes += fwrite_fvec_src(x[j], f);
+        bytes += fwrite_fvec_label(x[j], f);
         elements++;
     }
     
     return TRUE;
 }
-
 
 /**
  * Closes an open output file.
