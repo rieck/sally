@@ -8,7 +8,7 @@ sally.man: 	sally.pod
 		pod2man -c "User Manual" -s 1 -r "sally $(VERSION)" $< > $@
 
 changes:	
-		./git22changes.py
+		./git2changes.py
 
 manpage:	sally.pod
 		pod2text -l $< > ../MANPAGE

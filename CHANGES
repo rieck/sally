@@ -1,4 +1,25 @@
+2010-10-01  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * doc/example.cfg, src/output/output_matlab.c: support for exporting features
+  to matlab
+
+  * src/output/output_matlab.c, src/output/output_matlab.h: added label to
+  matlab struct
+
+  * compile, doc/example.cfg, src/output/output_matlab.c, src/sconfig.c:
+  feature vectors are now converted to matlab structs
+
+  * doc/doxygen.cfg, src/input/input_arc.c, src/input/input_dir.c,
+  src/input/input_fasta.c, src/input/input_lines.c, src/output/output_libsvm.c,
+  src/output/output_matlab.c, src/output/output_text.c: improved documentation
+  of output and input modules
+
+  * src/output/output_matlab.c: started rewrite of matlab module
+
 2010-09-30  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES, MANPAGE, Makefile.am, README, TODO, configure.in, doc/Makefile.am,
+  doc/git2changes.py: updated documentation
 
   * src/input/input_fasta.c: replaced strlcat with strncat for compatibility.
   got a bad feeling now
