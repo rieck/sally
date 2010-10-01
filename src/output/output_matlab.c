@@ -37,9 +37,9 @@ static int bits = 0;
 static uint32_t bytes = 0;
 
 /* Fields */
-#define NUM_FIELDS  3
+#define NUM_FIELDS  4
 #define FIELD_LEN   8
-char *fields[] = { "data", "src", "label" }; 
+char *fields[] = { "data", "src", "label", "feat" }; 
 
 
 /**
@@ -155,7 +155,45 @@ static int fwrite_array_name(char *n, FILE *f)
 
 
 /**
- * Writes a feature vector to a mat file
+ * Writes a string
+ * @param s string
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_string(char *s, FILE *f)
+{
+    int r = 0, l, i;
+    if (s)
+        l = strlen(s);
+    else
+        l = 0;
+
+    /* Tag */
+    fwrite_uint32(MAT_TYPE_ARRAY, f);
+    fwrite_uint32(0, f);
+
+    /* Header */
+    r += fwrite_array_flags(0, MAT_CLASS_CHAR, 0, f);
+    r += fwrite_array_dim(1, l, f);
+    r += fwrite_array_name("str", f);
+    r += fwrite_uint32(MAT_TYPE_UINT16, f);
+    r += fwrite_uint32(l * 2, f);
+
+    /* Write characters */
+    for (i = 0; i < l ; i++)
+        r += fwrite_uint16(s[i], f);
+    r += fpad(f);
+
+    /* Update size in tag */
+    fseek(f, -(r + 4), SEEK_CUR);
+    fwrite_uint32(r, f);
+    fseek(f, r, SEEK_CUR);
+
+    return r + 8;
+}
+
+/**
+ * Writes the data of a feature vector to a mat file
  * @param fv feature vector
  * @param f file pointer
  * @return number of bytes
@@ -227,6 +265,7 @@ static int fwrite_field_names(FILE *f)
     return r;
 }
 
+
 /**
  * Writes the source of a feature vector to a mat file
  * @param fv feature vector
@@ -235,27 +274,49 @@ static int fwrite_field_names(FILE *f)
  */
 static int fwrite_fvec_src(fvec_t *fv, FILE *f)
 {
-    int r = 0, l, i;
-    if (fv->src)
-        l = strlen(fv->src);
-    else
-        l = 0;
+    return fwrite_string(fv->src, f);
+}
+
+
+/**
+ * Writes the features of a feature vector to a mat file
+ * @param fv feature vector
+ * @param f file pointer
+ * @return number of bytes
+ */
+static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
+{
+    int r = 0, i, j, k;
+    char buf[4096];
 
     /* Tag */
     fwrite_uint32(MAT_TYPE_ARRAY, f);
     fwrite_uint32(0, f);
 
     /* Header */
-    r += fwrite_array_flags(0, MAT_CLASS_CHAR, 0, f);
-    r += fwrite_array_dim(1, l, f);
-    r += fwrite_array_name("src", f);
-    r += fwrite_uint32(MAT_TYPE_UINT16, f);
-    r += fwrite_uint32(l * 2, f);
+    r += fwrite_array_flags(0, MAT_CLASS_CELL, 0, f);
+    if (fhash_enabled()) 
+        r += fwrite_array_dim(1, fv->len, f);
+    else
+        r += fwrite_array_dim(1, 0, f);
+    r += fwrite_array_name("feat", f);
 
-    /* Write characters */
-    for (i = 0; i < l ; i++)
-        r += fwrite_uint16(fv->src[i], f);
-    r += fpad(f);
+    /* Features */
+    for (i = 0; fhash_enabled() && i < fv->len; i++) {
+
+        fentry_t *fe = fhash_get(fv->dim[i]);        
+        for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
+            if (isprint(fe->data[j]) && !strchr("%", fe->data[k])) {
+                buf[k] = fe->data[j];
+                k += 1;
+            } else {
+                snprintf(buf + k, 4, "%%%.2x", (unsigned char) fe->data[j]);
+                k += 3;
+            }
+        }
+        buf[k] = 0;
+        r += fwrite_string(buf, f);
+    }
 
     /* Update size in tag */
     fseek(f, -(r + 4), SEEK_CUR);
@@ -267,7 +328,7 @@ static int fwrite_fvec_src(fvec_t *fv, FILE *f)
 
 
 /**
- * Writes the label of a feature vector to a mat file
+ * Writes the label of feature vector to a mat file
  * @param fv feature vector
  * @param f file pointer
  * @return number of bytes
@@ -283,7 +344,7 @@ static int fwrite_fvec_label(fvec_t *fv, FILE *f)
     /* Header */
     r += fwrite_array_flags(0, MAT_CLASS_DOUBLE, 0, f);
     r += fwrite_array_dim(1, 1, f);
-    r += fwrite_array_name("lab", f);
+    r += fwrite_array_name("feat", f);
     r += fwrite_uint32(MAT_TYPE_DOUBLE, f);
     r += fwrite_uint32(8, f);
 
@@ -367,6 +428,7 @@ int output_matlab_write(fvec_t **x, int len)
         bytes += fwrite_fvec_data(x[j], f);
         bytes += fwrite_fvec_src(x[j], f);
         bytes += fwrite_fvec_label(x[j], f);
+        bytes += fwrite_fvec_feat(x[j], f);
         elements++;
     }
     
