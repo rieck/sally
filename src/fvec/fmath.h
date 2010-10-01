@@ -22,6 +22,5 @@ void fvec_times(fvec_t *fa, fvec_t *fb);
 void fvec_mul(fvec_t *f, double s);
 void fvec_log2(fvec_t *f);
 void fvec_invert(fvec_t *f);
-void fvec_trim(fvec_t *f, double mi, double ma);
 
 #endif                          /* FMATH_H */

@@ -305,30 +305,4 @@ void fvec_invert(fvec_t *f)
         f->val[i] = (float) 1.0 / f->val[i];
 }
 
-/**
- * Trim values of feature vector
- * Cut off low values from vector
- * @param f Feature vector 
- * @param mi Minimum value
- * @param ma Maximum value
- */
-void fvec_trim(fvec_t *f, double mi, double ma)
-{
-    int i = 0, j = 0;
-    assert(f);
-
-    for (i = 0; i < f->len; i++) {
-        if (f->val[i] < mi || f->val[i] > ma) 
-            continue;
-            
-        if (i == ++j - 1)
-            continue;
-
-        /* Copy data */
-        f->val[j - 1] = f->val[i];
-        f->dim[j - 1] = f->dim[i];
-    }
-    f->len = j;
-}
-
 /** @} */
