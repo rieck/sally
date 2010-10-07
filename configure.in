@@ -140,6 +140,7 @@ AC_CONFIG_FILES([
    src/fvec/Makefile \
    doc/Makefile \
    tests/Makefile \
+   contrib/Makefile \
 ])
 
 AC_OUTPUT_COMMANDS([],[

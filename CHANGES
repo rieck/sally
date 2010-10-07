@@ -1,4 +1,20 @@
+2010-10-05  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * Makefile.am, contrib/Makefile.am, contrib/sally_struct2mat.m: added contrib
+  directory and simple matlab function
+
 2010-10-01  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * doc/sally.pod: updated manpage
+
+  * doc/example.cfg, src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c,
+  src/sconfig.c: removed trim functionality as it badly interfers with
+  normalization and tfidf
+
+  * doc/example.cfg, src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c,
+  src/sconfig.c: support to trim min. and max. of dimensions
+
+  * CHANGES, configure.in, doc/Makefile.am: new minor update
 
   * doc/example.cfg, src/output/output_matlab.c: support for exporting features
   to matlab
