@@ -1,3 +1,7 @@
+2010-10-07  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES, MANPAGE, configure.in: new release 0.5.2
+
 2010-10-05  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * Makefile.am, contrib/Makefile.am, contrib/sally_struct2mat.m: added contrib
