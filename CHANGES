@@ -1,3 +1,8 @@
+2010-10-08  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES, MANPAGE, Makefile.am, doc/Makefile.am: added support to generate
+  PDF manual
+
 2010-10-07  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * CHANGES, MANPAGE, configure.in: new release 0.5.2
