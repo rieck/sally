@@ -82,7 +82,7 @@ int input_lines_read(string_t *strs, int len)
         strs[j].len = strlen(line);
         strs[j].label = 0;
 
-        snprintf(buf, 32, "line %d", line_num++);
+        snprintf(buf, 32, "line%d", line_num++);
         strs[j].src = strdup(buf);
         j++;
     }
