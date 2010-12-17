@@ -16,5 +16,3 @@ X = [fvec.data];
 Y = [fvec.label];
 S = {fvec.src};
 F = {fvec.feat};
-
-
