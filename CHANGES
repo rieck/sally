@@ -1,4 +1,14 @@
+2010-12-17  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * contrib/sally_sparsematrix.r, contrib/sally_struct2mat.m: new contrib
+
+2010-12-10  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * src/input/input_lines.c: removed space from src field of line module
+
 2010-10-08  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES, doc/latex-post.inc, doc/latex-pre.inc.in: missing latex templates
 
   * CHANGES, MANPAGE, Makefile.am, doc/Makefile.am: added support to generate
   PDF manual

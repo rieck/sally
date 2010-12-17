@@ -2,6 +2,7 @@
 *.la
 *.lo
 *.o
+.DS_Store
 .dep.inc
 .deps
 .libs
@@ -24,7 +25,9 @@ Makefile
 Makefile-sally.mk
 Makefile.in
 doc/html
+doc/latex-pre.inc
+doc/sally.pdf
+doc/sally.txt
 nbproject/
 src/sally
 tests/test_*
-.DS_Store
