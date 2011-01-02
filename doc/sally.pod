@@ -43,14 +43,23 @@ of words.
 
 B<sally> proceeds by counting the occurrences of the specified features in each
 string and generating a sparse vector of count values.  Alternatively,
-binary or TF-IDF values can be computed and stored in the vectors.  B<sally>
+binary or TF-IDF values can be computed and stored in the vectors. B<sally>
 then normalizes the vector, for example using the L1 or L2 norm, and outputs
 it in a specified format, such as plain text or in LibSVM or Matlab format.
 
+The processing chain of B<sally> makes heavy use of sparse data structures,
+such that high-dimensional vectors with millions of dimensions can be
+handled efficiently.  Moreover, all features and dimensions are indexed by
+an efficient hash function, where the bit width of this function can be
+adjusted according to the characteristics of the data.  In several settings,
+a hash width between 24 and 28 bit already suffices to store millions of
+features with little loss of accuracy.
+
 =head2 Input formats
 
-Following is a list of input formats supported by B<sally>. See the
-configuration section for more details.
+B<sally> supports different formats for reading data sets of strings, 
+which may range from plain files to directories and other structured
+resources. Following is a list of supported input formats.
 
 =over 14
 
@@ -85,8 +94,11 @@ are preceded by either ';' or '>'.
 
 =head2 Feature Sets
 
-Following is a list of features supported by B<sally>. See the
-configuration section for more details.
+The strings loaded by B<sally> are characterized by a set of features, where
+each feature is associated with one dimension of the vector space. 
+Following is a list of supported feature sets.  More details on defining and
+tuning these features are provided in the configuration section of this
+document.
 
 =over 14
 
@@ -120,21 +132,26 @@ choosing an n-gram length.
 
 =head2 Output formats
 
-Following is a list of output formats supported by B<sally>. See the
-configuration section for more details.
+Once the input strings have been embedded in a vector space, B<sally> stores
+the resulting vectors in one of several common formats, which allows for
+applying typical tools of statistics and machine learning to the data, for
+example, Matlab, Octave, Shogun, Weka, SVMLight and LibSVM.  Following is a
+list of output formats supported by B<sally>.
 
 =over 14
 
 =item B<libsvm> 
 
-The feature vectors of the embedded strings are stored in libsvm format. 
-The name of the output file is given as I<output> to B<sally>.
+The feature vectors of the embedded strings are stored in the common libsvm
+format, which is supported by Shogun, SVMLight and LibSVM. The name of the
+output file is given as I<output> to B<sally>.
 
 =item B<text> 
 
 The feature vectors of the embedded strings are stored as a plain text using
-a list of dimensions, features and respective values.  The name of the
-output file is given as I<output> to B<sally>.
+a list of dimensions, features and respective values.  Almost all
+compherensive analysis tools can deal with this type of format.  The name of
+the output file is given as I<output> to B<sally>.
 
 =item B<matlab>
 
@@ -147,7 +164,45 @@ I<output> to B<sally>.
 
 =head1 CONFIGURATION
 
-*TODO*
+The configuration of B<sally> is specified in the file I<config>. The
+configuration is structured into three sections B<input>, B<features> and
+B<output>, which define the parameters of the input format, the feature
+extraction and the output format, respectively.
+
+=over 4
+
+=item B<input = {>
+
+=over 4
+
+=item B<format = "lines";>
+
+This parameter specifies the input format. Supported values are "dir",
+"arc", "lines" and "fasta".  For the "dir" and "arc" format, the input
+strings are provided as either a directory or an archive of files.  For the
+"lines" format the strings are availables as lines in a text file. 
+Similarly, the "fasta" format expects a text file in FASTA format.
+
+=item B<chunk_size = 256;>
+
+This parameter defines the number of strings to process in each cunk. To
+enable an efficient processing of large data sets, B<sally> processes
+strings in chunks.  Depending on the length of the strings, this parameter
+can be adjusted to balance loading and processing of data.
+
+=item B<fasta_regex = " (\\+|-)[:digit:]*";>
+
+The FASTA format allows to equip each string with a short description. In
+several data sets this description contains a numerical label which can be
+useful for application of supervised learning methods.  The parameter is a
+regular expression matching labels, such as +1 and -1.
+
+=back
+
+=item B<};>
+
+=back
+
 
 =head1 COPYRIGHT
 
