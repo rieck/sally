@@ -175,7 +175,7 @@ extraction and the output format, respectively.
 
 =over 4
 
-=item B<format = "lines";>
+=item B<input_format = "lines";>
 
 This parameter specifies the input format. Supported values are "dir",
 "arc", "lines" and "fasta".  For the "dir" and "arc" format, the input

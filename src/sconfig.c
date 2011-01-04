@@ -26,7 +26,7 @@ extern int verbose;
 
 /* Default configuration */
 static config_default_t defaults[] = {
-    { "input", "format", CONFIG_TYPE_STRING, { .str = "dir" } },
+    { "input", "input_format", CONFIG_TYPE_STRING, { .str = "dir" } },
     { "input", "chunk_size", CONFIG_TYPE_INT, { .num = 1024 } },
     { "input", "fasta_regex", CONFIG_TYPE_STRING, { .str = " (\\+|-)[:digit:]*" }},
     { "input", "lines_regex", CONFIG_TYPE_STRING, { .str = "[:digit:]+: " }},
@@ -37,7 +37,7 @@ static config_default_t defaults[] = {
     { "features", "hash_bits", CONFIG_TYPE_INT, { .num = 26 } },
     { "features", "explicit_hash", CONFIG_TYPE_INT, { .num = 0 } },
     { "features", "tfidf_file", CONFIG_TYPE_STRING, { .str = "tfidf.fv" } },
-    { "output", "format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
+    { "output", "output_format", CONFIG_TYPE_STRING, { .str = "libsvm" } },
     { NULL }
 };
 

@@ -147,14 +147,14 @@ static void sally_init(int argc, char **argv)
     }
 
     /* Open input */
-    config_lookup_string(&cfg, "input.format", &cfg_str);
+    config_lookup_string(&cfg, "input.input_format", &cfg_str);
     input_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with input module '%s'.", input, cfg_str);
     entries = input_open(input);
     if (entries < 0)
         fatal("Could not open input source");
 
-    config_lookup_string(&cfg, "output.format", &cfg_str);
+    config_lookup_string(&cfg, "output.output_format", &cfg_str);
     output_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
     if (!output_open(output))
