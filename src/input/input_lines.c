@@ -84,7 +84,7 @@ int input_lines_open(char *name)
 
     /* Compile regular expression for label */
     config_lookup_string(&cfg, "input.lines_regex", &pattern);
-    if (regcomp(&re, pattern, REG_EXTENDED|REG_NOTBOL|REG_NOTEOL) != 0) {
+    if (regcomp(&re, pattern, REG_EXTENDED) != 0) {
         error("Could not compile regex for label");
         return -1;
     }
