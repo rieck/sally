@@ -142,6 +142,7 @@ int input_lines_read(string_t *strs, int len)
  */
 void input_lines_close()
 {
+    regfree(&re);
     gzclose(in);
 }
 
