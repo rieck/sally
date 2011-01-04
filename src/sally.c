@@ -52,11 +52,26 @@ int sally_version(FILE *f, char *p, char *m)
 static void print_usage(void)
 {
     printf("Usage: sally [options] <config> <input> <output>\n"
-            "Options:\n"
-            "  -v             Increase verbosity.\n"
-            "  -q             Be quiet during processing.\n"
-            "  -V             Print version and copyright.\n"
-            "  -h             Print this help screen.\n");
+            "\nI/O options:\n"
+            "  -i,  --input_format <format>   Set input format for strings.\n"
+            "  -c,  --chunk_size <num>        Set chunk size for processing.\n"   
+            "       --fasta_regex <regex>     Set RE for labels in FASTA sequences.\n"
+            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
+            "  -o,  --output_format <format>  Set output format for vectors.\n"            
+            "\nFeature options:\n"
+            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
+            "  -d,  --ngram_delim <delim>     Set delimiters of token in n-grams.\n"
+            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
+            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
+            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
+            "       --explicit_hash           Enable explicit hash representation.\n"
+            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
+            "\nGeneric options:\n"
+            "  -v,  --verbose                 Increase verbosity.\n"
+            "  -q,  --quiet                   Be quiet during processing.\n"
+            "  -V,  --version                 Print version and copyright.\n"
+            "  -h,  --help                    Print this help screen.\n"
+            "\n");
 }
 
 /**
