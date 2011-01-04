@@ -52,7 +52,7 @@ static float get_label(char *desc)
         return 0;
 
     name = desc + pmatch[0].rm_so;
-    desc[pmatch[0].rm_eo + 1] = 0;
+    desc[pmatch[0].rm_eo] = 0;
     
     /* Test direct conversion */
     float f = strtof(name, &endptr);

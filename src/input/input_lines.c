@@ -52,8 +52,8 @@ static float get_label(char *line)
 	return 0;
 
     name = line + pmatch[0].rm_so;
-    old = line[pmatch[0].rm_eo + 1];
-    line[pmatch[0].rm_eo + 1] = 0;
+    old = line[pmatch[0].rm_eo];
+    line[pmatch[0].rm_eo] = 0;
 
     /* Test direct conversion */
     float f = strtof(name, &endptr);
@@ -62,7 +62,7 @@ static float get_label(char *line)
     if (!endptr || strlen(endptr) > 0)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
 
-    line[pmatch[0].rm_eo + 1] = old;
+    line[pmatch[0].rm_eo] = old;
     return f;
 }
 
