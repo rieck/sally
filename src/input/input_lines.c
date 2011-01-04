@@ -12,8 +12,9 @@
 /** 
  * @addtogroup input
  * <hr>
- * <em>lines</em>: The strings are stored as text lines in a file. Labels
- * are not supported by this input format.
+ * <em>lines</em>: The strings are stored as text lines in a file. A
+ * label is automatically extracted if the beginning of the line 
+ * matches a specified regular expression.
  * @{
  */
 
@@ -23,9 +24,47 @@
 #include "murmur.h"
 #include "input.h"
 
+#include <regex.h>
+
 /** Static variable */
 static gzFile *in; 
+static regex_t re;
 static int line_num = 0;
+
+/** External variables */
+extern config_t cfg;
+
+
+/** 
+ * Converts the beginning of a text line to a label. The label is computed 
+ * by matching a regular expression, either directly if the match is a 
+ * number or indirectly by hashing.
+ * @param line Text line
+ * @return label value.
+ */
+static float get_label(char *line)
+{
+    char *endptr, *name = line, old;
+    regmatch_t pmatch[1];
+
+    /* No match found */
+    if (regexec(&re, line, 1, pmatch, 0)) 
+	return 0;
+
+    name = line + pmatch[0].rm_so;
+    old = line[pmatch[0].rm_eo + 1];
+    line[pmatch[0].rm_eo + 1] = 0;
+
+    /* Test direct conversion */
+    float f = strtof(name, &endptr);
+
+    /* Compute hash value */
+    if (!endptr || strlen(endptr) > 0)
+        f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
+
+    line[pmatch[0].rm_eo + 1] = old;
+    return f;
+}
 
 /**
  * Opens a file for reading text lines. 
@@ -35,10 +74,18 @@ static int line_num = 0;
 int input_lines_open(char *name) 
 {
     assert(name);    
+    const char *pattern;
 
     in = gzopen(name, "r");
     if (!in) {
         error("Could not open '%s' for reading", name);
+        return -1;
+    }
+
+    /* Compile regular expression for label */
+    config_lookup_string(&cfg, "input.lines_regex", &pattern);
+    if (regcomp(&re, pattern, REG_EXTENDED|REG_NOTBOL|REG_NOTEOL) != 0) {
+        error("Could not compile regex for label");
         return -1;
     }
 
@@ -79,8 +126,8 @@ int input_lines_read(string_t *strs, int len)
         }
 
         strs[j].str = line;
+	strs[i].label = get_label(line);
         strs[j].len = strlen(line);
-        strs[j].label = 0;
 
         snprintf(buf, 32, "line%d", line_num++);
         strs[j].src = strdup(buf);

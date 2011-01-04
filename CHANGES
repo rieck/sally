@@ -1,4 +1,20 @@
+2011-01-02  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * doc/sally.pod: started to update the man pagee
+
+  * doc/Makefile.am, doc/example.cfg, src/sconfig.c: extended example
+  configuration
+
+2010-12-21  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * contrib/sally_sparsematrix.r: important fix: added newline to eof
+
+  * contrib/sally_sparsematrix.r: fixed wrong skip lines
+
 2010-12-17  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * .gitignore, CHANGES, contrib/Makefile.am, contrib/sally_sparsematrix.r,
+  contrib/sally_struct2mat.m: sanitized contributions directory
 
   * contrib/sally_sparsematrix.r, contrib/sally_struct2mat.m: new contrib
 

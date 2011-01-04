@@ -47,10 +47,12 @@ static float get_label(char *desc)
     char *endptr, *name = desc;
     regmatch_t pmatch[1];
     
-    if (!regexec(&re, desc, 1, pmatch, 0)) {
-        name = desc + pmatch[0].rm_so;
-        desc[pmatch[0].rm_eo + 1] = 0;
-    }
+    /* No match found */
+    if (regexec(&re, desc, 1, pmatch, 0)) 
+        return 0;
+
+    name = desc + pmatch[0].rm_so;
+    desc[pmatch[0].rm_eo + 1] = 0;
     
     /* Test direct conversion */
     float f = strtof(name, &endptr);

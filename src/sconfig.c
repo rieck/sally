@@ -29,6 +29,7 @@ static config_default_t defaults[] = {
     { "input", "format", CONFIG_TYPE_STRING, { .str = "dir" } },
     { "input", "chunk_size", CONFIG_TYPE_INT, { .num = 1024 } },
     { "input", "fasta_regex", CONFIG_TYPE_STRING, { .str = " (\\+|-)[:digit:]*" }},
+    { "input", "lines_regex", CONFIG_TYPE_STRING, { .str = "[:digit:]+: " }},
     { "features", "ngram_len", CONFIG_TYPE_INT, { .num = 2 } },
     { "features", "ngram_delim", CONFIG_TYPE_STRING, { .str = "%0a%0d%20" } },
     { "features", "vect_embed", CONFIG_TYPE_STRING, { .str = "cnt" } },
