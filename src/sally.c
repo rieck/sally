@@ -27,6 +27,9 @@ static char *input = NULL;
 static char *output = NULL;
 static long entries = 0;
 
+/* Option string */
+#define OPTSTRING       "c:i:o:n:d:E:N:b:vqVh"
+
 /**
  * Array of options of getopt_long()
  */
@@ -42,7 +45,7 @@ static struct option longopts[] = {
     { "vect_embed", 	1, NULL, 'E' }, 
     { "vect_norm", 	1, NULL, 'N' },
     { "hash_bits", 	1, NULL, 'b' },
-    { "explicit_hash", 	0, NULL, 1003 }, 
+    { "explicit_hash", 	1, NULL, 1003 }, 
     { "tfidf_file", 	1, NULL, 1004 },
     { "verbose", 	0, NULL, 'v' }, 
     { "quiet", 		0, NULL, 'q' },
@@ -87,7 +90,7 @@ static void print_usage(void)
             "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
             "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
             "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-            "       --explicit_hash           Enable explicit hash representation.\n"
+            "       --explicit_hash <num>     Set explicit hash representation (0/1).\n"
             "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
             "\nGeneric options:\n"
             "  -c,  --config_file <file>      Set configuration file.\n"
@@ -117,8 +120,10 @@ static void sally_parse_options(int argc, char **argv)
 {
     int ch;
     
-    while ((ch = getopt_long(argc, argv, "c:i:o:n:d:E:N:b:vqVh", 
-                             longopts, NULL)) != -1) {
+    optreset = 1;
+    optind = 1;
+    
+    while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
@@ -206,7 +211,7 @@ static void sally_load_config(int argc, char **argv)
     int ch;
 
     /* Check for config file in command line */
-    while ((ch = getopt_long(argc, argv, "c:", longopts, NULL)) != -1) {
+    while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
         switch (ch) {
    	    case 'c':
    	        cfg_file = optarg;
