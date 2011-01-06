@@ -177,6 +177,9 @@ static void sally_parse_options(int argc, char **argv)
         }
     }
 
+    /* Check configuration */
+    config_check(&cfg);
+
     argc -= optind;
     argv += optind;
 
