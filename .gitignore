@@ -30,4 +30,5 @@ doc/sally.pdf
 doc/sally.txt
 nbproject/
 src/sally
+src/sally.h
 tests/test_*
