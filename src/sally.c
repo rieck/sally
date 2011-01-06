@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -23,10 +23,33 @@ int verbose = 1;
 config_t cfg;
 
 /* Local variables */
-static char *cfg_file = NULL;
 static char *input = NULL;
 static char *output = NULL;
 static long entries = 0;
+
+/**
+ * Array of options of getopt_long()
+ */
+static struct option longopts[] = {
+    { "config_file", 	1, NULL, 'c' },
+    { "input_format", 	1, NULL, 'i' },
+    { "output_format", 	1, NULL, 'o' },
+    { "chunk_size", 	1, NULL, 1000 },
+    { "fasta_regex", 	1, NULL, 1001 },
+    { "lines_regex", 	1, NULL, 1002 },
+    { "ngram_len", 	1, NULL, 'n' },
+    { "ngram_delim", 	1, NULL, 'd' },
+    { "vect_embed", 	1, NULL, 'E' }, 
+    { "vect_norm", 	1, NULL, 'N' },
+    { "hash_bits", 	1, NULL, 'b' },
+    { "explicit_hash", 	0, NULL, 1003 }, 
+    { "tfidf_file", 	1, NULL, 1004 },
+    { "verbose", 	0, NULL, 'v' }, 
+    { "quiet", 		0, NULL, 'q' },
+    { "version", 	0, NULL, 'V' },
+    { "help", 		0, NULL, 'h' },
+    { NULL, 		0, NULL, 0 }
+};
 
 /**
  * Prints version and copyright information to a file stream
@@ -51,10 +74,10 @@ int sally_version(FILE *f, char *p, char *m)
  */
 static void print_usage(void)
 {
-    printf("Usage: sally [options] <config> <input> <output>\n"
+    printf("Usage: sally [options] <input> <output>\n"
             "\nI/O options:\n"
             "  -i,  --input_format <format>   Set input format for strings.\n"
-            "  -c,  --chunk_size <num>        Set chunk size for processing.\n"   
+            "       --chunk_size <num>        Set chunk size for processing.\n"   
             "       --fasta_regex <regex>     Set RE for labels in FASTA sequences.\n"
             "       --lines_regex <regex>     Set RE for labels in text lines.\n"
             "  -o,  --output_format <format>  Set output format for vectors.\n"            
@@ -67,6 +90,7 @@ static void print_usage(void)
             "       --explicit_hash           Enable explicit hash representation.\n"
             "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
             "\nGeneric options:\n"
+            "  -c,  --config_file <file>      Set configuration file.\n"
             "  -v,  --verbose                 Increase verbosity.\n"
             "  -q,  --quiet                   Be quiet during processing.\n"
             "  -V,  --version                 Print version and copyright.\n"
@@ -80,7 +104,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)\n",
             PACKAGE_VERSION);
 }
 
@@ -89,11 +113,52 @@ static void print_version(void)
  * @param argc Number of arguments
  * @param argv Argument values
  */
-static void parse_options(int argc, char **argv)
+static void sally_parse_options(int argc, char **argv)
 {
     int ch;
-    while ((ch = getopt(argc, argv, "hqvV")) != -1) {
+    
+    while ((ch = getopt_long(argc, argv, "c:i:o:n:d:E:N:b:vqVh", 
+                             longopts, NULL)) != -1) {
         switch (ch) {
+        case 'c':
+            /* Skip. See sally_load_config(). */
+            break;
+        case 'i':
+            config_set_string(&cfg, "input.input_format", optarg);
+            break;
+        case 'o':
+            config_set_string(&cfg, "output.output_format", optarg);
+            break;
+        case 1000:
+            config_set_int(&cfg, "input.chunk_size", atoi(optarg));
+            break;    
+        case 1001:
+            config_set_string(&cfg, "input.fasta_regex", optarg);        
+            break;    
+        case 1002:
+            config_set_string(&cfg, "input.lines_regex", optarg);
+            break;    
+        case 'n':
+            config_set_int(&cfg, "features.ngram_len", atoi(optarg));
+            break;
+        case 'd':
+            config_set_string(&cfg, "features_ngram_delim", optarg);
+            break;
+        case 'E':
+            config_set_string(&cfg, "features.vect_embed", optarg);
+            break;
+        case 'N':
+            config_set_string(&cfg, "features.vect_norm", optarg);
+            break;
+        case 'b':
+            config_set_int(&cfg, "features.hash_bits", atoi(optarg));        
+            break;
+        case 1003:
+            config_set_int(&cfg, "features.explicit_hash", atoi(optarg));
+            break;    
+        case 1004:
+            config_set_string(&cfg, "features.tfidf_file", optarg);
+            break;    
         case 'q':
             verbose = 0;
             break;
@@ -116,28 +181,52 @@ static void parse_options(int argc, char **argv)
     argv += optind;
 
     /* Check remaining arguments */
-    if (argc != 3) {
+    if (argc != 2) {
         print_usage();
         exit(EXIT_FAILURE);
     }
 
-    cfg_file = argv[0];
-    input = argv[1];
-    output = argv[2];
+    input = argv[0];
+    output = argv[1];
 }
 
+
 /**
- * Init the Sally tool
+ * Load the configuration of Sally
  * @param argc number of arguments
  * @param argv arguments
  */
-static void sally_init(int argc, char **argv)
+static void sally_load_config(int argc, char **argv)
 {
-    int ehash;
-    const char *cfg_str;
+    char *cfg_file = NULL;
+    char cfg_path[MAX_PATH_LEN];
+    int ch;
 
-    /* Parse options */
-    parse_options(argc, argv);
+    /* Check for config file in command line */
+    while ((ch = getopt_long(argc, argv, "c:", longopts, NULL)) != -1) {
+        switch (ch) {
+   	    case 'c':
+   	        cfg_file = optarg;
+   	        break;
+            case '?':
+            default:
+                /* empty */
+                break;
+        }
+    }
+
+    /* Check for local config file ".sally" */   
+    snprintf(cfg_path, MAX_PATH_LEN, "%s/.sally", getenv("HOME"));
+    if (!cfg_file && !access(cfg_path, F_OK))
+        cfg_file = cfg_path;
+
+    /* Check for global config file "sally.cfg" */
+    snprintf(cfg_path, MAX_PATH_LEN, "%s/sally.cfg", CONFIG_DIR);
+    if (!cfg_file && !access(cfg_path, F_OK))
+        cfg_file = cfg_path;
+
+    if (!cfg_file)
+        fatal("No config file availablle.");
 
     /* Init and load configuration */
     config_init(&cfg);
@@ -147,9 +236,23 @@ static void sally_init(int argc, char **argv)
 
     /* Check configuration */
     config_check(&cfg);
+}
+
+
+/**
+ * Init the Sally tool
+ * @param argc number of arguments
+ * @param argv arguments
+ */
+static void sally_init()
+{
+    int ehash;
+    const char *cfg_str;
+
     if (verbose > 1)
         config_print(&cfg);
 
+    /* Check for TFIDF weighting */
     config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     if (!strcasecmp(cfg_str, "tfidf")) 
         idf_create(input);
@@ -169,6 +272,7 @@ static void sally_init(int argc, char **argv)
     if (entries < 0)
         fatal("Could not open input source");
 
+    /* Open output */
     config_lookup_string(&cfg, "output.output_format", &cfg_str);
     output_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
@@ -256,7 +360,10 @@ static void sally_exit()
  */
 int main(int argc, char **argv)
 {
-    sally_init(argc, argv);
+    sally_load_config(argc, argv);
+    sally_parse_options(argc, argv);
+
+    sally_init();
     sally_process();
     sally_exit();
 }

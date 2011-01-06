@@ -184,7 +184,7 @@ int main(int argc, char **argv)
 
     config_set_string(&cfg, "features.ngram_delim", " .,%0a%0d");
     config_set_int(&cfg, "features.ngram_len", 1);
-    config_set_string(&cfg, "input.format", "lines");
+    config_set_string(&cfg, "input.input_format", "lines");
     
     err |= test_norm_l1();
     err |= test_norm_l2();
