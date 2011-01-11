@@ -147,7 +147,7 @@ static void sally_parse_options(int argc, char **argv)
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
             break;
         case 'd':
-            config_set_string(&cfg, "features_ngram_delim", optarg);
+            config_set_string(&cfg, "features.ngram_delim", optarg);
             break;
         case 'E':
             config_set_string(&cfg, "features.vect_embed", optarg);
