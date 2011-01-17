@@ -120,8 +120,7 @@ static void sally_parse_options(int argc, char **argv)
 {
     int ch;
     
-    optreset = 1;
-    optind = 1;
+    optind = 0;
     
     while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
         switch (ch) {

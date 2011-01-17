@@ -54,7 +54,7 @@ static float get_label(char *line)
     name = line + pmatch[0].rm_so;
     old = line[pmatch[0].rm_eo];
     line[pmatch[0].rm_eo] = 0;
-
+    
     /* Test direct conversion */
     float f = strtof(name, &endptr);
 
@@ -63,6 +63,9 @@ static float get_label(char *line)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
 
     line[pmatch[0].rm_eo] = old;
+    
+    /* Shift string. This is very inefficient. I know */
+    memmove(line, line + pmatch[0].rm_eo, strlen(line) - pmatch[0].rm_eo + 1);
     return f;
 }
 
@@ -99,7 +102,7 @@ int input_lines_open(char *name)
 
     /* Prepare reading */
     gzrewind(in);
-    line_num = 1;
+    line_num = 0;
 
     return num_lines;
 }
@@ -120,13 +123,18 @@ int input_lines_read(string_t *strs, int len)
     for (i = 0; i < len; i++) {
         line = NULL;        
         read = gzgetline(&line, &size, in);
-        if (read == -1)  {
+        if (read == -1) {
             free(line);
             break;
         }
+        
+        if (strlen(line) == 0) {
+            line_num++;
+            continue;
+        }
 
-        strs[j].str = line;
 	strs[i].label = get_label(line);
+        strs[j].str = line;
         strs[j].len = strlen(line);
 
         snprintf(buf, 32, "line%d", line_num++);

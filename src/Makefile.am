@@ -11,7 +11,7 @@ INCLUDES                = -I$(top_srcdir)/src/input \
 
 bin_PROGRAMS		= sally
 sally_SOURCES		= sally.c
-sally_DEPENDENCIES    	= sally.h
+sally_DEPENDENCIES    	= sally.h libsally.la
 sally_LDADD		= libsally.la
 
 noinst_LTLIBRARIES     	= libsally.la
