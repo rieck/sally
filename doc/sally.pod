@@ -65,7 +65,7 @@ feature extraction and the output format, respectively.
 
 All parameters of the configuration can be also be specified on the
 command-line. That is, if a parameter is specified in the
-configuration as B<xx = "yy";>, it can be alternatively supplied as a
+configuration as B<xx = "yy">, it can be alternatively supplied as a
 command-line option by B<--xx "yy">.
 
 =head2 Input formats
@@ -240,7 +240,7 @@ This parameter specifies a file to store the TF-IDF weights. If the
 embedding B<tfidf> is selected, B<sally> first checks if the given
 file is present. If it is not available, TF-IDF weights will be
 computed from the input data and stored to this file, otherwise the
-weights will be read from the file. Keeping a separate file fo TF-IDF
+weights will be read from the file. Keeping a separate file for TF-IDF
 weights allows for computing the weighting for a data set, say the
 training set, and applying the exact same weighting to further data
 sets.
@@ -299,14 +299,14 @@ given as I<output> to B<sally>.
 
 =back
 
-=head1 COMMAND-LINE 
+=head1 OPTIONS
 
 The configuration of B<sally> can be refined and altered using several
-command-line options. All parameters of the configuration can be be
-specified on the command-line. That is, if a parameter is specified as
-B<xx = "yy";> in the configuration file, it can be alternatively
-supplied as a command-line option by B<--xx "yy">. Following is a list
-of common options:
+command-line options. In particular, all parameters of the
+configuration can be specified on the command-line. That is, if a
+parameter is specified as B<xx = "yy"> in the configuration file, it
+can be changed by using the command-line option B<--xx
+"zz">. Following is a list of common options:
 
 =head2 Basic options
 
