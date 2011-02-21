@@ -6,7 +6,7 @@ B<sally> -- a tool for embedding strings in vector spaces
 
 =head1 SYNOPSIS
 
-B<sally> [B<-hvV>] I<config> I<input> I<output>
+B<sally> [B<options>] [B<-c> I<config>] I<input> I<output>
 
 =head1 DESCRIPTION
 
@@ -18,12 +18,12 @@ such as text documents, DNA sequences or log files, where it can
 handle common formats such as directories, archives and text files of
 string data.
 
-The embedding is carried out incrementally, where B<sally> first loads
-a chunk of strings from I<input>, computes the mapping to vectors and
-then writes the chunk of vectors to I<output>. The configuration of
-this process, such as the input format, the embedding type and the
-output format, are specified in the file I<config> (see
-L</CONFIGURATION>)
+The embedding of strings is carried out incrementally, where B<sally>
+first loads a chunk of strings from I<input>, computes the mapping to
+vectors and then writes the chunk of vectors to I<output>. The
+configuration of this process, such as the input format, the embedding
+setting and the output format, are specified in the file I<config> and
+additionally using command-line options.
 
     .---------.                        .----------.
     |   dir   |                        |   text   |
@@ -31,14 +31,12 @@ L</CONFIGURATION>)
     |  lines  |   --  |  Sally  |  --  |  matlab  |
     |   ...   |   /   '---------'   \  |   ...    |
     '---------'                        '----------'
-       Input           Embedding          Output 
+      Input           Embedding          Output 
 
-
-=head2 Embedding strings
 
 B<sally> implements a standard technique for mapping strings to a
 vector space that is often referred to as vector space model or
-bag-of-words model.  The strings are characterized by a set of
+bag-of-words model. The strings are characterized by a set of
 features, where each feature is associated with one dimension of the
 vector space.  The following types of features are supported by
 B<sally>: bytes, words, n-grams of bytes and n-grams of words.
@@ -50,128 +48,31 @@ stored in the vectors. B<sally> then normalizes the vector, for
 example using the L1 or L2 norm, and outputs it in a specified format,
 such as plain text or in LibSVM or Matlab format.
 
-The processing chain of B<sally> makes heavy use of sparse data
-structures, such that high-dimensional vectors with millions of
-dimensions can be handled efficiently.  Moreover, all features and
-dimensions are indexed by an efficient hash function, where the bit
-width of this function can be adjusted according to the
+The processing chain of B<sally> makes use of sparse data structures,
+such that high-dimensional vectors with millions of dimensions can be
+handled efficiently.  All features are indexed by a hash function,
+where the bit width of this function can be adjusted according to the
 characteristics of the data.  In several settings, a hash width
 between 24 and 28 bit already suffices to store millions of features
 with little loss of accuracy.
+
+=head1 CONFIGURATION
+
+The configuration of B<sally> is specified in a configuration file.
+This file is structured into the three sections B<input>, B<features>
+and B<output>, which define the parameters of the input format, the
+feature extraction and the output format, respectively.
+
+All parameters of the configuration can be also be specified on the
+command-line. That is, if a parameter is specified in the
+configuration as B<xx = "yy";>, it can be alternatively supplied as a
+command-line option by B<--xx "yy">.
 
 =head2 Input formats
 
 B<sally> supports different formats for reading data sets of strings,
 which may range from plain files to directories and other structured
 resources. Following is a list of supported input formats.
-
-=over 14
-
-=item B<dir> 
-
-The input strings are available as binary files in a directory and the
-name of the directory is given as I<input> to B<sally>. The suffixes
-of the files are used as labels for the extracted vectors.
-
-=item B<arc> 
-
-The input strings are available as binary files in a compressed
-archive, such as a zip or tgz archive.  The name of the archive is
-given as I<input> to B<sally>.  The suffixes of the files are used as
-labels for the extracted vectors.
-
-=item B<lines> 
-
-The input strings are available as lines in a text file. The name of
-the file is given as I<input> to B<sally>.  No label information is
-supported by this input format.  The lines need to be separated by
-newline and may not contain the NUL character.
-
-=item B<fasta>
-
-The input strings are available in FASTA format. The name of the file
-is given as I<input> to B<sally>. Labels are extracted from the
-description of each sequence using a regular expression. Comments are
-allowed if they are preceded by either ';' or '>'.
-
-=back 
-
-=head2 Feature Sets
-
-The strings loaded by B<sally> are characterized by a set of features,
-where each feature is associated with one dimension of the vector
-space.  Following is a list of supported feature sets:
-
-=over 14
-
-=item B<words>
-
-The strings are partitioned into substrings (words) using a set of
-delimiter characters.  Such partitioning is typical for natural
-language processing, where the delimiters are usually defined as
-white-space and punctuation symbols.  An embedding using words is
-selected by defining a set of delimiter characters (B<ngram_delim>)
-and setting the n-gram length to 1 (B<ngram_len>).
-
-=item B<byte n-grams>
-
-The strings are characterized by all possible byte sequences of a
-fixed length n (byte n-grams).  These features are frequently used if
-no information about the structure of strings is available, such as in
-bioinformatics or computer security.  An embedding using byte n-grams
-is selected by defining the n-gram length (B<ngram_len>) and setting
-the delimiters to an empty string (B<ngram_delim>).
-
-=item B<word n-grams>
-
-The strings are characterized by all possible word sequences of a
-fixed length n (word n-grams).  These features require the definition
-of a set of delimiters and a length n.  They are often used in natural
-language processing as a coarse way for capturing structure of text.
-An embedding using word n-grams is selected by defining a set of
-delimiter characters (B<ngram_delim>) and choosing an n-gram length
-(B<ngram_len>).
-
-=back
-
-=head2 Output formats
-
-Once the input strings have been embedded in a vector space, B<sally>
-stores the resulting vectors in one of several common formats, which
-allows for applying typical tools of statistics and machine learning
-to the data, for example, Matlab, Octave, Shogun, Weka, SVMLight and
-LibSVM.  Following is a list of output formats supported by B<sally>:
-
-=over 14
-
-=item B<libsvm> 
-
-The feature vectors of the embedded strings are stored in the common
-libsvm format, which is supported by Shogun, SVMLight and LibSVM. The
-name of the output file is given as I<output> to B<sally>.
-
-=item B<text> 
-
-The feature vectors of the embedded strings are stored as a plain text
-using a list of dimensions, features and respective values.  Almost
-all comprehensive analysis tools can deal with this type of format.
-The name of the output file is given as I<output> to B<sally>.
-
-=item B<matlab>
-
-The feature vectors of the embedded strings are stored in matlab
-format (v5).  The vectors are stored as a 1 x n struct array with the
-fields: data, src, label and feat. The name of the output file is
-given as I<output> to B<sally>.
-
-=back
-
-=head1 CONFIGURATION
-
-The configuration of B<sally> is specified in the file I<config>. It
-is structured into the three sections B<input>, B<features> and
-B<output>, which define the parameters of the input format, the
-feature extraction and the output format, respectively.
 
 =over 4
 
@@ -181,11 +82,38 @@ feature extraction and the output format, respectively.
 
 =item B<input_format = "lines";>
 
-This parameter specifies the input format. Supported values are "dir",
-"arc", "lines" and "fasta".  For the "dir" and "arc" format, the input
-strings are provided as either a directory or an archive of files. For
-the "lines" format the strings are available as lines in a text file.
-Similarly, the "fasta" format expects a text file in FASTA format.
+This parameter specifies the input format.
+
+=over 14
+
+=item I<"dir"> 
+
+The input strings are available as binary files in a directory and the
+name of the directory is given as I<input> to B<sally>. The suffixes
+of the files are used as labels for the extracted vectors.
+
+=item I<"arc"> 
+
+The input strings are available as binary files in a compressed
+archive, such as a zip or tgz archive.  The name of the archive is
+given as I<input> to B<sally>.  The suffixes of the files are used as
+labels for the extracted vectors.
+
+=item I<"lines"> 
+
+The input strings are available as lines in a text file. The name of
+the file is given as I<input> to B<sally>.  No label information is
+supported by this input format.  The lines need to be separated by
+newline and may not contain the NUL character.
+
+=item I<"fasta">
+
+The input strings are available in FASTA format. The name of the file
+is given as I<input> to B<sally>. Labels are extracted from the
+description of each sequence using a regular expression. Comments are
+allowed if they are preceded by either ';' or '>'.
+
+=back 
 
 =item B<chunk_size = 256;>
 
@@ -215,6 +143,13 @@ parameter is a regular expression matching labels, such as +1 and -1.
 
 =back
 
+=head2 Features
+
+The strings loaded by B<sally> are characterized by a set of features,
+where each feature is associated with one dimension of the vector
+space. Different types of features can be extracted by changing the 
+following parameters.
+
 =over 4
 
 =item B<features = {>
@@ -223,22 +158,46 @@ parameter is a regular expression matching labels, such as +1 and -1.
 
 =item B<ngram_len = 2;>
 
-This parameter specifies the length of n-grams.  It determines the
-numbers of consecutive words that are considered as one feature.  If
-set to 1, the embedding of B<sally> matches a classical bag-of-words
-model, where each word is associated with one dimension of the feature
-space. For larger values, short sequences of consecutive words are
-associated with the dimensions of the feature space, resulting in a
-more complex embedding.
-
 =item B<ngram_delim = "%0a%0d";>
 
-This parameter defines characters for delimiting words in strings.
-The characters can be either specified as regular bytes or as
-hexadecimal numbers prefixed by "%" (similar to URI encoding). If no
-characters are specified, the strings are analyzed at byte-level, that
-is, each byte reflects one word. This settings is useful if the
-structure of the data is unknown.
+The parameter B<ngram_len> specifies the numbers of consecutive words
+that are considered as one feature, while the parameter B<ngram_delim>
+defines characters for delimiting these words.  The characters can be
+either specified as bytes or as hexadecimal numbers prefixed by "%".
+The following types of features can be extracted using these
+parameters:
+
+=over 14
+
+=item I<words>
+
+The strings are partitioned into substrings (words) using a set of
+delimiter characters.  Such partitioning is typical for natural
+language processing, where the delimiters are usually defined as
+white-space and punctuation symbols.  An embedding using words is
+selected by defining a set of delimiter characters (B<ngram_delim>)
+and setting the n-gram length to 1 (B<ngram_len>).
+
+=item I<byte n-grams>
+
+The strings are characterized by all possible byte sequences of a
+fixed length n (byte n-grams).  These features are frequently used if
+no information about the structure of strings is available, such as in
+bioinformatics or computer security.  An embedding using byte n-grams
+is selected by defining the n-gram length (B<ngram_len>) and setting
+the delimiters to an empty string (B<ngram_delim>).
+
+=item I<word n-grams>
+
+The strings are characterized by all possible word sequences of a
+fixed length n (word n-grams).  These features require the definition
+of a set of delimiters and a length n.  They are often used in natural
+language processing as a coarse way for capturing structure of text.
+An embedding using word n-grams is selected by defining a set of
+delimiter characters (B<ngram_delim>) and choosing an n-gram length
+(B<ngram_len>).
+
+=back
 
 =item B<vect_embed = "bin";>
 
@@ -292,6 +251,13 @@ sets.
 
 =back
 
+=head2 Output formats
+
+Once the input strings have been embedded in a vector space, B<sally>
+stores the resulting vectors in one of several common formats, which
+allows for applying typical tools of statistics and machine learning
+to the data, for example, Matlab, Octave, Shogun, Weka, SVMLight and
+LibSVM.  
 
 =over 4
 
@@ -301,11 +267,31 @@ sets.
 
 =item B<output_format = "libsvm";>
 
-This parameter specifies the output format. Supported values are
-"libsvm", "text" and "matlab". For "libsvm", B<sally> generates data
-files suitable for processing using the tools LibSVM and SVMLight. The
-"text" and "matlab" formats target a generic analysis, where the later
-format can be read from a Matlab and Octave environment.
+Following is a list of output formats supported by B<sally>:
+
+=over 14
+
+=item I<"libsvm"> 
+
+The feature vectors of the embedded strings are stored in the common
+libsvm format, which is supported by Shogun, SVMLight and LibSVM. The
+name of the output file is given as I<output> to B<sally>.
+
+=item I<"text"> 
+
+The feature vectors of the embedded strings are stored as a plain text
+using a list of dimensions, features and respective values.  Almost
+all comprehensive analysis tools can deal with this type of format.
+The name of the output file is given as I<output> to B<sally>.
+
+=item I<"matlab">
+
+The feature vectors of the embedded strings are stored in matlab
+format (v5).  The vectors are stored as a 1 x n struct array with the
+fields: data, src, label and feat. The name of the output file is
+given as I<output> to B<sally>.
+
+=back
 
 =back
 
@@ -313,8 +299,42 @@ format can be read from a Matlab and Octave environment.
 
 =back
 
+=head1 COMMAND-LINE 
 
+The configuration of B<sally> can be refined and altered using several
+command-line options. All parameters of the configuration can be be
+specified on the command-line. That is, if a parameter is specified as
+B<xx = "yy";> in the configuration file, it can be alternatively
+supplied as a command-line option by B<--xx "yy">. Following is a list
+of common options:
 
+=head2 Basic options
+
+  -i, --input_format <format>   Set input format for strings.
+  -o, --output_format <format>  Set output format for vectors.
+  -c, --config_file <file>      Set configuration file.
+  -v, --verbose                 Increase verbosity.
+  -q, --quiet                   Be quiet during processing.
+  -V, --version                 Print version and copyright.
+
+=head2 Feature options
+
+  -n, --ngram_len <num>         Set length of n-grams.
+  -d, --ngram_delim <delim>     Set delimiters of words.
+  -E, --vect_embed <embed>      Set embedding mode. 
+  -N, --vect_norm <norm>        Set normalization mode.
+  -b, --hash_bits <num>         Set number of hash bits.
+
+=head1 FILES
+
+=over 4
+
+=item F</etc/sally.cfg> 
+
+The system wide configuration file of B<sally>. See the configuration
+section for further details.
+
+=back
 
 =head1 EXAMPLES
 
@@ -324,7 +344,7 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)
+Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
