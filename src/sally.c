@@ -86,7 +86,7 @@ static void print_usage(void)
             "  -o,  --output_format <format>  Set output format for vectors.\n"            
             "\nFeature options:\n"
             "  -n,  --ngram_len <num>         Set length of n-grams.\n"
-            "  -d,  --ngram_delim <delim>     Set delimiters of token in n-grams.\n"
+            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
             "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
             "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
             "  -b,  --hash_bits <num>         Set number of hash bits.\n"
