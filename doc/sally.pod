@@ -219,7 +219,7 @@ differ just due to the number of extracted features.
 B<sally> uses a hash function to map individual features to dimensions
 in the vector space. This parameter specifies the number of bits used
 by this hash function and defines the maximum dimensionality of the
-vector space with 2^bits. as the embedding of B<sally> is usually
+vector space with 2 ** bits. as the embedding of B<sally> is usually
 sparse and only a small fraction of dimensions is non-zero, 24 to 28
 bits are often sufficient for representing the data.  If this
 parameter is chosen too small, the embedding may suffer from
