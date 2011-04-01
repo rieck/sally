@@ -5,7 +5,7 @@ man1_MANS = sally.man
 sysconf_DATA = sally.cfg
 
 EXTRA_DIST = sally.pod doxygen.cfg sally.pdf sally.txt \
-             latex-pre.inc.in latex-post.inc 
+             latex-pre.inc.in latex-post.inc sally.cfg
 
 changes:	
 	./git2changes.py

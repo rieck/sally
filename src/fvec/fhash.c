@@ -48,7 +48,7 @@ void fhash_put(feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
-
+    
     if (!enabled)
         return;
 

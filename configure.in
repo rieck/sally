@@ -1,7 +1,7 @@
 # Sally - A Tool for Embedding Strings in Vector Spaces
-# Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+# Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
 
-AC_INIT([sally], [0.6.0], [konrad@mlsec.org])
+AC_INIT([sally], [0.6.1], [konrad@mlsec.org])
 AC_PREFIX_DEFAULT("/usr/local")
 
 # Library version current:revision:age
@@ -10,7 +10,7 @@ LIB_VERSION=1:1:1
 
 echo
 echo "  .Oo Sally - A Tool for Embedding Strings in Vector Spaces"
-echo "      Copyright (c) 2010 Konrad Rieck (konrad@mlsec.org)"
+echo "      Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)"
 echo
 
 # Init automake & config.h

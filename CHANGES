@@ -1,4 +1,10 @@
+2011-03-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * doc/sally.pod: minor fix
+
 2011-02-21  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES: final release
 
   * doc/sally.pod: minor typos fixed
 
