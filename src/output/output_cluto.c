@@ -74,7 +74,7 @@ int output_cluto_write(fvec_t **x, int len)
 
     for (j = 0; j < len; j++) {
         for (i = 0; i < x[j]->len; i++) {
-            fprintf(f, "%llu ", (long long unsigned int)  x[j]->dim[i]);
+            fprintf(f, "%llu ", (long long unsigned int)  x[j]->dim[i] + 1);
             fprintf(f, "%g", x[j]->val[i]);
             if (i < x[j]->len - 1)
                 fprintf(f, " ");
