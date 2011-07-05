@@ -29,6 +29,7 @@ doc/latex-pre.inc
 doc/sally.pdf
 doc/sally.txt
 nbproject/
+sally.komodoproject
 src/sally
 src/sally.h
 tests/test_*

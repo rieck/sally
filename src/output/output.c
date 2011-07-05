@@ -27,6 +27,7 @@
 #include "output_libsvm.h"
 #include "output_text.h"
 #include "output_matlab.h"
+#include "output_cluto.h"
 
 /**
  * Structure for output interface
@@ -57,6 +58,10 @@ void output_config(const char *format)
         func.output_open = output_matlab_open;
         func.output_write = output_matlab_write;
         func.output_close = output_matlab_close;
+    } else if (!strcasecmp(format, "cluto")) {
+        func.output_open = output_cluto_open;
+        func.output_write = output_cluto_write;
+        func.output_close = output_cluto_close;
     } else {
         error("Unknown ouptut format '%s', using 'text' instead.", format);
         output_config("text");

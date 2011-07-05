@@ -21,7 +21,7 @@ case $arg in
 
    twoface*|rieck*)
        echo "Configuration: Twoface/Rieck"
-       CC="/opt/local/bin/gcc" \
+       CC="/opt/local/bin/gcc-mp-4.4" \
        CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;

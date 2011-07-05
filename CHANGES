@@ -1,3 +1,8 @@
+2011-04-01  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES, README, TODO, configure.in, doc/Makefile.am, src/fvec/fhash.c:
+  added missing config file
+
 2011-03-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * doc/sally.pod: minor fix

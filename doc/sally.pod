@@ -46,7 +46,7 @@ features in each string and generating a sparse vector of count
 values.  Alternatively, binary or TF-IDF values can be computed and
 stored in the vectors. B<sally> then normalizes the vector, for
 example using the L1 or L2 norm, and outputs it in a specified format,
-such as plain text or in LibSVM or Matlab format.
+such as plain text, LibSVM, Cluto or Matlab format.
 
 The processing chain of B<sally> makes use of sparse data structures,
 such that high-dimensional vectors with millions of dimensions can be
@@ -290,6 +290,14 @@ The feature vectors of the embedded strings are stored in matlab
 format (v5).  The vectors are stored as a 1 x n struct array with the
 fields: data, src, label and feat. The name of the output file is
 given as I<output> to B<sally>.
+
+=item I<"cluto"> 
+
+The feature vectors of the embedded strings are stored as a sparse
+matrix suitable for the clustering tool Cluto. The first line of
+the file is a header for Cluto, while the remaining lines correspond
+to feature vectors. The name of the output file is given as I<output>
+to B<sally>.
 
 =back
 
