@@ -214,7 +214,7 @@ vector norm. Supported norms are "l1" for the Taxicab norm (L1) and
 the lengths of the strings varies significantly and thus vectors
 differ just due to the number of extracted features.
 
-=item B<hash_bits = 26;>
+=item B<hash_bits = 22;>
 
 B<sally> uses a hash function to map individual features to dimensions
 in the vector space. This parameter specifies the number of bits used
@@ -223,7 +223,7 @@ vector space with 2 ** bits. As the embedding of B<sally> is usually
 sparse and only a small fraction of dimensions is non-zero, 20 to 24
 bits are often sufficient for representing the data. If this
 parameter is chosen too small, the embedding may suffer from
-collisions of features in the vector space. If it is chosen too large
+collisions of features in the vector space. If it is chosen too large,
 several application may choke from the vast amount of dimensions.
 
 =item B<explicit_hash = 0;>
@@ -290,7 +290,10 @@ The name of the output file is given as I<output> to B<sally>.
 The feature vectors of the embedded strings are stored in matlab
 format (v5).  The vectors are stored as a 1 x n struct array with the
 fields: data, src, label and feat. The name of the output file is
-given as I<output> to B<sally>.
+given as I<output> to B<sally>. Note that great care is required to
+efficiently operate with sparse vectors in Matlab. If the sparse
+representation is lost during computations, excessive run-time and
+memory requirements are likely.
 
 =item I<"cluto"> 
 
@@ -298,7 +301,8 @@ The feature vectors of the embedded strings are stored as a sparse
 matrix suitable for the clustering tool Cluto. The first line of
 the file is a header for Cluto, while the remaining lines correspond
 to feature vectors. The name of the output file is given as I<output>
-to B<sally>.
+to B<sally>. Note that Cluto can not handle arbitrarily large vector
+spaces and thus the B<"hash_bits"> should be set to values below 24.
 
 =back
 
