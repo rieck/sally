@@ -1,3 +1,19 @@
+2011-07-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * doc/sally.pod: further comments about run-time behavior
+
+  * doc/sally.cfg, doc/sally.pod: added note about dimensionality
+
+2011-07-05  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * configure.in: version change
+
+  * src/output/output_cluto.c: minor bug fix in output module
+
+  * .gitignore, CHANGES, compile, doc/sally.cfg, doc/sally.pod,
+  src/output/Makefile.am, src/output/output.c, src/output/output_cluto.c,
+  src/output/output_cluto.h: first version of output module for cluto
+
 2011-04-01  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * CHANGES, README, TODO, configure.in, doc/Makefile.am, src/fvec/fhash.c:
