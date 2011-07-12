@@ -72,7 +72,7 @@ int output_text_write(fvec_t **x, int len)
             fentry_t *fe = fhash_get(x[j]->dim[i]);
             fprintf(f, "%llu:", (long long unsigned int)  x[j]->dim[i]);
             for (k = 0; fe && k < fe->len; k++) {
-                if (isprint(fe->data[k]) && !strchr("%: ", fe->data[k])) 
+                if (isprint(fe->data[k]) && !strchr("%:, ", fe->data[k])) 
                     fprintf(f, "%c", fe->data[k]);
                 else
                     fprintf(f, "%%%.2x", (unsigned char) fe->data[k]);
