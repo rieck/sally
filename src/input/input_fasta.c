@@ -89,7 +89,7 @@ int input_fasta_open(char *name)
         return -1;
     }
 
-    int num, cont = FALSE;
+    int num = 0, cont = FALSE;
     while(!gzeof(in)) {
         line = NULL;
         read = gzgetline(&line, &size, in);
