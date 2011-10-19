@@ -199,6 +199,15 @@ delimiter characters (B<ngram_delim>) and choosing an n-gram length
 
 =back
 
+=item B<ngram_pos = 0;>
+
+The parameter B<ngram_pos> can be used to enable positional n-grams.  In
+contrast to regular n-grams, these subsequences of length n are 
+associated with a position in the originating string.  Positional n-grams
+thus only match if they appear at the exact same location in a string.  They
+are often used in bioinformatics for analysis of DNA sequences (see the work 
+of Raetsch and Sonnenburg).
+
 =item B<vect_embed = "bin";>
 
 This parameter specifies how the features are embedded in the vector
