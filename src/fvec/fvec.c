@@ -182,31 +182,42 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
  * the clatter of code.
  * @param s Byte sequence
  * @param l Length of sequence
- * @param p Position of sequence
+ * @param p Position of sequence (-1 disabled)
  * @return hash value
  * 
  */
 static feat_t hash_str(char *s, int l, int p)
 {
     feat_t ret;
-    int bits;
-
-    /* Set bits of hash mask */
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
-    feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
+    char *str = s;
+    int len = l;
+    
+    if (p >= 0) {
+        len = l + sizeof(int);
+        str = malloc(len);
+        if (!str) {
+            error("Could not allocate memory for positional n-grams");
+            return 0;
+        }
+        memcpy(str, s, l);
+        memcpy(str + l, &p, sizeof(int));
+    }
 
 #ifdef ENABLE_MD5HASH    
     unsigned char buf[MD5_DIGEST_LENGTH];
 #endif    
 
 #ifdef ENABLE_MD5HASH        
-    MD5((unsigned char *) s, l, buf);
+    MD5((unsigned char *) str, len, buf);
     memcpy(ret, buf, sizeof(feat_t));
 #else            
-    ret = MurmurHash64B(s, l, 0x12345678); 
+    ret = MurmurHash64B(str, len, 0x12345678); 
 #endif            
 
-    return ret & hash_mask;
+    if (p >= 0) 
+        free(str);
+
+    return ret;
 }
 
 /**
@@ -219,7 +230,7 @@ static feat_t hash_str(char *s, int l, int p)
 static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
-    int nlen, pos;
+    int nlen, pos, bits, idx = -1;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
     char *t = malloc(l + 1);
     fentry_t *cache = NULL;
@@ -227,6 +238,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
+
+    /* Set bits of hash mask */
+    feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
 
     if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
@@ -261,7 +276,12 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         
         /* Store n-gram */
         if (q == nlen && i - k > 0) {
-            fv->dim[fv->len] = hash_str(t + k, i - k, 0);
+        
+            if (pos) 
+                idx++;
+        
+            fv->dim[fv->len] = hash_str(t + k, i - k, idx);
+            fv->dim[fv->len] &= hash_mask;
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
@@ -297,13 +317,17 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     assert(fv && x);
 
     unsigned int i = 0;
-    int nlen, pos;
+    int nlen, pos, bits, idx = -1;
     char *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
+
+    /* Set bits of hash mask */
+    feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
 
     if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
@@ -313,7 +337,11 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         if (t + nlen > x + l)
             break;
 
-        fv->dim[fv->len] = hash_str(t, nlen, 0);
+        if (pos) 
+            idx++;
+
+        fv->dim[fv->len] = hash_str(t, nlen, idx);
+        fv->dim[fv->len] &= hash_mask;        
         fv->val[fv->len] = 1;
         
         /* Cache feature */

@@ -51,6 +51,7 @@ static struct option longopts[] = {
     { "quiet", 		0, NULL, 'q' },
     { "version", 	0, NULL, 'V' },
     { "help", 		0, NULL, 'h' },
+    { "ngram_pos",      1, NULL, 1005 },
     { NULL, 		0, NULL, 0 }
 };
 
@@ -87,6 +88,7 @@ static void print_usage(void)
             "\nFeature options:\n"
             "  -n,  --ngram_len <num>         Set length of n-grams.\n"
             "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
+            "       --ngram_pos <num>         Set positional n-grams (0/1).\n"
             "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
             "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
             "  -b,  --hash_bits <num>         Set number of hash bits.\n"
@@ -163,6 +165,9 @@ static void sally_parse_options(int argc, char **argv)
         case 1004:
             config_set_string(&cfg, "features.tfidf_file", optarg);
             break;    
+        case 1005:
+            config_set_int(&cfg, "features.ngram_pos", atoi(optarg));    
+            break;
         case 'q':
             verbose = 0;
             break;
