@@ -10,8 +10,17 @@ fi
 # Apply configuration
 case $arg in
 
+   gwd*)
+       echo "Configuration: Cluster (GWDG)"
+       CC="gcc" \
+       PKG_CONFIG_PATH="$HOME/local/lib/pkgconfig" \
+       CPPFLAGS="-I $HOME/local/include" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/local/lib" \
+       ./configure --enable-libarchive --prefix=$HOME/local
+       ;;       
+
    node*)
-       echo "Configuration: Node"
+       echo "Configuration: Cluster (TU Berlin)"
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
@@ -23,12 +32,6 @@ case $arg in
        echo "Configuration: Twoface/Rieck"
        CC="gcc-mp-4.4" \
        CFLAGS="-DDEBUG -g -pedantic -pipe" \
-       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
-       ;;
-
-   bane*)
-       echo "Configuration: Bane"
-       CFLAGS="-march=native -DDEBUG -g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
