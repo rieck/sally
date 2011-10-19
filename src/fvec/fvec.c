@@ -50,7 +50,7 @@ static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
-static feat_t hash_str(char *s, int l, int p);
+static feat_t hash_str(char *s, int l);
 
 /* Delimiter functions and table */
 static void decode_delim(const char *s);
@@ -182,40 +182,23 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
  * the clatter of code.
  * @param s Byte sequence
  * @param l Length of sequence
- * @param p Position of sequence (-1 disabled)
  * @return hash value
  * 
  */
-static feat_t hash_str(char *s, int l, int p)
+static feat_t hash_str(char *s, int l)
 {
     feat_t ret;
-    char *str = s;
-    int len = l;
     
-    if (p >= 0) {
-        len = l + sizeof(int);
-        str = malloc(len);
-        if (!str) {
-            error("Could not allocate memory for positional n-grams");
-            return 0;
-        }
-        memcpy(str, s, l);
-        memcpy(str + l, &p, sizeof(int));
-    }
-
 #ifdef ENABLE_MD5HASH    
     unsigned char buf[MD5_DIGEST_LENGTH];
 #endif    
 
 #ifdef ENABLE_MD5HASH        
-    MD5((unsigned char *) str, len, buf);
+    MD5((unsigned char *) s, l, buf);
     memcpy(ret, buf, sizeof(feat_t));
 #else            
-    ret = MurmurHash64B(str, len, 0x12345678); 
+    ret = MurmurHash64B(s, l, 0x12345678); 
 #endif            
-
-    if (p >= 0) 
-        free(str);
 
     return ret;
 }
@@ -230,9 +213,9 @@ static feat_t hash_str(char *s, int l, int p)
 static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
-    int nlen, pos, bits, idx = -1;
+    int nlen, pos, bits, flen;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
-    char *t = malloc(l + 1);
+    char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
 
     /* Get configuration */
@@ -276,20 +259,31 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         
         /* Store n-gram */
         if (q == nlen && i - k > 0) {
+
+            /* Positonal n-grams code */
+            if (pos) {
+                flen = (i - k) + sizeof(unsigned long);
+                fstr = malloc(flen);
+                memcpy(fstr, t + k, i - k);
+                memcpy(fstr + (i - k), &(fv->len), sizeof(unsigned long));
+            } else {
+                fstr = t + k;
+                flen = i - k;
+            }
         
-            if (pos) 
-                idx++;
-        
-            fv->dim[fv->len] = hash_str(t + k, i - k, idx);
+            fv->dim[fv->len] = hash_str(fstr, flen);
             fv->dim[fv->len] &= hash_mask;
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
             if (fhash_enabled()) 
-                cache_put(cache, fv, t + k, i - k);
+                cache_put(cache, fv, fstr, flen);
             
             k = s + 1, i = s, q = 0;
             fv->len++;
+            
+            if (pos)
+                free(fstr);
         }
     }
 
@@ -317,8 +311,8 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     assert(fv && x);
 
     unsigned int i = 0;
-    int nlen, pos, bits, idx = -1;
-    char *t = x;
+    int nlen, pos, bits, flen;
+    char *fstr, *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
@@ -337,19 +331,29 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         if (t + nlen > x + l)
             break;
 
-        if (pos) 
-            idx++;
+        /* Positonal n-grams code */
+        if (pos) {
+            flen = nlen + sizeof(unsigned long);
+            fstr = malloc(flen);
+            memcpy(fstr, t, nlen);
+            memcpy(fstr + nlen, &(fv->len), sizeof(unsigned long));
+        } else {
+            fstr = t;
+            flen = nlen;
+        }
 
-        fv->dim[fv->len] = hash_str(t, nlen, idx);
+        fv->dim[fv->len] = hash_str(fstr, flen);
         fv->dim[fv->len] &= hash_mask;        
         fv->val[fv->len] = 1;
         
         /* Cache feature */
         if (fhash_enabled())
-            cache_put(cache, fv, t, nlen);
+            cache_put(cache, fv, fstr, flen);
                 
         t++;
         fv->len++;
+        if (pos)
+            free(fstr);
     }
     fv->total = fv->len;
     
