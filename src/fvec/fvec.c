@@ -546,7 +546,7 @@ void fvec_write(fvec_t *f, gzFile *z)
     assert(f && z);
     int i;
 
-    gzprintf(z, "fvec: len=%lu, total=%lu, label=%12.10f, src=lala\n",
+    gzprintf(z, "fvec: len=%lu, total=%lu, label=%12.10f, src=%s\n",
              f->len, f->total, f->label, f->src ? f->src : "(null)");
     for (i = 0; i < f->len; i++)
         gzprintf(z, "  feat=%.16llx:%12.10f\n", (unsigned long long) f->dim[i],
