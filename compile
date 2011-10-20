@@ -15,7 +15,7 @@ case $arg in
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/local/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/local/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/local/lib" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -L$HOME/local/lib" \
        ./configure --enable-libarchive --prefix=$HOME/local
        ;;       
 
