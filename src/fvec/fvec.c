@@ -44,12 +44,13 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l, int n, int b);
-static void extract_ngrams(fvec_t *, char *x, int l, int n, int b);
+static void extract_wgrams(fvec_t *, char *x, int l);
+static void extract_ngrams(fvec_t *, char *x, int l);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
+static feat_t hash_str(char *s, int l);
 
 /* Delimiter functions and table */
 static void decode_delim(const char *s);
@@ -64,7 +65,6 @@ static char delim[256] = { DELIM_NOT_INIT };
 fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
-    int nlen, bits;
     const char *dlm_str, *cfg_str;
     assert(x && l >= 0);
 
@@ -91,17 +91,14 @@ fvec_t *fvec_extract(char *x, int l)
         fvec_destroy(fv);
         return NULL;
     }
-    
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
 
     /* N-grams of bytes */
     if (!dlm_str || strlen(dlm_str) == 0) {
         /* Feature extraction */
-        extract_ngrams(fv, x, l, nlen, bits);
+        extract_ngrams(fv, x, l);
     } else {
 
 #ifdef ENABLE_OPENMP    
@@ -113,7 +110,7 @@ fvec_t *fvec_extract(char *x, int l)
         }
 
         /* Feature extraction */
-        extract_wgrams(fv, x, l, nlen, bits);
+        extract_wgrams(fv, x, l);
     }
 
     /* Sort extracted features */
@@ -179,28 +176,55 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
     }
 }
 
+
+/**
+ * Hashes a string to a feature dimension. Utility function to limit
+ * the clatter of code.
+ * @param s Byte sequence
+ * @param l Length of sequence
+ * @return hash value
+ * 
+ */
+static feat_t hash_str(char *s, int l)
+{
+    feat_t ret;
+    
+#ifdef ENABLE_MD5HASH    
+    unsigned char buf[MD5_DIGEST_LENGTH];
+#endif    
+
+#ifdef ENABLE_MD5HASH        
+    MD5((unsigned char *) s, l, buf);
+    memcpy(ret, buf, sizeof(feat_t));
+#else            
+    ret = MurmurHash64B(s, l, 0x12345678); 
+#endif            
+
+    return ret;
+}
+
 /**
  * Extracts word n-grams from a string. The features are represented 
  * by hash values.
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param n N-gram length
- * @param b Bit of hash
- * @param d First delimiter
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int n, int b)
+static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
+    int nlen, pos, bits, flen;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
-    char *t = malloc(l + 1);
+    char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
-#ifdef ENABLE_MD5HASH    
-    unsigned char buf[MD5_DIGEST_LENGTH];
-#endif    
+
+    /* Get configuration */
+    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
+    config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (b - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
 
     if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
@@ -234,23 +258,32 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int n, int b)
                 s = i;
         
         /* Store n-gram */
-        if (q == n && i - k > 0) {
+        if (q == nlen && i - k > 0) {
 
-#ifdef ENABLE_MD5HASH        
-            MD5((unsigned char *) (t + k), i - k, buf);
-            memcpy(fv->dim + fv->len, buf, sizeof(feat_t));
-#else            
-            fv->dim[fv->len] = MurmurHash64B(t + k, i - k, 0x12345678); 
-#endif            
-            fv->dim[fv->len] &= hash_mask; 
+            /* Positonal n-grams code */
+            if (pos) {
+                flen = (i - k) + sizeof(unsigned long);
+                fstr = malloc(flen);
+                memcpy(fstr, t + k, i - k);
+                memcpy(fstr + (i - k), &(fv->len), sizeof(unsigned long));
+            } else {
+                fstr = t + k;
+                flen = i - k;
+            }
+        
+            fv->dim[fv->len] = hash_str(fstr, flen);
+            fv->dim[fv->len] &= hash_mask;
             fv->val[fv->len] = 1;
             
             /* Cache feature and key */
             if (fhash_enabled()) 
-                cache_put(cache, fv, t + k, i - k);
+                cache_put(cache, fv, fstr, flen);
             
             k = s + 1, i = s, q = 0;
             fv->len++;
+            
+            if (pos)
+                free(fstr);
         }
     }
 
@@ -272,46 +305,55 @@ clean:
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param n N-gram length
- * @param b Bits for hash
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, int n, int b)
+static void extract_ngrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x);
 
     unsigned int i = 0;
-    char *t = x;
+    int nlen, pos, bits, flen;
+    char *fstr, *t = x;
     fentry_t *cache = NULL;
-#ifdef ENABLE_MD5HASH    
-    unsigned char buf[MD5_DIGEST_LENGTH];
-#endif    
+
+    /* Get configuration */
+    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
+    config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
 
     /* Set bits of hash mask */
-    feat_t hash_mask = ((long long unsigned) 2 << (b - 1)) - 1; 
+    feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
 
     if (fhash_enabled())
         cache = malloc(l * sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
-        if (t + n > x + l)
+        if (t + nlen > x + l)
             break;
 
-#ifdef ENABLE_MD5HASH        
-        MD5((unsigned char *) t, n, buf);
-        memcpy(fv->dim + fv->len, buf, sizeof(feat_t));
-#else            
-        fv->dim[fv->len] = MurmurHash64B(t, n, 0x12345678); 
-#endif    
-        fv->dim[fv->len] &= hash_mask; 
+        /* Positonal n-grams code */
+        if (pos) {
+            flen = nlen + sizeof(unsigned long);
+            fstr = malloc(flen);
+            memcpy(fstr, t, nlen);
+            memcpy(fstr + nlen, &(fv->len), sizeof(unsigned long));
+        } else {
+            fstr = t;
+            flen = nlen;
+        }
+
+        fv->dim[fv->len] = hash_str(fstr, flen);
+        fv->dim[fv->len] &= hash_mask;        
         fv->val[fv->len] = 1;
         
         /* Cache feature */
         if (fhash_enabled())
-            cache_put(cache, fv, t, n);
+            cache_put(cache, fv, fstr, flen);
                 
         t++;
         fv->len++;
+        if (pos)
+            free(fstr);
     }
     fv->total = fv->len;
     
