@@ -9,7 +9,6 @@ fi
 
 # Apply configuration
 case $arg in
-
    gwd*)
        echo "Configuration: Cluster (GWDG)"
        CC="gcc" \
@@ -28,10 +27,10 @@ case $arg in
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
-   twoface*|rieck*)
+   twoface*|ltrieck*)
        echo "Configuration: Twoface/Rieck"
-       CC="gcc-mp-4.4" \
-       CFLAGS="-DDEBUG -g -pedantic -pipe" \
+       CC="gcc" \
+       CFLAGS="-g -pedantic -pipe" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
