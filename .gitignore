@@ -6,6 +6,7 @@
 .dep.inc
 .deps
 .libs
+/a.out.dSYM/
 /aclocal.m4
 /autom4te.cache
 /build
