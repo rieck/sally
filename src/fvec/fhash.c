@@ -28,9 +28,6 @@
 /* External variables */
 extern int verbose;
 
-/* Local functions */
-static int decode_string(char *str);
-
 /* Hash table */
 static fentry_t *fhash = NULL;
 static int enabled = FALSE;
@@ -150,38 +147,6 @@ void fhash_print(FILE *f)
 unsigned long fhash_size()
 {
     return HASH_COUNT(fhash);
-}
-
-/**
- * Decodes a string with URI encoding. The function operates 
- * in-place. A trailing NULL character is appended to the string.
- * @private
- * @param str Stirng to escape.
- * @return length of decoded sequence
- */
-static int decode_string(char *str)
-{
-    int j, k, r;
-    char hex[5] = "0x00";
-
-    /* Loop over string */
-    for (j = 0, k = 0; j < strlen(str); j++, k++) {
-        if (str[j] != '%') {
-            str[k] = str[j];
-        } else {
-            /* Check for truncated string */
-            if (strlen(str) - j < 2)
-                break;
-
-            /* Parse hexadecimal number */
-            hex[2] = str[++j];
-            hex[3] = str[++j];
-            sscanf(hex, "%x", (unsigned int *) &r);
-            str[k] = (char) r;
-        }
-    }
-
-    return k;
 }
 
 /**

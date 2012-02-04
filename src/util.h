@@ -43,5 +43,7 @@ double time_stamp();
 void prog_bar(long, long, long);
 size_t gzgetline (char **s, size_t *n, gzFile *f);
 void strtrim(char *x);
+int decode_string(char *str);
+
 
 #endif                          /* UTIL_H */
