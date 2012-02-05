@@ -28,7 +28,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:E:N:b:vqVh"
+#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVh"
 
 /**
  * Array of options of getopt_long()
@@ -42,17 +42,18 @@ static struct option longopts[] = {
     { "decode_str",     1, NULL, 1005 },
     { "ngram_len",      1, NULL, 'n' },
     { "ngram_delim",    1, NULL, 'd' },
+    { "ngram_pos",      1, NULL, 'p' },
+    { "ngram_sort",     1, NULL, 's'}
     { "vect_embed",     1, NULL, 'E' }, 
     { "vect_norm",      1, NULL, 'N' },
     { "hash_bits",      1, NULL, 'b' },
     { "explicit_hash",  1, NULL, 1003 }, 
     { "tfidf_file",     1, NULL, 1004 },
+    { "output_format",  1, NULL, 'o' },
     { "verbose",        0, NULL, 'v' }, 
     { "quiet",          0, NULL, 'q' },
     { "version",        0, NULL, 'V' },
     { "help",           0, NULL, 'h' },
-    { "ngram_pos",      1, NULL, 'p' },
-    { "output_format",  1, NULL, 'o' },
     { NULL,             0, NULL, 0 }
 };
 
@@ -81,16 +82,17 @@ static void print_usage(void)
 {
     printf("Usage: sally [options] <input> <output>\n"
     "\nI/O options:\n"
-    "  -i, --input_format <format>    Set input format for strings.\n"
-    "      --chunk_size <num>         Set chunk size for processing.\n"
-    "      --decode_str <0|1>         Enable decoding of URI encodings.\n"   
-    "      --fasta_regex <regex>      Set RE for labels in FASTA data.\n"
-    "      --lines_regex <regex>      Set RE for labels in text lines.\n"
-    "  -o, --output_format <format>   Set output format for vectors.\n"        
+    "  -i,  --input_format <format>   Set input format for strings.\n"
+    "       --chunk_size <num>        Set chunk size for processing.\n"
+    "       --decode_str <0|1>        Enable decoding of URI encodings.\n"
+    "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
+    "       --lines_regex <regex>     Set RE for labels in text lines.\n"
+    "  -o,  --output_format <format>  Set output format for vectors.\n"      
     "\nFeature options:\n"
     "  -n,  --ngram_len <num>         Set length of n-grams.\n"
     "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
     "  -p,  --ngram_pos <0|1>         Enable positional n-grams.\n"
+    "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
     "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
     "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
     "  -b,  --hash_bits <num>         Set number of hash bits.\n"
@@ -152,6 +154,12 @@ static void sally_parse_options(int argc, char **argv)
         case 'd':
             config_set_string(&cfg, "features.ngram_delim", optarg);
             break;
+        case 'p':
+            config_set_int(&cfg, "features.ngram_pos", atoi(optarg));    
+            break;
+        case 's':
+            config_set_int(&cfg, "features.ngram_sort", atoi(optarg));    
+            break;
         case 'E':
             config_set_string(&cfg, "features.vect_embed", optarg);
             break;
@@ -167,9 +175,6 @@ static void sally_parse_options(int argc, char **argv)
         case 1004:
             config_set_string(&cfg, "features.tfidf_file", optarg);
             break;    
-        case 'p':
-            config_set_int(&cfg, "features.ngram_pos", atoi(optarg));    
-            break;
         case 'o':
             config_set_string(&cfg, "output.output_format", optarg);
             break;            
