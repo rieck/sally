@@ -43,7 +43,7 @@ static struct option longopts[] = {
     { "ngram_len",      1, NULL, 'n' },
     { "ngram_delim",    1, NULL, 'd' },
     { "ngram_pos",      1, NULL, 'p' },
-    { "ngram_sort",     1, NULL, 's'}
+    { "ngram_sort",     1, NULL, 's' },
     { "vect_embed",     1, NULL, 'E' }, 
     { "vect_norm",      1, NULL, 'N' },
     { "hash_bits",      1, NULL, 'b' },
