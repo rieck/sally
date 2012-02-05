@@ -252,7 +252,7 @@ int decode_str(char *str)
     int j, k, r;
 
     /* Loop over string */
-    for (j = 0, k = 0; j < strlen(str); j++, k++) {
+    for (j = k = 0; j < strlen(str); j++, k++) {
         if (str[j] != '%') {
             str[k] = str[j];
         } else {
@@ -261,7 +261,8 @@ int decode_str(char *str)
                 break;
 
             /* Parse hexadecimal number */
-            r = get_hex(str[++j]) * 16 + get_hex(str[++j]);
+            r = get_hex(str[j + 1]) * 16 + get_hex(str[j + 2]);
+            j += 2;
             str[k] = (char) r;
         }
     }
