@@ -204,6 +204,71 @@ static feat_t hash_str(char *s, int l)
 }
 
 /**
+ * Compares to words (not necessary null terminated)
+ * @param v1 first word 
+ * @param v2 second word
+ * @return comparisong result as integer
+ */
+static int wordcmp(const void *v1, const void *v2)
+{
+    int l, c;
+    word_t *w1 = (word_t *) v1;
+    word_t *w2 = (word_t *) v2;
+
+    if (w1->l > w2->l)
+        l = w2->l;
+    else
+        l = w1->l;
+
+    c = memcmp(w1->w, w2->w, l);
+    if (c == 0)
+        c = w1->l - w2->l;
+    return c;
+}
+
+/**
+ * Sorts the words in a string for sorted n-grams of words. A new string
+ * is allocated and the original one is freed.
+ * @param str string
+ * @param len Length of string
+ * @param delim Delimiter for words
+ * @param return sorted string 
+ */
+static char *sort_words(char *str, int len, char delim)
+{
+    assert(str);
+    assert(len > 0);
+
+    int i, j, k;
+    word_t words[len];
+
+    /* Extract words */
+    for (i = k = 0, j = 0; i < len; i++) {
+        if (str[i] == delim || i == len - 1) {
+            words[k].w = str + j;
+            words[k].l = i - j;
+            if (i == len - 1)
+                words[k].l++;
+
+            j = i + 1; k++;
+        }
+    }
+
+    /* Sort words */
+    qsort(words, k, sizeof(word_t), wordcmp);
+
+    char *s = malloc(len + 1);
+    for (i = j = 0; i < k; i++) {
+        memcpy(s + j, words[i].w, words[i].l);
+        j += words[i].l + 1;
+        s[j - 1] = delim;
+    }
+
+    free(str);
+    return s;
+}
+
+/**
  * Extracts word n-grams from a string. The features are represented 
  * by hash values.
  * @param fv Feature vector
@@ -213,7 +278,7 @@ static feat_t hash_str(char *s, int l)
 static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
-    int nlen, pos, bits, flen;
+    int nlen, pos, sort, bits, flen;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
     char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
@@ -221,6 +286,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
 
     /* Set bits of hash mask */
@@ -259,16 +325,20 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         
         /* Store n-gram */
         if (q == nlen && i - k > 0) {
+            /* Copy feature string and add some slag */
+            flen = i - k;
+            fstr = malloc(flen + sizeof(unsigned long));
+            memcpy(fstr, t + k, flen);
+
+            /* Sorted n-grams code */
+            if (sort) {
+                fstr = sort_words(fstr, flen, d);
+            }
 
             /* Positonal n-grams code */
             if (pos) {
-                flen = (i - k) + sizeof(unsigned long);
-                fstr = malloc(flen);
-                memcpy(fstr, t + k, i - k);
-                memcpy(fstr + (i - k), &(fv->len), sizeof(unsigned long));
-            } else {
-                fstr = t + k;
-                flen = i - k;
+                memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
+                flen += sizeof(unsigned long);
             }
         
             fv->dim[fv->len] = hash_str(fstr, flen);
@@ -280,10 +350,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
                 cache_put(cache, fv, fstr, flen);
             
             k = s + 1, i = s, q = 0;
-            fv->len++;
-            
-            if (pos)
-                free(fstr);
+            fv->len++;            
+            free(fstr);
         }
     }
 

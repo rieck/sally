@@ -35,6 +35,15 @@ typedef struct {
     char *src;              /**< Source of features */
 } fvec_t;
 
+
+/**
+ * Auxiliary struct for storing arrays of words.
+ */
+typedef struct {
+    char *w;                /**< Pointer to word */
+    int l;                  /**< Length of word */
+} word_t;
+
 /* Functions */
 fvec_t *fvec_extract(char *, int l);
 void fvec_destroy(fvec_t *);
