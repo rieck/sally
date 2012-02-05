@@ -123,6 +123,14 @@ strings in one of these chunks. Depending on the lengths of the
 strings, this parameter can be adjusted to balance loading and
 processing of data.
 
+=item B<decode_str = 0;>
+
+If this parameter is set to 1, B<sally> automatically decodes strings 
+that contain URI-encoded characters. That is, substrings of the form %XX 
+are replaced with the byte represented by the hexadecimal number XX. This
+feature comes handy, if binary data is provided using the textual input format B<lines>. For example, HTTP requests can be stored in a single line
+if linebreaks are represented by "%0a%0d".
+
 =item B<fasta_regex = " (\\+|-)?[0-9]+";>
 
 The FASTA format allows to equip each string with a short
