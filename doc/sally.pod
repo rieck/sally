@@ -216,6 +216,16 @@ thus only match if they appear at the exact same location in a string.  They
 are often used in bioinformatics for analysis of DNA sequences (see the work 
 of Raetsch and Sonnenburg).
 
+=item B<ngram_sort = 0;>
+
+This parameter can be used to enable sorted n-grams (n-perms). During the
+extraction of an n-gram its symbols are sorted according to their
+lexographical order. That is, if n-grams are composed of bytes, these bytes
+are sorted. If the n-grams are composed of words, the respective words are
+sorted. Sorted n-grams can be used to compensate minor perturbation in
+string data. For example, the strings "abac" and "aabc" contain the same 
+sorted 3-grams, namely "aab" and "abc".
+
 =item B<vect_embed = "bin";>
 
 This parameter specifies how the features are embedded in the vector
