@@ -223,15 +223,33 @@ void strtrim(char *x)
 }
 
 /**
+ * Returns the number of a hexadecimal digit 
+ * @param c Byte containing digit
+ * @private
+ * @return number
+ */
+static int get_hex(char c)
+{
+    if (c >= '0' && c <= '9')
+        return c - '0';
+    if (c >= 'a' && c <= 'f')
+        return c - 'a' + 0xa;
+    if (c >= 'A' && c <= 'F')
+        return c - 'A' + 0xa;
+
+    warning("Invalid URI encoding (%c)", c);
+    return 0;
+}
+
+/**
  * Decodes a string with URI encoding. The function operates 
  * in-place. A trailing NULL character is appended to the string.
  * @param str String to decode.
  * @return length of decoded sequence
  */
-int decode_string(char *str)
+int decode_str(char *str)
 {
     int j, k, r;
-    char hex[5] = "0x00";
 
     /* Loop over string */
     for (j = 0, k = 0; j < strlen(str); j++, k++) {
@@ -243,12 +261,11 @@ int decode_string(char *str)
                 break;
 
             /* Parse hexadecimal number */
-            hex[2] = str[++j];
-            hex[3] = str[++j];
-            sscanf(hex, "%x", (unsigned int *) &r);
+            r = get_hex(str[++j]) * 16 + get_hex(str[++j]);
             str[k] = (char) r;
         }
     }
+    str[k] = 0;
 
     return k;
 }

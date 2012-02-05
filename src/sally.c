@@ -34,25 +34,26 @@ static long entries = 0;
  * Array of options of getopt_long()
  */
 static struct option longopts[] = {
-    { "config_file", 	1, NULL, 'c' },
-    { "input_format", 	1, NULL, 'i' },
-    { "output_format", 	1, NULL, 'o' },
-    { "chunk_size", 	1, NULL, 1000 },
-    { "fasta_regex", 	1, NULL, 1001 },
-    { "lines_regex", 	1, NULL, 1002 },
-    { "ngram_len", 	1, NULL, 'n' },
-    { "ngram_delim", 	1, NULL, 'd' },
-    { "vect_embed", 	1, NULL, 'E' }, 
-    { "vect_norm", 	1, NULL, 'N' },
-    { "hash_bits", 	1, NULL, 'b' },
-    { "explicit_hash", 	1, NULL, 1003 }, 
-    { "tfidf_file", 	1, NULL, 1004 },
-    { "verbose", 	0, NULL, 'v' }, 
-    { "quiet", 		0, NULL, 'q' },
-    { "version", 	0, NULL, 'V' },
-    { "help", 		0, NULL, 'h' },
+    { "config_file",    1, NULL, 'c' },
+    { "input_format",   1, NULL, 'i' },
+    { "chunk_size",     1, NULL, 1000 },
+    { "fasta_regex",    1, NULL, 1001 },
+    { "lines_regex",    1, NULL, 1002 },
+    { "decode_str",     1, NULL, 1005 },
+    { "ngram_len",      1, NULL, 'n' },
+    { "ngram_delim",    1, NULL, 'd' },
+    { "vect_embed",     1, NULL, 'E' }, 
+    { "vect_norm",      1, NULL, 'N' },
+    { "hash_bits",      1, NULL, 'b' },
+    { "explicit_hash",  1, NULL, 1003 }, 
+    { "tfidf_file",     1, NULL, 1004 },
+    { "verbose",        0, NULL, 'v' }, 
+    { "quiet",          0, NULL, 'q' },
+    { "version",        0, NULL, 'V' },
+    { "help",           0, NULL, 'h' },
     { "ngram_pos",      1, NULL, 'p' },
-    { NULL, 		0, NULL, 0 }
+    { "output_format",  1, NULL, 'o' },
+    { NULL,             0, NULL, 0 }
 };
 
 /**
@@ -79,28 +80,29 @@ int sally_version(FILE *f, char *p, char *m)
 static void print_usage(void)
 {
     printf("Usage: sally [options] <input> <output>\n"
-            "\nI/O options:\n"
-            "  -i,  --input_format <format>   Set input format for strings.\n"
-            "       --chunk_size <num>        Set chunk size for processing.\n"   
-            "       --fasta_regex <regex>     Set RE for labels in FASTA sequences.\n"
-            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
-            "  -o,  --output_format <format>  Set output format for vectors.\n"            
-            "\nFeature options:\n"
-            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
-            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
-            "  -p,  --ngram_pos <num>         Set positional n-grams (0/1).\n"
-            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
-            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
-            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-            "       --explicit_hash <num>     Set explicit hash representation (0/1).\n"
-            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
-            "\nGeneric options:\n"
-            "  -c,  --config_file <file>      Set configuration file.\n"
-            "  -v,  --verbose                 Increase verbosity.\n"
-            "  -q,  --quiet                   Be quiet during processing.\n"
-            "  -V,  --version                 Print version and copyright.\n"
-            "  -h,  --help                    Print this help screen.\n"
-            "\n");
+    "\nI/O options:\n"
+    "  -i, --input_format <format>    Set input format for strings.\n"
+    "      --chunk_size <num>         Set chunk size for processing.\n"
+    "      --decode_str <0|1>         Enable decoding of URI encodings.\n"   
+    "      --fasta_regex <regex>      Set RE for labels in FASTA data.\n"
+    "      --lines_regex <regex>      Set RE for labels in text lines.\n"
+    "  -o, --output_format <format>   Set output format for vectors.\n"        
+    "\nFeature options:\n"
+    "  -n,  --ngram_len <num>         Set length of n-grams.\n"
+    "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
+    "  -p,  --ngram_pos <0|1>         Enable positional n-grams.\n"
+    "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
+    "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
+    "  -b,  --hash_bits <num>         Set number of hash bits.\n"
+    "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
+    "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
+    "\nGeneric options:\n"
+    "  -c,  --config_file <file>      Set configuration file.\n"
+    "  -v,  --verbose                 Increase verbosity.\n"
+    "  -q,  --quiet                   Be quiet during processing.\n"
+    "  -V,  --version                 Print version and copyright.\n"
+    "  -h,  --help                    Print this help screen.\n"
+    "\n");
 }
 
 /**
@@ -109,7 +111,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)\n",
             PACKAGE_VERSION);
 }
 
@@ -132,9 +134,6 @@ static void sally_parse_options(int argc, char **argv)
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
             break;
-        case 'o':
-            config_set_string(&cfg, "output.output_format", optarg);
-            break;
         case 1000:
             config_set_int(&cfg, "input.chunk_size", atoi(optarg));
             break;    
@@ -143,7 +142,10 @@ static void sally_parse_options(int argc, char **argv)
             break;    
         case 1002:
             config_set_string(&cfg, "input.lines_regex", optarg);
-            break;    
+            break;
+        case 1005:
+            config_set_int(&cfg, "input.decode_str", atoi(optarg));
+            break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
             break;
@@ -168,6 +170,9 @@ static void sally_parse_options(int argc, char **argv)
         case 'p':
             config_set_int(&cfg, "features.ngram_pos", atoi(optarg));    
             break;
+        case 'o':
+            config_set_string(&cfg, "output.output_format", optarg);
+            break;            
         case 'q':
             verbose = 0;
             break;
@@ -217,9 +222,9 @@ static void sally_load_config(int argc, char **argv)
     /* Check for config file in command line */
     while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
         switch (ch) {
-   	    case 'c':
-   	        cfg_file = optarg;
-   	        break;
+        case 'c':
+            cfg_file = optarg;
+            break;
             case '?':
             default:
                 /* empty */
@@ -317,6 +322,9 @@ static void sally_process()
         read = input_read(strs, chunk);
         if (read <= 0)
             fatal("Failed to read strings from input '%s'", input);
+
+        /* Generic preprocessing of input */
+        input_preproc(strs, read);
 
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);

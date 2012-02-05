@@ -10,7 +10,7 @@ LIB_VERSION=1:1:1
 
 echo
 echo "  .Oo Sally - A Tool for Embedding Strings in Vector Spaces"
-echo "      Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)"
+echo "      Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)"
 echo
 
 # Init automake & config.h

@@ -201,7 +201,7 @@ void fhash_read(gzFile *z)
         }
 
         /* Decode string */
-        r = decode_string(str);
+        r = decode_str(str);
 
         /* Put string to table */
         fhash_put(key, str, r);

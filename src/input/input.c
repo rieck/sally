@@ -39,6 +39,9 @@ typedef struct {
 } func_t;
 static func_t func;
 
+/** External variables */
+extern config_t cfg;
+
 /** 
  * Configure the input of Sally
  * @param format Name of input format
@@ -114,5 +117,22 @@ void input_free(string_t *strs, int len)
     }    
 }
 
+/** 
+ * In-place preprocessing of strings
+ */
+void input_preproc(string_t *strs, int len)
+{
+    assert(strs);    
+    int decode, j;
+
+    config_lookup_int(&cfg, "input.decode_str", &decode);
+
+    for (j = 0; j < len; j++) {
+        if (decode) {
+            /* After decoding some bytes are wasted in memory :( */
+            decode_str(strs[j].str);
+        }
+    }       
+}
 
 /** @} */

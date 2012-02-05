@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,6 +28,7 @@ extern int verbose;
 static config_default_t defaults[] = {
     { "input", "input_format", CONFIG_TYPE_STRING, { .str = "dir" } },
     { "input", "chunk_size", CONFIG_TYPE_INT, { .num = 1024 } },
+    { "input", "decode_str", CONFIG_TYPE_INT, { .num = 0 }},
     { "input", "fasta_regex", CONFIG_TYPE_STRING, { .str = " (\\+|-)[:digit:]*" }},
     { "input", "lines_regex", CONFIG_TYPE_STRING, { .str = "[:digit:]+: " }},
     { "features", "ngram_len", CONFIG_TYPE_INT, { .num = 2 } },
