@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -204,7 +204,25 @@ static feat_t hash_str(char *s, int l)
 }
 
 /**
- * Compares to words (not necessary null terminated)
+ * Compares two characters (I bet there is a similar function somewhere in 
+ * libc and this is just some ugly code).
+ * @param v1 first char 
+ * @param v2 second char
+ * @return comparisong result as integer
+ */
+static int chrcmp(const void *v1, const void *v2) {
+    char *c1 = (char *) v1;
+    char *c2 = (char *) v2;
+
+    if (*c1 > *c2)
+        return +1;
+    if (*c1 < *c2)
+        return -1;
+    return 0;
+}
+
+/**
+ * Compares two words (not necessary null terminated)
  * @param v1 first word 
  * @param v2 second word
  * @return comparisong result as integer
@@ -257,7 +275,8 @@ static char *sort_words(char *str, int len, char delim)
     /* Sort words */
     qsort(words, k, sizeof(word_t), wordcmp);
 
-    char *s = malloc(len + 1);
+    /* Allocate string with slack */
+    char *s = malloc(len + sizeof(unsigned long));
     for (i = j = 0; i < k; i++) {
         memcpy(s + j, words[i].w, words[i].l);
         j += words[i].l + 1;
@@ -325,7 +344,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         
         /* Store n-gram */
         if (q == nlen && i - k > 0) {
-            /* Copy feature string and add some slag */
+            /* Copy feature string and add slack */
             flen = i - k;
             fstr = malloc(flen + sizeof(unsigned long));
             memcpy(fstr, t + k, flen);
@@ -379,13 +398,14 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     assert(fv && x);
 
     unsigned int i = 0;
-    int nlen, pos, bits, flen;
+    int nlen, pos, sort, bits, flen;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);    
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
 
     /* Set bits of hash mask */
@@ -399,15 +419,20 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         if (t + nlen > x + l)
             break;
 
+        /* Copy feature string and add slack */
+        flen = nlen;
+        fstr = malloc(flen + sizeof(unsigned long));
+        memcpy(fstr, t, nlen);
+
+        /* Sorted n-grams code */
+        if (sort) {
+            qsort(fstr, flen, 1, chrcmp);    
+        }
+
         /* Positonal n-grams code */
         if (pos) {
-            flen = nlen + sizeof(unsigned long);
-            fstr = malloc(flen);
-            memcpy(fstr, t, nlen);
-            memcpy(fstr + nlen, &(fv->len), sizeof(unsigned long));
-        } else {
-            fstr = t;
-            flen = nlen;
+            memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
+            flen += sizeof(unsigned long);
         }
 
         fv->dim[fv->len] = hash_str(fstr, flen);
@@ -420,8 +445,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
                 
         t++;
         fv->len++;
-        if (pos)
-            free(fstr);
+        free(fstr);
     }
     fv->total = fv->len;
     
