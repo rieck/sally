@@ -1,6 +1,6 @@
 
 .Oo Sally - A Tool for Embedding Strings in Vector Spaces
-    Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
+    Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
 
 Introduction
 -- 
@@ -34,11 +34,19 @@ Dependencies
 
 Compilation & Installation
 --
+  From GIT repository first run
+
+  $ ./bootstrap
+
+  From tarball run
+
   $ ./configure [options]
   $ make
   $ make check
   $ make install
 
+Configuration Options
+--
   --prefix=PATH           Set directory prefix for installation
 
   By default Sally is installed into /usr/local. If you prefer a
