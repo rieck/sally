@@ -1,3 +1,83 @@
+2012-02-06  Konrad Rieck <konrad@mlsec.org>
+
+  * configure.in: new release
+
+2012-02-05  Konrad Rieck <konrad@mlsec.org>
+
+  * doc/sally.pod: added note about sorted n-grams
+
+  * doc/sally.pod: added note about decoding
+
+  * doc/sally.cfg, src/fvec/fvec.c: code for sorting bytes in n-grams
+
+  * src/fvec/fvec.c, src/fvec/fvec.h: code for sorting words in n-grams
+
+  * src/util.c: minor fix to decoding function
+
+  * src/sally.c: missin comma added
+
+  * doc/sally.cfg, src/sally.c, src/sconfig.c: added config switches
+
+  * configure.in, doc/sally.cfg, src/fvec/fhash.c, src/input/input.c,
+  src/input/input.h, src/sally.c, src/sconfig.c, src/util.c, src/util.h: added
+  support for decoding strings with URI encoding
+
+  * README: further fixed README
+
+  * README, bootstrap: switched to libtoolize
+
+2012-02-04  Konrad Rieck <konrad@mlsec.org>
+
+  * .gitignore: another dir to ignore
+
+  * src/fvec/fhash.c, src/util.c, src/util.h: moved decode function to util
+
+2012-01-22  Konrad Rieck <konrad@mlsec.org>
+
+  * bootstrap, compile, tests/test_fhash.c: sync
+
+2011-10-20  Konrad Rieck <konrad@mlsec.org>
+
+  * compile: Adapted flags to GWDG cluster
+
+2011-10-19  Konrad Rieck <konrad@mlsec.org>
+
+  * compile: adapted compile script
+
+  * src/sally.c: added cmd switch
+
+  * src/fvec/fvec.c: first running version of pos ngrams
+
+  * src/fvec/fvec.c, src/sally.c, src/sconfig.c: half version of positional
+  n-grams. explicit reprepresentation at least incorrect
+
+  * src/fvec/fvec.c: moved hash computation to extra func
+
+  * src/fvec/fvec.c: moved cfg into extraction functions
+
+  * doc/sally.cfg, doc/sally.pod, src/sconfig.c: config for positional n-grams
+
+  * src/fvec/fvec.c: fixed bug from debuggin
+
+2011-08-22  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * src/input/input_fasta.c: fixed nasty bug in fasta module
+
+  * compile: minor changes
+
+2011-08-16  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * bootstrap: removed annoying -x in bootstrap script
+
+2011-07-12  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * src/output/output_text.c: fixed annoying bug in feature output (credits to
+  t. krueger)
+
+2011-07-10  Konrad Rieck <konrad.rieck@tu-berlin.de>
+
+  * CHANGES: sync
+
 2011-07-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * doc/sally.pod: further comments about run-time behavior
