@@ -1,5 +1,9 @@
 2012-02-06  Konrad Rieck <konrad@mlsec.org>
 
+  * configure.in: updated incorrect version number
+
+  * CHANGES: new release done
+
   * configure.in: new release
 
 2012-02-05  Konrad Rieck <konrad@mlsec.org>
