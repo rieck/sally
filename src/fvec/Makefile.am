@@ -4,10 +4,9 @@
 INCLUDES                = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/input
 
-noinst_LTLIBRARIES	= libsally.la
+noinst_LTLIBRARIES	= libfvec.la
 
-libsally_la_SOURCES	= fhash.c fhash.h fvec.c fvec.h \
+libfvec_la_SOURCES	= fhash.c fhash.h fvec.c fvec.h \
 			  fmath.c fmath.h embed.c embed.h \
-			  norm.c norm.h common.h uthash.h \
-			  murmur.c murmur.h md5.c md5.h 
+			  norm.c norm.h
 
