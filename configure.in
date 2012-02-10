@@ -137,7 +137,7 @@ AC_CONFIG_FILES([
    src/Makefile \
    src/input/Makefile \
    src/output/Makefile \
-   src/fvec/Makefile \
+   src/libsally/Makefile \
    doc/Makefile \
    tests/Makefile \
    contrib/Makefile \
