@@ -360,13 +360,13 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
                 flen += sizeof(unsigned long);
             }
         
-            fv->dim[fv->len] = hash_str(fstr, flen);
-            fv->dim[fv->len] &= hash_mask;
+            feat_t h = hash_str(fstr, flen);
+            fv->dim[fv->len] = h & hash_mask;
             fv->val[fv->len] = 1;
 
             /* Signed embedding */
             if (sign) 
-                fv->val[fv->len] *= -1.0 * (fv->dim[fv->len] & 1);
+                fv->val[fv->len] *= (signed) h > 0 ? -1 : 1;
             
             /* Cache feature and key */
             if (fhash_enabled()) 
@@ -439,13 +439,13 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
             flen += sizeof(unsigned long);
         }
 
-        fv->dim[fv->len] = hash_str(fstr, flen);
-        fv->dim[fv->len] &= hash_mask;        
+        feat_t h = hash_str(fstr, flen);
+        fv->dim[fv->len] = h & hash_mask;
         fv->val[fv->len] = 1;
         
         /* Signed embedding */
         if (sign) 
-            fv->val[fv->len] *= -1.0 * (fv->dim[fv->len] & 1);
+            fv->val[fv->len] *= (signed) h > 0 ? -1 : 1;
         
         /* Cache feature */
         if (fhash_enabled())
