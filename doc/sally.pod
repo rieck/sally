@@ -241,16 +241,26 @@ vector norm. Supported norms are "l1" for the Taxicab norm (L1) and
 the lengths of the strings varies significantly and thus vectors
 differ just due to the number of extracted features.
 
+=item B<vect_sign = 0;>
+
+B<sally> uses a hash function to map individual features to dimensions in
+the vector space.  Depending on the number of bits used by this functions,
+different features may collide on the same dimension.  Such collisions often
+result in larger values at particular dimensions.  The parameter
+B<vect_sign> can be used to enable a signed embedding.  That is, one bit of
+the hash function is used to define a sign for each feature.  Collisions are
+still possible, yet their impact is lessened as colliding features not
+necessary induce larger values.
+
 =item B<hash_bits = 22;>
 
-B<sally> uses a hash function to map individual features to dimensions
-in the vector space. This parameter specifies the number of bits used
-by this hash function and defines the maximum dimensionality of the
-vector space with 2 ** bits. As the embedding of B<sally> is usually
-sparse and only a small fraction of dimensions is non-zero, 20 to 24
-bits are often sufficient for representing the data. If this
-parameter is chosen too small, the embedding may suffer from
-collisions of features in the vector space. If it is chosen too large,
+B<sally> uses a hash function to map individual features to dimensions. 
+This parameter specifies the number of bits used by this hash function and
+defines the maximum dimensionality of the vector space with 2 ** bits.  As
+the embedding of B<sally> is usually sparse and only a small fraction of
+dimensions is non-zero, 20 to 24 bits are often sufficient for representing
+the data.  If this parameter is chosen too small, the embedding may suffer
+from collisions of features in the vector space.  If it is chosen too large,
 several application may choke from the vast amount of dimensions.
 
 =item B<explicit_hash = 0;>
@@ -384,7 +394,7 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2011 Konrad Rieck (konrad@mlsec.org)
+Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
