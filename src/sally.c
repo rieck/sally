@@ -46,6 +46,7 @@ static struct option longopts[] = {
     { "ngram_sort",     1, NULL, 's' },
     { "vect_embed",     1, NULL, 'E' }, 
     { "vect_norm",      1, NULL, 'N' },
+    { "vect_sign",      0, NULL, 1006 },
     { "hash_bits",      1, NULL, 'b' },
     { "explicit_hash",  1, NULL, 1003 }, 
     { "tfidf_file",     1, NULL, 1004 },
@@ -95,6 +96,7 @@ static void print_usage(void)
     "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
     "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
     "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
+    "       --vect_sign <0|1>         Enable signed embedding.\n"
     "  -b,  --hash_bits <num>         Set number of hash bits.\n"
     "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
     "       --tfidf_file <file>       Set file name for TFIDF weighting.\n" 
@@ -147,6 +149,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1005:
             config_set_int(&cfg, "input.decode_str", atoi(optarg));
+            break;
+        case 1006:
+            config_set_int(&cfg, "features.vect_sign", atoi(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
