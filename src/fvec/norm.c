@@ -36,7 +36,7 @@ void fvec_norm(fvec_t *fv, const char *n)
         return;
     } else if (!strcasecmp(n, "l1")) {
         for (i = 0; i < fv->len; i++)
-            s += fv->val[i];
+            s += fabs(fv->val[i]);
         for (i = 0; i < fv->len; i++)
             fv->val[i] = fv->val[i] / s;
     } else if (!strcasecmp(n, "l2")) {
@@ -45,9 +45,7 @@ void fvec_norm(fvec_t *fv, const char *n)
         for (i = 0; i < fv->len; i++)
             fv->val[i] = fv->val[i] / sqrt(s);
     } else {
-        warning("Unknown normalization mode '%s', using 'l1'.", n);
-        for (i = 0; i < fv->len; i++)
-            fv->val[i] = fv->val[i] / fv->total;    
+        warning("Unknown normalization mode '%s', using 'none'.", n);
     }
 } 
 

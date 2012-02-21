@@ -297,7 +297,7 @@ static char *sort_words(char *str, int len, char delim)
 static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
-    int nlen, pos, sort, bits, flen;
+    int nlen, pos, sort, bits, sign, flen;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
     char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
@@ -307,6 +307,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
     config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
+    config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);    
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
@@ -363,6 +364,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
             fv->dim[fv->len] = hash_str(fstr, flen);
             fv->dim[fv->len] &= hash_mask;
             fv->val[fv->len] = 1;
+
+            /* Signed embedding */
+            if (sign) 
+                fv->val[fv->len] *= -1.0 * (fv->dim[fv->len] & 1);
             
             /* Cache feature and key */
             if (fhash_enabled()) 
@@ -398,7 +403,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     assert(fv && x);
 
     unsigned int i = 0;
-    int nlen, pos, sort, bits, flen;
+    int nlen, pos, sort, bits, flen, sign;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
 
@@ -407,6 +412,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
     config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);    
+    config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);        
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1; 
@@ -438,6 +444,10 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         fv->dim[fv->len] = hash_str(fstr, flen);
         fv->dim[fv->len] &= hash_mask;        
         fv->val[fv->len] = 1;
+        
+        /* Signed embedding */
+        if (sign) 
+            fv->val[fv->len] *= -1.0 * (fv->dim[fv->len] & 1);
         
         /* Cache feature */
         if (fhash_enabled())
