@@ -348,22 +348,34 @@ parameter is specified as B<xx = "yy"> in the configuration file, it
 can be changed by using the command-line option B<--xx
 "zz">. Following is a list of common options:
 
-=head2 Basic options
+=head2 I/O options
 
-  -i, --input_format <format>   Set input format for strings.
-  -o, --output_format <format>  Set output format for vectors.
-  -c, --config_file <file>      Set configuration file.
-  -v, --verbose                 Increase verbosity.
-  -q, --quiet                   Be quiet during processing.
-  -V, --version                 Print version and copyright.
+  -i,  --input_format <format>   Set input format for strings.
+       --chunk_size <num>        Set chunk size for processing.
+       --decode_str <0|1>        Enable decoding of URI encodings.
+       --fasta_regex <regex>     Set RE for labels in FASTA data.
+       --lines_regex <regex>     Set RE for labels in text lines.
+  -o,  --output_format <format>  Set output format for vectors.
 
 =head2 Feature options
 
-  -n, --ngram_len <num>         Set length of n-grams.
-  -d, --ngram_delim <delim>     Set delimiters of words.
-  -E, --vect_embed <embed>      Set embedding mode. 
-  -N, --vect_norm <norm>        Set normalization mode.
-  -b, --hash_bits <num>         Set number of hash bits.
+  -n,  --ngram_len <num>         Set length of n-grams.
+  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.
+  -p,  --ngram_pos <0|1>         Enable positional n-grams.
+  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).
+  -E,  --vect_embed <embed>      Set embedding mode for vectors.
+  -N,  --vect_norm <norm>        Set normalization mode for vectors.
+  -b,  --hash_bits <num>         Set number of hash bits.
+       --explicit_hash <0|1>     Enable explicit hash representation.
+       --tfidf_file <file>       Set file name for TFIDF weighting.
+
+=head2 Generic options
+
+  -c,  --config_file <file>      Set configuration file.
+  -v,  --verbose                 Increase verbosity.
+  -q,  --quiet                   Be quiet during processing.
+  -V,  --version                 Print version and copyright.
+  -h,  --help                    Print this help screen.
 
 =head1 FILES
 
