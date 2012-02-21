@@ -46,7 +46,7 @@ static struct option longopts[] = {
     { "ngram_sort",     1, NULL, 's' },
     { "vect_embed",     1, NULL, 'E' }, 
     { "vect_norm",      1, NULL, 'N' },
-    { "vect_sign",      0, NULL, 1006 },
+    { "vect_sign",      1, NULL, 1006 },
     { "hash_bits",      1, NULL, 'b' },
     { "explicit_hash",  1, NULL, 1003 }, 
     { "tfidf_file",     1, NULL, 1004 },

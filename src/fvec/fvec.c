@@ -351,9 +351,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
             memcpy(fstr, t + k, flen);
 
             /* Sorted n-grams code */
-            if (sort) {
+            if (sort) 
                 fstr = sort_words(fstr, flen, d);
-            }
 
             /* Positonal n-grams code */
             if (pos) {
@@ -431,9 +430,8 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         memcpy(fstr, t, nlen);
 
         /* Sorted n-grams code */
-        if (sort) {
+        if (sort) 
             qsort(fstr, flen, 1, chrcmp);    
-        }
 
         /* Positonal n-grams code */
         if (pos) {
