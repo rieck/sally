@@ -70,7 +70,7 @@ int output_text_write(fvec_t **x, int len)
         for (i = 0; i < x[j]->len; i++) {
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);
-            fprintf(f, "%llu:", (long long unsigned int)  x[j]->dim[i]);
+            fprintf(f, "%llu:", (long long unsigned int)  x[j]->dim[i] + 1);
             for (k = 0; fe && k < fe->len; k++) {
                 if (isprint(fe->data[k]) && !strchr("%:, ", fe->data[k])) 
                     fprintf(f, "%c", fe->data[k]);
