@@ -33,7 +33,7 @@ for data in datasets:
     X = np.c_[np.log(x),np.ones(len(x))]
     y = np.log(y)
 
-    # BLUE
+    # Estimate
     C = np.dot(X.T,X)
     b = np.dot(np.dot(np.linalg.inv(C), X.T), y)
     s = np.dot(X,b)
@@ -48,7 +48,7 @@ for data in datasets:
 
     plt.loglog(mx, my, 'o', markeredgewidth=1.5, color = 'w', markersize=10)
 
-    plt.legend(('BLUE', 'Average'), 'upper left', numpoints = 1)
+    plt.legend(('Estimate', 'Average'), 'upper left', numpoints = 1)
     leg = plt.gca().get_legend()
     ltext = leg.get_texts()
     plt.setp(ltext, fontsize='small')
