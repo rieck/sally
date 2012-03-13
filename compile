@@ -27,7 +27,7 @@ case $arg in
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
-   twoface*|ltrieck*)
+   scarecrow*|twoface*|ltrieck*)
        echo "Configuration: Twoface/Rieck"
        CC="gcc" \
        CFLAGS="-g -pedantic -pipe" \
