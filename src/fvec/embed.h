@@ -18,4 +18,4 @@ void fvec_embed(fvec_t *fv, const char *);
 void idf_create(char *input);
 void idf_destroy();
 
-#endif                          /* EMBED */
+#endif /* EMBED */

@@ -23,4 +23,4 @@ void fvec_mul(fvec_t *f, double s);
 void fvec_log2(fvec_t *f);
 void fvec_invert(fvec_t *f);
 
-#endif                          /* FMATH_H */
+#endif /* FMATH_H */

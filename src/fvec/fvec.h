@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 /** Data type for a feature */
-typedef uint64_t 	feat_t;
+typedef uint64_t feat_t;
 
 /** Placeholder for non-initialized delimiters */
 #define DELIM_NOT_INIT	42
@@ -26,7 +26,8 @@ typedef uint64_t 	feat_t;
  * are specified as regular indices or alternatively as 32bit
  * hash values. 
  */
-typedef struct {
+typedef struct
+{
     feat_t *dim;            /**< List of dimensions */
     float *val;             /**< List of values */
     unsigned long len;      /**< Length of list */
@@ -39,7 +40,8 @@ typedef struct {
 /**
  * Auxiliary struct for storing arrays of words.
  */
-typedef struct {
+typedef struct
+{
     char *w;                /**< Pointer to word */
     int l;                  /**< Length of word */
 } word_t;
@@ -51,7 +53,7 @@ void fvec_print(FILE *, fvec_t *);
 void fvec_realloc(fvec_t *);
 void fvec_set_label(fvec_t *fv, float l);
 void fvec_set_source(fvec_t *fv, char *s);
-void fvec_write(fvec_t *f, gzFile * z);
+void fvec_write(fvec_t *f, gzFile *z);
 fvec_t *fvec_zero();
 fvec_t *fvec_read(gzFile *);
 void fvec_save(fvec_t *fv, char *f);
@@ -63,4 +65,4 @@ void fvec_reset_delim();
 #include "embed.h"
 #include "fhash.h"
 
-#endif                          /* FVEC_H */
+#endif /* FVEC_H */

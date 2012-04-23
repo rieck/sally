@@ -36,7 +36,7 @@ void fvec_embed(fvec_t *fv, const char *n)
 {
     int i;
     double s = 0;
-    
+
     if (!strcasecmp(n, "cnt")) {
         /* Nothing */
     } else if (!strcasecmp(n, "bin")) {
@@ -48,14 +48,14 @@ void fvec_embed(fvec_t *fv, const char *n)
             s += fv->val[i];
         for (i = 0; i < fv->len; i++)
             fv->val[i] = fv->val[i] / s;
-    
+
         /* Multiply with pre-computed IDF weights */
         assert(idf_weights);
         fvec_times(fv, idf_weights);
     } else {
         warning("Unknown embedding mode '%s', using 'cnt.", n);
     }
-} 
+}
 
 
 /**
@@ -81,20 +81,20 @@ void idf_create(char *input)
     }
 
     /* Allocate stuff */
-    string_t *strs = alloca(sizeof (string_t) * chunk);
+    string_t *strs = alloca(sizeof(string_t) * chunk);
     idf_weights = fvec_zero();
 
     /* Open input */
     input_config(in_format);
     entries = input_open(input);
-    
+
     if (entries <= 0) {
         error("Could not open input for computing IDF weights");
         return;
     }
 
-    info_msg(1, "Computing IDF weights from %d strings in chunks of %d.", 
-                entries, chunk);
+    info_msg(1, "Computing IDF weights from %d strings in chunks of %d.",
+             entries, chunk);
 
     for (i = 0, read = 0; i < entries; i += read) {
         read = input_read(strs, chunk);
@@ -115,15 +115,15 @@ void idf_create(char *input)
 
     /* Close input */
     input_close();
-    
+
     /* Finish computation */
     fvec_invert(idf_weights);
     fvec_mul(idf_weights, entries);
     fvec_log2(idf_weights);
-    
+
     info_msg(1, "Saving IDF weights to '%s'.", tfidf_file);
     fvec_save(idf_weights, (char *) tfidf_file);
-} 
+}
 
 /**
  * Destroys the IDF weights

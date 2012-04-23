@@ -31,7 +31,7 @@ void fvec_norm(fvec_t *fv, const char *n)
 {
     int i;
     double s = 0;
-    
+
     if (!strcasecmp(n, "none")) {
         return;
     } else if (!strcasecmp(n, "l1")) {
@@ -47,6 +47,6 @@ void fvec_norm(fvec_t *fv, const char *n)
     } else {
         warning("Unknown normalization mode '%s', using 'none'.", n);
     }
-} 
+}
 
 /** @} */
