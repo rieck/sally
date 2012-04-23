@@ -25,7 +25,8 @@
 int verbose = 5;
 
 /* Test structure */
-typedef struct {
+typedef struct
+{
     feat_t f;
     char *s;
 } test_t;
@@ -110,8 +111,8 @@ int test_stress()
     }
 
     test_return(err, STRESS_RUNS);
-    
-    fhash_destroy();    
+
+    fhash_destroy();
     return err;
 }
 
@@ -136,7 +137,7 @@ int test_read_write()
         printf("Could not create file (ignoring)\n");
         return FALSE;
     }
-    
+
     fhash_write(z);
     gzclose(z);
     fhash_destroy();
@@ -176,6 +177,6 @@ int main(int argc, char **argv)
     err |= test_static();
     err |= test_stress();
     err |= test_read_write();
-    
+
     return err;
 }

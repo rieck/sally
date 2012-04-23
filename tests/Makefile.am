@@ -19,3 +19,8 @@ test_fvec_LDADD         = $(top_builddir)/src/libsally.la
 
 test_embed_SOURCES       = test_embed.c tests.c tests.h
 test_embed_LDADD         = $(top_builddir)/src/libsally.la 
+
+beautify:
+	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \
+		-T string_t -T gzFile -T fvec_t -T fentry_t -T FILE \
+		*.c *.h

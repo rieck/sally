@@ -20,7 +20,8 @@ int verbose = 5;
 config_t cfg;
 
 /* Test structure */
-typedef struct {
+typedef struct
+{
     char *str;
     char *dlm;
     int nlen;
@@ -63,7 +64,7 @@ int test_static()
         fvec_reset_delim();
         config_set_string(&cfg, "features.ngram_delim", tests[i].dlm);
         config_set_int(&cfg, "features.ngram_len", tests[i].nlen);
-        
+
         /* Extract features */
         f = fvec_extract(tests[i].str, strlen(tests[i].str));
 
@@ -92,7 +93,7 @@ int test_stress()
     test_printf("Stress test for feature vectors");
     config_set_string(&cfg, "features.ngram_delim", "0");
     fhash_init();
-    
+
     for (i = 0; i < STRESS_RUNS; i++) {
         config_set_int(&cfg, "features.ngram_len", rand() % 10 + 1);
 
@@ -138,11 +139,11 @@ int test_stress_omp()
 
         /* Extract features */
         f = fvec_extract(buf, strlen(buf));
-        
+
         /* Destroy features */
         fvec_destroy(f);
     }
-    
+
     fhash_destroy();
     test_return(err, STRESS_RUNS);
     return err;
@@ -192,7 +193,7 @@ int test_read_write()
                 break;
             }
             if (fabs(f->val[j] - g->val[j]) > 10e-9) {
-                test_error("(%d) f->val[%d] %f != g->val[%d] %f", i, j, 
+                test_error("(%d) f->val[%d] %f != g->val[%d] %f", i, j,
                            f->val[j], j, g->val[j]);
                 break;
             }
@@ -223,9 +224,9 @@ int main(int argc, char **argv)
 
     err |= test_static();
     err |= test_stress();
-#ifdef ENABLE_OPENMP    
+#ifdef ENABLE_OPENMP
     err |= test_stress_omp();
-#endif    
+#endif
     err |= test_read_write();
 
     config_destroy(&cfg);
