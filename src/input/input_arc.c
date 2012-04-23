@@ -41,9 +41,9 @@ static float get_label(char *desc);
  * @param name Archive name
  * @return number of regular files or -1 on error
  */
-int input_arc_open(char *name) 
+int input_arc_open(char *name)
 {
-    assert(name);    
+    assert(name);
     struct archive_entry *entry;
 
     a = archive_read_new();
@@ -64,7 +64,7 @@ int input_arc_open(char *name)
         archive_read_data_skip(a);
     }
     archive_read_finish(a);
-    
+
     /* Open file again */
     a = archive_read_new();
     archive_read_support_compression_all(a);
@@ -84,14 +84,14 @@ int input_arc_read(string_t *strs, int len)
     assert(strs && len > 0);
     struct archive_entry *entry;
     int i, j = 0;
-    
-    /* Load block of files (no OpenMP here)*/
-    for (i = 0; i < len; i++) {    
+
+    /* Load block of files (no OpenMP here) */
+    for (i = 0; i < len; i++) {
         /* Perform reading of archive */
         int r = archive_read_next_header(a, &entry);
-        if (r != ARCHIVE_OK) 
+        if (r != ARCHIVE_OK)
             break;
-        
+
         const struct stat *s = archive_entry_stat(entry);
         if (!S_ISREG(s->st_mode)) {
             archive_read_data_skip(a);
@@ -105,7 +105,7 @@ int input_arc_read(string_t *strs, int len)
             j++;
         }
     }
-    
+
     return j;
 }
 
@@ -132,7 +132,7 @@ static float get_label(char *desc)
 
     /* Determine dot in file name */
     while (name != desc && *name != '.')
-        name--; 
+        name--;
 
     /* Place pointer before '.' */
     if (name != desc)
@@ -140,13 +140,13 @@ static float get_label(char *desc)
 
     /* Test direct conversion */
     float f = strtof(name, &endptr);
-    
+
     /* Compute hash value */
-    if (!endptr || strlen(endptr) > 0) 
+    if (!endptr || strlen(endptr) > 0)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
-    
+
     return f;
-} 
+}
 
 
 #endif

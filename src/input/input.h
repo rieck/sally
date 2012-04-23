@@ -8,18 +8,19 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_H
 #define INPUT_H
 
 /**
  * Structure for a string
  */
-typedef struct {
-    char *str;      /* String data (not necessary c-style) */
-    int len;        /* Length of string */
-    char *src;      /* Optional description of source */
-    float label;    /* Optional label of string */
+typedef struct
+{
+    char *str;                  /* String data (not necessary c-style) */
+    int len;                    /* Length of string */
+    char *src;                  /* Optional description of source */
+    float label;                /* Optional label of string */
 } string_t;
 
 /* Configuration */
@@ -32,4 +33,4 @@ int input_open(char *);
 int input_read(string_t *, int);
 void input_close(void);
 
-#endif                          /* INPUT_H */
+#endif /* INPUT_H */

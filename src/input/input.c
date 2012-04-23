@@ -32,10 +32,11 @@
 /**
  * Structure for input interface
  */
-typedef struct {
-    int (*input_open)(char *);
-    int (*input_read)(string_t *, int);
-    void (*input_close)(void);
+typedef struct
+{
+    int (*input_open) (char *);
+    int (*input_read) (string_t *, int);
+    void (*input_close) (void);
 } func_t;
 static func_t func;
 
@@ -70,14 +71,14 @@ void input_config(const char *format)
         error("Unknown input format '%s', using 'lines' instead.", format);
         input_config("lines");
     }
-} 
+}
 
 /**
  * Wrapper for opening the input source.
  * @param name Name of input source, e.g., directory or file name
  * @return Number of available entries or -1 on error
  */
-int input_open(char *name) 
+int input_open(char *name)
 {
     return func.input_open(name);
 }
@@ -107,14 +108,14 @@ void input_close(void)
 void input_free(string_t *strs, int len)
 {
     assert(strs);
-    
+
     int j;
     for (j = 0; j < len; j++) {
         if (strs[j].src)
             free(strs[j].src);
         if (strs[j].str)
             free(strs[j].str);
-    }    
+    }
 }
 
 /** 
@@ -122,7 +123,7 @@ void input_free(string_t *strs, int len)
  */
 void input_preproc(string_t *strs, int len)
 {
-    assert(strs);    
+    assert(strs);
     int decode, j;
 
     config_lookup_int(&cfg, "input.decode_str", &decode);
@@ -132,7 +133,7 @@ void input_preproc(string_t *strs, int len)
             /* After decoding some bytes are wasted in memory :( */
             decode_str(strs[j].str);
         }
-    }       
+    }
 }
 
 /** @} */

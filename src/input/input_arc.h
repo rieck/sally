@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_ARC_H
 #define INPUT_ARC_H
 
@@ -19,4 +19,4 @@ int input_arc_read(string_t *, int);
 void input_arc_close(void);
 #endif
 
-#endif                          /* INPUT_ARC_H */
+#endif /* INPUT_ARC_H */
