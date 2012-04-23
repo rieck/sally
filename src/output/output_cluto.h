@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef OUTPUT_CLUTO_H
 #define OUTPUT_CLUTO_H
 
@@ -17,4 +17,4 @@ int output_cluto_open(char *);
 int output_cluto_write(fvec_t **, int);
 void output_cluto_close(void);
 
-#endif                          /* OUTPUT_CLUTO_H */
+#endif /* OUTPUT_CLUTO_H */

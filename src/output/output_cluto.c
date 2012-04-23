@@ -41,23 +41,23 @@ static long entries = 0;
  * @param fn File name
  * @return number of regular files
  */
-int output_cluto_open(char *fn) 
+int output_cluto_open(char *fn)
 {
-    assert(fn);    
+    assert(fn);
     int bits;
-    
+
     f = fopen(fn, "w");
     if (!f) {
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
-    
+
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
     cols = 1 << bits;
-    
+
     /* Write dummy header. We fix it later */
     fprintf(f, "%12ld %12ld %12ld\n", rows, cols, entries);
-    
+
     return TRUE;
 }
 
@@ -74,7 +74,7 @@ int output_cluto_write(fvec_t **x, int len)
 
     for (j = 0; j < len; j++) {
         for (i = 0; i < x[j]->len; i++) {
-            fprintf(f, "%llu ", (long long unsigned int)  x[j]->dim[i] + 1);
+            fprintf(f, "%llu ", (long long unsigned int) x[j]->dim[i] + 1);
             fprintf(f, "%g", x[j]->val[i]);
             if (i < x[j]->len - 1)
                 fprintf(f, " ");
@@ -83,7 +83,7 @@ int output_cluto_write(fvec_t **x, int len)
         rows++;
         fprintf(f, "\n");
     }
-    
+
     return TRUE;
 }
 

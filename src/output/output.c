@@ -32,10 +32,11 @@
 /**
  * Structure for output interface
  */
-typedef struct {
-    int (*output_open)(char *);
-    int (*output_write)(fvec_t **, int);
-    void (*output_close)(void);
+typedef struct
+{
+    int (*output_open) (char *);
+    int (*output_write) (fvec_t **, int);
+    void (*output_close) (void);
 } func_t;
 static func_t func;
 
@@ -66,14 +67,14 @@ void output_config(const char *format)
         error("Unknown ouptut format '%s', using 'text' instead.", format);
         output_config("text");
     }
-} 
+}
 
 /**
  * Wrapper for opening the output desctination.
  * @param name Name of output destination, e.g., directory or file name
  * @return 1 on success, 0 otherwise.
  */
-int output_open(char *name) 
+int output_open(char *name)
 {
     return func.output_open(name);
 }
@@ -105,7 +106,7 @@ void output_close(void)
 void output_free(fvec_t **x, int len)
 {
     assert(x);
-    
+
     int j;
     for (j = 0; j < len; j++)
         fvec_destroy(x[j]);
