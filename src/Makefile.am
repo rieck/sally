@@ -28,4 +28,9 @@ sally.h: sally.h.in
 
 clean-local:
 	rm -f sally.h
+
+beautify:
+	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \
+		-T fvec_t \
+		$(libsally_SOURCES) $(sally_SOURCES)
 	
