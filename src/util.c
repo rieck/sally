@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 /**
  * @defgroup util Utility functions
  * The module contains utility functions for Sally.
@@ -17,7 +17,7 @@
  */
 
 #include "config.h"
-#include "common.h" 
+#include "common.h"
 #include "util.h"
 
 /* External variable */
@@ -48,7 +48,7 @@ void info_msg(int v, char *m, ...)
     va_start(ap, m);
     vsnprintf(s, 256, m, ap);
     va_end(ap);
-    
+
     fprintf(stderr, "> %s\n", s);
     fflush(stderr);
 }
@@ -61,11 +61,11 @@ void info_msg(int v, char *m, ...)
  * @param f Function name
  * @param m Format string
  */
-void err_msg(char *p, const char *f, char *m, ...) 
+void err_msg(char *p, const char *f, char *m, ...)
 {
     va_list ap;
     char s[256] = { " " };
-    
+
     va_start(ap, m);
     vsnprintf(s, 256, m, ap);
     va_end(ap);
@@ -100,10 +100,10 @@ void prog_bar(long a, long b, long c)
     int i, first, last;
     double perc, ptime = 0, min, max, in;
     char *descr = "";
-    
+
     if (verbose == 0)
         return;
-    
+
     min = (double) a;
     max = (double) b;
     in = (double) c;
@@ -166,31 +166,31 @@ void prog_bar(long a, long b, long c)
  * appropriate. Some people confused fgets() with getline(), 
  * others were arguing on licences over and over.
  */
-size_t gzgetline(char **s, size_t *n, gzFile *f)
+size_t gzgetline(char **s, size_t * n, gzFile * f)
 {
-      assert(f);
-      int c = 0;
-      *n = 0;      
- 
-      if (gzeof(f)) 
-          return -1;
-      
-      while (c != '\n') { 
-          if (!*s || *n % BLOCK_SIZE == 0) {
-              *s = realloc(*s, *n + BLOCK_SIZE + 1);
-              if (!*s)
-                  return -1;
-          }   
-          
-          c = gzgetc(f);   
-          if (c == -1) 
-              break;
-          
-          (*s)[(*n)++] = c;
-      }
-      
-      (*s)[*n] = 0;
-      return *n;
+    assert(f);
+    int c = 0;
+    *n = 0;
+
+    if (gzeof(f))
+        return -1;
+
+    while (c != '\n') {
+        if (!*s || *n % BLOCK_SIZE == 0) {
+            *s = realloc(*s, *n + BLOCK_SIZE + 1);
+            if (!*s)
+                return -1;
+        }
+
+        c = gzgetc(f);
+        if (c == -1)
+            break;
+
+        (*s)[(*n)++] = c;
+    }
+
+    (*s)[*n] = 0;
+    return *n;
 }
 
 /** 
@@ -198,7 +198,7 @@ size_t gzgetline(char **s, size_t *n, gzFile *f)
  * blanks. The original string is modified in place.
  * @param x Input string
  */
-void strtrim(char *x) 
+void strtrim(char *x)
 {
     assert(x);
     int i = 0, j = 0, l = strlen(x);
@@ -206,11 +206,11 @@ void strtrim(char *x)
     if (l == 0)
         return;
 
-    for (i = 0; i <  l; i++) 
+    for (i = 0; i < l; i++)
         if (!isspace(x[i]))
             break;
 
-    for (j = l; j > 0; j--) 
+    for (j = l; j > 0; j--)
         if (!isspace(x[j - 1]))
             break;
 
@@ -272,4 +272,3 @@ int decode_str(char *str)
 }
 
 /** @} */
-  

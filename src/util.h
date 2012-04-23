@@ -41,9 +41,9 @@ void err_msg(char *, const char *, char *, ...);
 void info_msg(int, char *, ...);
 double time_stamp();
 void prog_bar(long, long, long);
-size_t gzgetline (char **s, size_t *n, gzFile *f);
+size_t gzgetline(char **s, size_t * n, gzFile * f);
 void strtrim(char *x);
 int decode_str(char *str);
 
 
-#endif                          /* UTIL_H */
+#endif /* UTIL_H */

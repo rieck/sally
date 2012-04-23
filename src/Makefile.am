@@ -31,6 +31,6 @@ clean-local:
 
 beautify:
 	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \
-		-T fvec_t \
-		$(libsally_SOURCES) $(sally_SOURCES)
+		-T fvec_t -T FILE -T config_t \
+		$(libsally_la_SOURCES) $(sally_SOURCES)
 	

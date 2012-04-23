@@ -22,12 +22,14 @@
  * configuration. The type can be determined by first testing for a 
  * string and then for a float argument.
  */
-typedef struct {
+typedef struct
+{
     char *group;        /**< Configuration group */
     char *name;         /**< Configuration name */
     int type;           /**< Type of configuration */
-    
-    union {
+
+    union
+    {
         long num;       /**< Integer value */
         double flt;     /**< Float value  */
         char *str;      /**< String */
@@ -39,4 +41,4 @@ void config_print(config_t *cfg);
 void config_check(config_t *cfg);
 void config_fprint(FILE *, config_t *cfg);
 
-#endif                          /* SCONFIG_H */
+#endif /* SCONFIG_H */

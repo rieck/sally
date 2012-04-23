@@ -65,7 +65,7 @@ static struct option longopts[] = {
  * @param m Message
  * @return number of written characters
  */
-int sally_version(FILE * f, char *p, char *m)
+int sally_version(FILE *f, char *p, char *m)
 {
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }

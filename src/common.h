@@ -15,7 +15,7 @@
 #define _BSD_SOURCE             /* Linux: strdup() */
 #define __USE_POSIX             /* Linux: readdir_r() */
 
-#ifdef __STRICT_ANSI__          
+#ifdef __STRICT_ANSI__
 #undef __STRICT_ANSI__          /* Required on Cygwin */
 #endif
 
@@ -62,4 +62,4 @@
 #endif
 
 
-#endif                          /* COMMON_H */
+#endif /* COMMON_H */

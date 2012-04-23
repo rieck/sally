@@ -8,8 +8,7 @@
 #ifndef MURMUR_H
 #define MURMUR_H
 
-uint32_t MurmurHash2 ( const void * key, int32_t len, uint32_t seed );
-uint64_t MurmurHash64B ( const void * key, int32_t len, uint32_t seed );
+uint32_t MurmurHash2(const void *key, int32_t len, uint32_t seed);
+uint64_t MurmurHash64B(const void *key, int32_t len, uint32_t seed);
 
 #endif
-
