@@ -44,8 +44,8 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l);
-static void extract_ngrams(fvec_t *, char *x, int l);
+static void extract_wgrams(fvec_t *, char *x, int l, int p);
+static void extract_ngrams(fvec_t *, char *x, int l, int p);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
@@ -65,6 +65,7 @@ static char delim[256] = { DELIM_NOT_INIT };
 fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
+    int pos;
     const char *dlm_str, *cfg_str;
     assert(x && l >= 0);
 
@@ -74,12 +75,16 @@ fvec_t *fvec_extract(char *x, int l)
         error("Could not extract feature vector");
         return NULL;
     }
+    
+    /* Get configuration */
+    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
+    config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
 
     /* Initialize feature vector */
     fv->len = 0;
     fv->total = 0;
-    fv->dim = (feat_t *) malloc(l * sizeof(feat_t));
-    fv->val = (float *) malloc(l * sizeof(float));
+    fv->dim = (feat_t *) malloc(l * sizeof(feat_t) * (pos ? pos : 1));
+    fv->val = (float *) malloc(l * sizeof(float) * (pos ? pos : 1));
     fv->src = NULL;
 
     /* Check for empty sequence */
@@ -92,13 +97,15 @@ fvec_t *fvec_extract(char *x, int l)
         return NULL;
     }
 
-    /* Get configuration */
-    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-
     /* N-grams of bytes */
     if (!dlm_str || strlen(dlm_str) == 0) {
         /* Feature extraction */
-        extract_ngrams(fv, x, l);
+        if (pos) {
+            for (int p = 1; p <= pos; p++) 
+                extract_ngrams(fv, x, l, p);
+        } else {
+                extract_ngrams(fv, x, l, 0);
+        }
     } else {
 
 #ifdef ENABLE_OPENMP
@@ -110,7 +117,12 @@ fvec_t *fvec_extract(char *x, int l)
         }
 
         /* Feature extraction */
-        extract_wgrams(fv, x, l);
+        if (pos) {
+            for (int p = 1; p <= pos; p++) 
+                extract_wgrams(fv, x, l, p);
+        } else {
+            extract_wgrams(fv, x, l, 0);
+        }
     }
 
     /* Sort extracted features */
@@ -295,18 +307,18 @@ static char *sort_words(char *str, int len, char delim)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
+ * @param pos Positional n-grams (with shift)
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l)
+static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 {
     assert(fv && x && l > 0);
-    int nlen, pos, sort, bits, sign, flen;
+    int nlen, sort, bits, sign, flen;
     unsigned int i, j = l, k = 0, s = 0, q = 0, d;
     char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
     config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
     config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);
@@ -315,7 +327,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
     if (fhash_enabled())
-        cache = malloc(l * sizeof(fentry_t));
+        cache = malloc(l * sizeof(fentry_t) * (pos ? pos : 1));
 
     /* Find first delimiter symbol */
     for (d = 0; !delim[(unsigned char) d] && d < 256; d++);
@@ -358,7 +370,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
 
             /* Positonal n-grams code */
             if (pos) {
-                memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
+                unsigned long p = fv->len + pos;
+                memcpy(fstr + flen, &p, sizeof(unsigned long));
                 flen += sizeof(unsigned long);
             }
 
@@ -381,7 +394,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
     }
 
     /* Save extracted n-grams */
-    fv->total = fv->len;
+    fv->total += fv->len;
 
   clean:
     if (fhash_enabled()) {
@@ -398,19 +411,19 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
+ * @param pos Positional n-grams (with shift)
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l)
+static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 {
     assert(fv && x);
 
     unsigned int i = 0;
-    int nlen, pos, sort, bits, flen, sign;
+    int nlen, sort, bits, flen, sign;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
     config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
     config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);
@@ -418,8 +431,8 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
-    if (fhash_enabled())
-        cache = malloc(l * sizeof(fentry_t));
+    if (fhash_enabled()) 
+        cache = malloc(l * sizeof(fentry_t) * (pos ? pos : 1));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
@@ -437,7 +450,8 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
 
         /* Positonal n-grams code */
         if (pos) {
-            memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
+            unsigned long p = fv->len + pos;
+            memcpy(fstr + flen, &p, sizeof(unsigned long));
             flen += sizeof(unsigned long);
         }
 
@@ -457,7 +471,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         fv->len++;
         free(fstr);
     }
-    fv->total = fv->len;
+    fv->total += fv->len;
 
     if (!fhash_enabled())
         return;
