@@ -166,7 +166,7 @@ void prog_bar(long a, long b, long c)
  * appropriate. Some people confused fgets() with getline(), 
  * others were arguing on licences over and over.
  */
-size_t gzgetline(char **s, size_t * n, gzFile * f)
+size_t gzgetline(char **s, size_t * n, gzFile f)
 {
     assert(f);
     int c = 0;

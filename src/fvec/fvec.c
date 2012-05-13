@@ -623,7 +623,7 @@ void fvec_print(FILE * f, fvec_t *fv)
  * @param z File pointer
  * @return Feature vector
  */
-fvec_t *fvec_read(gzFile *z)
+fvec_t *fvec_read(gzFile z)
 {
     assert(z);
     fvec_t *f;
@@ -685,7 +685,7 @@ fvec_t *fvec_read(gzFile *z)
  * @param f Feature vector
  * @param z File pointer
  */
-void fvec_write(fvec_t *f, gzFile *z)
+void fvec_write(fvec_t *f, gzFile z)
 {
     assert(f && z);
     int i;
@@ -704,7 +704,7 @@ void fvec_write(fvec_t *f, gzFile *z)
  */
 fvec_t *fvec_load(char *f)
 {
-    gzFile *z = gzopen(f, "r");
+    gzFile z = gzopen(f, "r");
     if (!z) {
         error("Could not open '%s' for reading.", f);
         return NULL;
@@ -723,7 +723,7 @@ fvec_t *fvec_load(char *f)
  */
 void fvec_save(fvec_t *fv, char *f)
 {
-    gzFile *z = gzopen(f, "w9");
+    gzFile z = gzopen(f, "w9");
     if (!z) {
         error("Could not open '%s' for writing.", f);
         return;

@@ -157,7 +157,7 @@ int test_read_write()
 {
     int i, j, err = 0;
     fvec_t *f, *g;
-    gzFile *z;
+    gzFile z;
 
     test_printf("reading and saving of feature vectors");
 
