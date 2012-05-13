@@ -129,7 +129,7 @@ If this parameter is set to 1, B<sally> automatically decodes strings
 that contain URI-encoded characters. That is, substrings of the form %XX 
 are replaced with the byte represented by the hexadecimal number XX. This
 feature comes handy, if binary data is provided using the textual input format B<lines>. For example, HTTP requests can be stored in a single line
-if linebreaks are represented by "%0a%0d".
+if line-breaks are represented by "%0a%0d".
 
 =item B<fasta_regex = " (\\+|-)?[0-9]+";>
 
@@ -324,7 +324,7 @@ The name of the output file is given as I<output> to B<sally>.
 
 =item I<"matlab">
 
-The feature vectors of the embedded strings are stored in matlab
+The feature vectors of the embedded strings are stored in Matlab
 format (v5).  The vectors are stored as a 1 x n struct array with the
 fields: data, src, label and feat. The name of the output file is
 given as I<output> to B<sally>. Note that great care is required to
@@ -362,7 +362,7 @@ can be changed by using the command-line option B<--xx
 
   -i,  --input_format <format>   Set input format for strings.
        --chunk_size <num>        Set chunk size for processing.
-       --decode_str <0|1>        Enable decoding of URI encodings.
+       --decode_str <0|1>        Enable decoding of URI encoded strings.
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
   -o,  --output_format <format>  Set output format for vectors.
