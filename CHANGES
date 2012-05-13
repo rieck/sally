@@ -1,3 +1,83 @@
+2012-05-13  Konrad Rieck <konrad@mlsec.org>
+
+  * README, doc/sally.pod: spell check
+
+  * README: extended README
+
+2012-04-23  Konrad Rieck <konrad@mlsec.org>
+
+  * tests/Makefile.am, tests/test_embed.c, tests/test_fhash.c,
+  tests/test_fvec.c: code cleanup 6
+
+  * src/Makefile.am, src/common.h, src/md5.c, src/md5.h, src/murmur.c,
+  src/murmur.h, src/sally.c, src/sconfig.c, src/sconfig.h, src/uthash.h,
+  src/util.c, src/util.h: code cleanup 5
+
+  * src/Makefile.am, src/sally.c: code cleanup 4
+
+  * src/input/Makefile.am, src/output/Makefile.am, src/output/output.c,
+  src/output/output.h, src/output/output_cluto.c, src/output/output_cluto.h,
+  src/output/output_libsvm.c, src/output/output_libsvm.h,
+  src/output/output_matlab.c, src/output/output_matlab.h,
+  src/output/output_text.c, src/output/output_text.h: code cleanup 3
+
+  * src/input/Makefile.am, src/input/input.c, src/input/input.h,
+  src/input/input_arc.c, src/input/input_arc.h, src/input/input_dir.c,
+  src/input/input_dir.h, src/input/input_fasta.c, src/input/input_fasta.h,
+  src/input/input_lines.c, src/input/input_lines.h: code cleanup 2
+
+  * src/fvec/Makefile.am, src/fvec/embed.c, src/fvec/embed.h, src/fvec/fhash.c,
+  src/fvec/fhash.h, src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c,
+  src/fvec/fvec.h, src/fvec/norm.c, src/fvec/norm.h: code cleanup 1
+
+2012-03-13  Konrad Rieck <konrad@mlsec.org>
+
+  * compile: new laptop
+
+2012-02-24  Konrad Rieck <konrad@mlsec.org>
+
+  * src/output/output_text.c: unified output of dimensions (via c. wressnegger)
+
+2012-02-21  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fvec.c: fixed bug in sign computation
+
+  * src/fvec/fvec.c, src/sally.c: removed some brackets
+
+  * src/fvec/fvec.c, src/fvec/norm.c: support for signed embedding added
+
+  * doc/sally.pod: minor fix to documentation
+
+  * doc/sally.pod: added option
+
+  * doc/sally.pod: updated options
+
+  * doc/sally.pod: added documentation of sign feature
+
+  * doc/sally.cfg, src/sally.c, src/sconfig.c: added framework for new option
+
+2012-02-10  Konrad Rieck <konrad@mlsec.org>
+
+  * src/common.h, src/libsally/common.h, src/libsally/embed.c,
+  src/libsally/embed.h, src/libsally/norm.c, src/libsally/norm.h,
+  src/libsally/util.c, src/libsally/util.h, src/util.c, src/util.h: first
+  cleanup of lib dir
+
+  * configure.in, src/Makefile.am, src/common.h, src/fvec/Makefile.am,
+  src/fvec/embed.c, src/fvec/embed.h, src/fvec/fhash.c, src/fvec/fhash.h,
+  src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c, src/fvec/fvec.h,
+  src/fvec/norm.c, src/fvec/norm.h, src/libsally/Makefile.am,
+  src/libsally/common.h, src/libsally/embed.c, src/libsally/embed.h,
+  src/libsally/fhash.c, src/libsally/fhash.h, src/libsally/fmath.c,
+  src/libsally/fmath.h, src/libsally/fvec.c, src/libsally/fvec.h,
+  src/libsally/md5.c, src/libsally/md5.h, src/libsally/murmur.c,
+  src/libsally/murmur.h, src/libsally/norm.c, src/libsally/norm.h,
+  src/libsally/uthash.h, src/libsally/util.c, src/libsally/util.h, src/md5.c,
+  src/md5.h, src/murmur.c, src/murmur.h, src/output/Makefile.am, src/uthash.h,
+  src/util.c, src/util.h, tests/Makefile.am: destroyed structure. hmm.
+
+  * CHANGES: sync
+
 2012-02-06  Konrad Rieck <konrad@mlsec.org>
 
   * configure.in: updated incorrect version number

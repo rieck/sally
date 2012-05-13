@@ -27,22 +27,16 @@ case $arg in
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
-   scarecrow*|twoface*|ltrieck*)
-       echo "Configuration: Twoface/Rieck"
+   scarecrow*)
+       echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
-       CFLAGS="-g -pedantic -pipe" \
+       CFLAGS="-g -pedantic -pipe -O3" \
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
-       ;;
-
-   ubuntu)    
-       echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -DDEBUG"  \
-       ./configure --enable-libarchive --enable-openmp
        ;;
 
    *)    
        echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -DDEBUG" \
+       CFLAGS="-g -pedantic -pipe -O3" \
        ./configure 
        ;;
 esac
