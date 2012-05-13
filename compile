@@ -31,7 +31,7 @@ case $arg in
        echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
        CFLAGS="-g -pedantic -pipe -O3" \
-       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
+       ./configure --enable-openmp --enable-md5hash --enable-libarchive --prefix=/opt/rieck
        ;;
 
    *)    

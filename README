@@ -31,14 +31,16 @@ Introduction
 Dependencies
 --
 
+  >= zlib-1.2.1
   >= libconfig-1.4
   >= libarchive-2.70
 
-  Debian and Ubuntu Linux: libconfig8-dev libarchive-dev
-  MacOS X with Homebrew:   libconfig libarchive (homebrew-dupes)
-  MacOS X with MacPorts:   libconfig-ht libarchive
+  Debian and Ubuntu Linux:  zlib1g-dev libconfig8-dev libarchive-dev
+  MacOS X with Homebrew:    libconfig libarchive (homebrew-dupes)
+  MacOS X with MacPorts:    libconfig-ht libarchive
 
   The source code of the libraries is available here:
+  zlib        http://www.zlib.net/
   libconfig   http://www.hyperrealm.com/libconfig/
   libarchive  http://libarchive.github.com/
 
