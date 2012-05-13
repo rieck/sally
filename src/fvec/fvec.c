@@ -187,7 +187,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
  */
 static feat_t hash_str(char *s, int l)
 {
-    feat_t ret;
+    feat_t ret = 0;
 
 #ifdef ENABLE_MD5HASH
     unsigned char buf[MD5_DIGEST_LENGTH];
@@ -195,7 +195,7 @@ static feat_t hash_str(char *s, int l)
 
 #ifdef ENABLE_MD5HASH
     MD5((unsigned char *) s, l, buf);
-    memcpy(ret, buf, sizeof(feat_t));
+    memcpy(&ret, buf, sizeof(feat_t));
 #else
     ret = MurmurHash64B(s, l, 0x12345678);
 #endif

@@ -14,7 +14,7 @@ case $arg in
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/local/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/local/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -L$HOME/local/lib" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -L$HOME/local/lib" \
        ./configure --enable-libarchive --prefix=$HOME/local
        ;;       
 
@@ -23,20 +23,20 @@ case $arg in
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -march=native -L$HOME/usr/lib" \
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
    scarecrow*)
        echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
-       CFLAGS="-g -pedantic -pipe -O3" \
+       CFLAGS="-g -pedantic -pipe -O2" \
        ./configure --enable-openmp --enable-md5hash --enable-libarchive --prefix=/opt/rieck
        ;;
 
    *)    
        echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -O3" \
+       CFLAGS="-g -pedantic -pipe -O2" \
        ./configure 
        ;;
 esac
