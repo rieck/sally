@@ -1,5 +1,15 @@
 2012-05-13  Konrad Rieck <konrad@mlsec.org>
 
+  * src/md5.c: fixed broken aliasing
+
+  * compile, src/fvec/fvec.c: fixed broken md5 copy
+
+  * src/fvec/fhash.c, src/fvec/fhash.h, src/fvec/fvec.c, src/fvec/fvec.h,
+  src/input/input_fasta.c, src/input/input_lines.c, src/util.c, src/util.h,
+  tests/test_fhash.c, tests/test_fvec.c: fixed gzfile pointer madness
+
+  * CHANGES, README, compile: added note about zlib dep
+
   * CHANGES, compile, configure.in: new release
 
   * README, doc/sally.pod: spell check
