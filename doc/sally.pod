@@ -53,7 +53,7 @@ such that high-dimensional vectors with millions of dimensions can be
 handled efficiently.  All features are indexed by a hash function,
 where the bit width of this function can be adjusted according to the
 characteristics of the data.  In several settings, a hash width
-between 24 and 28 bit already suffices to store millions of features
+between 22 and 26 bit already suffices to store millions of features
 with little loss of accuracy.
 
 =head1 CONFIGURATION
@@ -125,10 +125,11 @@ processing of data.
 
 =item B<decode_str = 0;>
 
-If this parameter is set to 1, B<sally> automatically decodes strings 
-that contain URI-encoded characters. That is, substrings of the form %XX 
-are replaced with the byte represented by the hexadecimal number XX. This
-feature comes handy, if binary data is provided using the textual input format B<lines>. For example, HTTP requests can be stored in a single line
+If this parameter is set to 1, B<sally> automatically decodes strings that
+contain URI-encoded characters.  That is, substrings of the form %XX are
+replaced with the byte represented by the hexadecimal number XX.  This
+feature comes handy, if binary data is provided using the textual input
+format "lines".  For example, HTTP requests can be stored in a single line
 if line-breaks are represented by "%0a%0d".
 
 =item B<fasta_regex = " (\\+|-)?[0-9]+";>
@@ -168,12 +169,13 @@ following parameters.
 
 =item B<ngram_delim = "%0a%0d";>
 
-The parameter B<ngram_len> specifies the numbers of consecutive words
-that are considered as one feature, while the parameter B<ngram_delim>
-defines characters for delimiting these words.  The characters can be
-either specified as bytes or as hexadecimal numbers prefixed by "%".
-The following types of features can be extracted using these
-parameters:
+The parameter B<ngram_len> specifies the numbers of consecutive words that
+are considered as one feature, while the parameter B<ngram_delim> defines
+characters for delimiting these words.  The characters can be either
+specified as bytes or as hexadecimal numbers prefixed by "%".  If no
+delimiters are given, i.e. the parameter B<ngram_delim> is an empty string,
+B<sally> considers each byte as an individual word.  The following types of
+different feature types can be extracted using these parameters:
 
 =over 14
 
@@ -258,7 +260,7 @@ B<sally> uses a hash function to map individual features to dimensions.
 This parameter specifies the number of bits used by this hash function and
 defines the maximum dimensionality of the vector space with 2 ** bits.  As
 the embedding of B<sally> is usually sparse and only a small fraction of
-dimensions is non-zero, 20 to 24 bits are often sufficient for representing
+dimensions is non-zero, 22 to 26 bits are often sufficient for representing
 the data.  If this parameter is chosen too small, the embedding may suffer
 from collisions of features in the vector space.  If it is chosen too large,
 several application may choke from the vast amount of dimensions.
@@ -317,10 +319,16 @@ name of the output file is given as I<output> to B<sally>.
 
 =item I<"text"> 
 
-The feature vectors of the embedded strings are stored as a plain text
-using a list of dimensions, features and respective values.  Almost
-all comprehensive analysis tools can deal with this type of format.
-The name of the output file is given as I<output> to B<sally>.
+The feature vectors of the embedded strings are stored as plain text. 
+Each feature vector is represented as a list of dimensions, which is written
+to I<output> in the following form
+ 
+    dimension:feature:value,... source 
+
+I<dimension> specifies the index of the dimension, I<feature> a textual
+representation of the feature and I<value> the value at the dimension.  If
+parameter B<explicit_hash> is not enabled in the configuration, the field
+I<feature> is empty.
 
 =item I<"matlab">
 
@@ -362,7 +370,7 @@ can be changed by using the command-line option B<--xx
 
   -i,  --input_format <format>   Set input format for strings.
        --chunk_size <num>        Set chunk size for processing.
-       --decode_str <0|1>        Enable decoding of URI encoded strings.
+       --decode_str <0|1>        Enable URI-decoding of strings.
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
   -o,  --output_format <format>  Set output format for vectors.

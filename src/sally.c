@@ -85,7 +85,7 @@ static void print_usage(void)
            "\nI/O options:\n"
            "  -i,  --input_format <format>   Set input format for strings.\n"
            "       --chunk_size <num>        Set chunk size for processing.\n"
-           "       --decode_str <0|1>        Enable decoding of URI encodings.\n"
+           "       --decode_str <0|1>        Enable URI-decoding of strings.\n"
            "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
