@@ -13,7 +13,7 @@ B<sally> [B<options>] [B<-c> I<config>] I<input> I<output>
 B<sally> is a small tool for mapping a set of strings to a set of
 vectors. This mapping is referred to as embedding and allows for
 applying techniques of machine learning and data mining for analysis
-of string data. B<sally> can applied to several types of string data,
+of string data. B<sally> can be applied to several types of string data,
 such as text documents, DNA sequences or log files, where it can
 handle common formats such as directories, archives and text files of
 string data.
