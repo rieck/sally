@@ -1,3 +1,12 @@
+2012-05-14  Konrad Rieck <konrad@mlsec.org>
+
+  * contrib/sally_sparsematrix.r, doc/sally.pod, src/sally.c: minor fixes to
+  man page
+
+  * README, doc/sally.pod: fixed typo
+
+  * CHANGES, README, configure.in: fixed configure
+
 2012-05-13  Konrad Rieck <konrad@mlsec.org>
 
   * src/md5.c: fixed broken aliasing
