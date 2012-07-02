@@ -602,7 +602,7 @@ void fvec_print(FILE * f, fvec_t *fv)
             fv->src, fv->label, fv->len, fv->total);
 
     for (i = 0; i < fv->len; i++) {
-        fprintf(f, "   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i],
+        fprintf(f, "   %.16llx:%6.4f [", (long long unsigned int) fv->dim[i] +1,
                 fv->val[i]);
 
         if (fhash_enabled()) {
@@ -670,6 +670,9 @@ fvec_t *fvec_read(gzFile z)
                    (float *) &f->val[i]);
         if (r != 2)
             goto err;
+
+        // The output representation of the dimension is increased by one, cf. fvec_write(.,.)
+        f->dim[i]--;
     }
 
     return f;
@@ -694,7 +697,7 @@ void fvec_write(fvec_t *f, gzFile z)
              f->len, f->total, f->label, f->src ? f->src : "(null)");
     for (i = 0; i < f->len; i++)
         gzprintf(z, "  feat=%.16llx:%12.10f\n",
-                 (unsigned long long) f->dim[i], (double) f->val[i]);
+                 (unsigned long long) f->dim[i] +1, (double) f->val[i]);
 }
 
 /**
