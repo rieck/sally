@@ -128,10 +128,10 @@ void input_preproc(string_t *strs, int len)
 
     config_lookup_int(&cfg, "input.decode_str", &decode);
 
-    for (j = 0; j < len; j++) {
-        if (decode) {
-            /* After decoding some bytes are wasted in memory :( */
-            decode_str(strs[j].str);
+    if (decode) {
+        for (j = 0; j < len; j++) {
+            strs[j].len = decode_str(strs[j].str);
+            strs[j].str = (char*) realloc(strs[j].str, strs[j].len);
         }
     }
 }
