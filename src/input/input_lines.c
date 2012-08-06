@@ -92,13 +92,16 @@ int input_lines_open(char *name)
         return -1;
     }
 
-    /* Count lines in file (I hope this is buffered) */
-    int c, num_lines = 0;
+    /* Count lines in file (I hope this is buffered)*/
+    int c = -1, prev, num_lines = 0;
     do {
+        prev = c;
         c = gzgetc(in);
         if (c == '\n')
             num_lines++;
-    } while (c != -1);
+    } while(c != -1);
+
+    if (prev >= 0 && prev != '\n') num_lines++;
 
     /* Prepare reading */
     gzrewind(in);
