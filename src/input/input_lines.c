@@ -153,7 +153,7 @@ int input_lines_read(string_t *strs, int len)
         //    continue;
         // }
 
-        strs[i].label = get_label(line);
+        strs[j].label = get_label(line);
         strs[j].str = line;
         strs[j].len = strlen(line);
 
