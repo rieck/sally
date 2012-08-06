@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -119,9 +119,13 @@ int input_lines_open(char *name)
 int input_lines_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
-    int read, i = 0, j = 0;
+    int read, i = 0, j = 0, k = 0;
     size_t size;
     char buf[32], *line = NULL;
+
+    static char strip[256] = {0};
+    strip[(int) '\n'] = 1;
+    strip[(int) '\r'] = 1;
 
     for (i = 0; i < len; i++) {
         line = NULL;
@@ -131,10 +135,23 @@ int input_lines_read(string_t *strs, int len)
             break;
         }
 
-        if (strlen(line) == 0) {
-            line_num++;
-            continue;
+        for (k = read -1; k >= 0; k--) {
+            if (!strip[(int) line[k]]) {
+                break;
+            }
         }
+        line[k +1] = 0x00;
+
+        // ATTENTION! Skipping a line means that at the end of the loop i != j
+        // Whereas i is the number of lines read and j would by the number of
+        // not empty lines processed. Hence, returning j would clash with the
+        // function's specification that defines the return value as the number
+        // of lines read.
+
+        // if (k < 0) {
+        //    line_num++;
+        //    continue;
+        // }
 
         strs[i].label = get_label(line);
         strs[j].str = line;
@@ -158,3 +175,4 @@ void input_lines_close()
 }
 
 /** @} */
+
