@@ -114,7 +114,7 @@ int input_lines_open(char *name)
  * Reads a block of files into memory.
  * @param strs Array for data
  * @param len Length of block
- * @return number of read files
+ * @return number of lines read into memory
  */
 int input_lines_read(string_t *strs, int len)
 {
@@ -140,18 +140,11 @@ int input_lines_read(string_t *strs, int len)
                 break;
             }
         }
-        line[k +1] = 0x00;
+        line[k + 1] = 0x00;
 
-        // ATTENTION! Skipping a line means that at the end of the loop i != j
-        // Whereas i is the number of lines read and j would by the number of
-        // not empty lines processed. Hence, returning j would clash with the
-        // function's specification that defines the return value as the number
-        // of lines read.
-
-        // if (k < 0) {
-        //    line_num++;
-        //    continue;
-        // }
+        /* Skip empty lines */
+        if (strlen(line) == 0)
+            continue;
 
         strs[j].label = get_label(line);
         strs[j].str = line;
