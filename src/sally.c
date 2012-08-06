@@ -242,9 +242,11 @@ static void sally_load_config(int argc, char **argv)
     }
 
     /* Check for local config file ".sally" */
+#if 0    
     snprintf(cfg_path, MAX_PATH_LEN, "%s/.sally", getenv("HOME"));
     if (!cfg_file && !access(cfg_path, F_OK))
         cfg_file = cfg_path;
+#endif
 
     /* Check for global config file "sally.cfg" */
     snprintf(cfg_path, MAX_PATH_LEN, "%s/sally.cfg", CONFIG_DIR);
