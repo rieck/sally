@@ -130,8 +130,8 @@ void input_preproc(string_t *strs, int len)
 
     for (j = 0; j < len; j++) {
         if (decode) {
-            /* After decoding some bytes are wasted in memory :( */
-            decode_str(strs[j].str);
+            strs[j].len = decode_str(strs[j].str);
+            strs[j].str = (char*) realloc(strs[j].str, strs[j].len);
         }
     }
 }
