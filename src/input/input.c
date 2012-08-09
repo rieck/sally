@@ -28,6 +28,7 @@
 #include "input_dir.h"
 #include "input_lines.h"
 #include "input_fasta.h"
+#include "input_stdin.h"
 
 /**
  * Structure for input interface
@@ -67,6 +68,10 @@ void input_config(const char *format)
         func.input_read = input_arc_read;
         func.input_close = input_arc_close;
 #endif
+	} else if (!strcasecmp(format, "stdin")) {
+        func.input_open = input_stdin_open;
+        func.input_read = input_stdin_read;
+        func.input_close = input_stdin_close; 
     } else {
         error("Unknown input format '%s', using 'lines' instead.", format);
         input_config("lines");
