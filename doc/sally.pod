@@ -113,6 +113,12 @@ is given as I<input> to B<sally>. Labels are extracted from the
 description of each sequence using a regular expression. Comments are
 allowed if they are preceded by either ';' or '>'.
 
+=item I<"stdin"> 
+
+One input string is read from standard input stream. The I<input> 
+parameter must be present but is not used and should set to 
+I<input = "-">. No label information is supported by this input format.
+
 =back 
 
 =item B<chunk_size = 256;>
