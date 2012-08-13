@@ -89,4 +89,6 @@ different dimensions in the vector space.  By default the very
 efficient Murmur hash is used for this task.  In certain critical
 cases it may be useful to use a cryptographic hash as MD5.
 
-Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+			Christian Wressnegger (chwress@idalab.de);
+			Alexander Bikadorov (biku@cs.tu-berlin.de)

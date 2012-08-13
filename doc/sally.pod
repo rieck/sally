@@ -421,7 +421,9 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+		Christian Wressnegger (chwress@idalab.de);
+		Alexander Bikadorov (biku@cs.tu-berlin.de)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
