@@ -12,7 +12,7 @@
 /** 
  * @addtogroup input
  * <hr>
- * <em>stdin</em>: One string is passed from standard input.
+ * <em>stdin</em>: A single string is read from standard input.
  * @{
  */
 
@@ -28,6 +28,7 @@
  */
 int input_stdin_open(char *notused)
 {
+    /* TODO: A check whether stdin is really open */
     return 1;
 }
 
@@ -42,7 +43,7 @@ int input_stdin_read(string_t *strs, int lt)
     assert(strs && lt > 0);
 
     char buf[1024];
-    size_t xSize = 1; 
+    size_t len = 1; 
     
     char *x = malloc(sizeof(char) * 1024);
     if(x == NULL) {
@@ -54,9 +55,9 @@ int input_stdin_read(string_t *strs, int lt)
     /* read entire standard input */
     while(fgets(buf, 1024, stdin)) {
         char *old = x;
-        xSize += strlen(buf);
-        x = realloc(x, xSize);
-        if(x == NULL) {
+        len += strlen(buf);
+        x = realloc(x, len);
+        if(!x) {
             error("Failed to reallocate memory");
             free(old);
             return 0;
