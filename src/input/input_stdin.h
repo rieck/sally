@@ -13,7 +13,7 @@
 #define INPUT_STDIN_H
 
 /* Stdin module */
-int input_stdin_open(void);
+int input_stdin_open(char *);
 int input_stdin_read(string_t *, int);
 void input_stdin_close(void);
 

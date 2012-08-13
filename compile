@@ -34,6 +34,14 @@ case $arg in
        ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
        ;;
 
+   schulle*)
+       echo "Configuration: Schulle (ESX Cluster)"
+       PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" \
+       CC="gcc" \
+       CFLAGS="-g -pedantic -pipe -O2" \
+       ./configure --enable-openmp --enable-libarchive
+       ;;
+
    *)    
        echo "Configuration: Standard"
        CFLAGS="-g -pedantic -pipe -O2" \

@@ -19,13 +19,14 @@
 #include "config.h"
 #include "common.h"
 #include "input.h"
+#include "util.h"
 #include "stdio.h"
 
 /**
  * Prepare for reading from standard input. 
  * @return number of input or -1 on error
  */
-int input_stdin_open()
+int input_stdin_open(char *notused)
 {
     return 1;
 }

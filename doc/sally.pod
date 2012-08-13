@@ -115,8 +115,8 @@ allowed if they are preceded by either ';' or '>'.
 
 =item I<"stdin"> 
 
-One input string is read from standard input stream. The I<input> 
-parameter must be present but is not used and should set to 
+A single string is read from standard input stream. The I<input> 
+parameter must be present but is not used and should set be to 
 I<input = "-">. No label information is supported by this input format.
 
 =back 
