@@ -58,7 +58,7 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
 
     int i;
     for (i = 0; i < d - 1; i++)
-        fprintf(f, "    ");
+        fprintf(f, "       ");
 
     char *n = config_setting_name(cs);
 
@@ -72,8 +72,8 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
 
         if (d > 0) {
             for (i = 0; i < d - 1; i++)
-                fprintf(f, "    ");
-            fprintf(f, "};\n");
+                fprintf(f, "        ");
+            fprintf(f, "};\n\n");
         }
         break;
     case CONFIG_TYPE_STRING:
