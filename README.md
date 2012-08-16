@@ -91,4 +91,4 @@ cases it may be useful to use a cryptographic hash as MD5.
 
 Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
 			Christian Wressnegger (chwress@idalab.de);
-			Alexander Bikadorov (biku@cs.tu-berlin.de)
+			Alexander Bikadorov (abiku@cs.tu-berlin.de)
