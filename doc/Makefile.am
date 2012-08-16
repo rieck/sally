@@ -2,7 +2,7 @@
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 man1_MANS = sally.man 
-sysconf_DATA = sally.cfg
+doc_DATA = example.cfg
 
 EXTRA_DIST = sally.pod doxygen.cfg sally.pdf sally.txt \
              latex-pre.inc.in latex-post.inc sally.cfg

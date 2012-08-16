@@ -61,12 +61,16 @@ with little loss of accuracy.
 The configuration of B<sally> is specified in a configuration file.
 This file is structured into the three sections B<input>, B<features>
 and B<output>, which define the parameters of the input format, the
-feature extraction and the output format, respectively.
+feature extraction and the output format, respectively. 
 
 All parameters of the configuration can be also be specified on the
 command-line. That is, if a parameter is specified in the
 configuration as B<xx = "yy">, it can be alternatively supplied as a
 command-line option by B<--xx "yy">.
+
+If no configuration file is provided, B<sally> resorts to a default 
+configuration. This default configuration can be dumped using the 
+command-line option B<-P>.
 
 =head2 Input formats
 
@@ -398,6 +402,7 @@ can be changed by using the command-line option B<--xx
 
   -c,  --config_file <file>      Set configuration file.
   -v,  --verbose                 Increase verbosity.
+  -P,  --print_config            Print the default configuration.
   -q,  --quiet                   Be quiet during processing.
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.
@@ -406,9 +411,9 @@ can be changed by using the command-line option B<--xx
 
 =over 4
 
-=item F</etc/sally.cfg> 
+=item F<PREFIX/share/doc/sally/example.cfg> 
 
-The system wide configuration file of B<sally>. See the configuration
+An example configuration file for B<sally>. See the configuration
 section for further details.
 
 =back

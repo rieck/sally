@@ -27,7 +27,7 @@ case $arg in
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
 
-   scarecrow*)
+   scarecrow*|sec01*)
        echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
        CFLAGS="-g -pedantic -pipe -O2" \

@@ -237,7 +237,6 @@ static void sally_parse_options(int argc, char **argv)
 static void sally_load_config(int argc, char **argv)
 {
     char *cfg_file = NULL;
-    char cfg_path[MAX_PATH_LEN];
     int ch;
 
     /* Check for config file in command line */
@@ -253,26 +252,16 @@ static void sally_load_config(int argc, char **argv)
         }
     }
 
-    /* Check for local config file ".sally" */
-#if 0    
-    snprintf(cfg_path, MAX_PATH_LEN, "%s/.sally", getenv("HOME"));
-    if (!cfg_file && !access(cfg_path, F_OK))
-        cfg_file = cfg_path;
-#endif
-
-    /* Check for global config file "sally.cfg" */
-    snprintf(cfg_path, MAX_PATH_LEN, "%s/sally.cfg", CONFIG_DIR);
-    if (!cfg_file && !access(cfg_path, F_OK))
-        cfg_file = cfg_path;
-
-    if (!cfg_file)
-        fatal("No config file availablle.");
-
     /* Init and load configuration */
     config_init(&cfg);
-    if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
-        fatal("Could not read configuration (%s in line %d)",
-              config_error_text(&cfg), config_error_line(&cfg));
+
+    if (!cfg_file) {
+        warning("No config file given. Using defaults (see -P)");
+    } else { 
+        if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
+            fatal("Could not read configuration (%s in line %d)",
+                  config_error_text(&cfg), config_error_line(&cfg));
+    }
 
     /* Check configuration */
     config_check(&cfg);
