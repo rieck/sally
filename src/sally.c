@@ -28,7 +28,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVh"
+#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhP"
 
 /**
  * Array of options of getopt_long()
@@ -52,6 +52,7 @@ static struct option longopts[] = {
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
+    {"print_config", 0, NULL, 'P'},
     {"quiet", 0, NULL, 'q'},
     {"version", 0, NULL, 'V'},
     {"help", 0, NULL, 'h'},
@@ -68,6 +69,12 @@ static struct option longopts[] = {
 int sally_version(FILE *f, char *p, char *m)
 {
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
+}
+
+static void print_config(void)
+{
+    sally_version(stdout, "# ", "Default configuration");
+    config_print(&cfg);
 }
 
 /**
@@ -104,6 +111,7 @@ static void print_usage(void)
            "  -c,  --config_file <file>      Set configuration file.\n"
            "  -v,  --verbose                 Increase verbosity.\n"
            "  -q,  --quiet                   Be quiet during processing.\n"
+           "  -P,  --print_config            Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
            "  -h,  --help                    Print this help screen.\n" "\n");
 }
@@ -187,6 +195,10 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 'v':
             verbose++;
+            break;
+        case 'P':
+            print_config();
+            exit(EXIT_SUCCESS);
             break;
         case 'V':
             print_version();

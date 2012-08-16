@@ -57,8 +57,8 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
     assert(cs && d >= 0);
 
     int i;
-    for (i = 0; i < d; i++)
-        fprintf(f, "  ");
+    for (i = 0; i < d - 1; i++)
+        fprintf(f, "    ");
 
     char *n = config_setting_name(cs);
 
@@ -71,8 +71,8 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
             config_setting_fprint(f, config_setting_get_elem(cs, i), d + 1);
 
         if (d > 0) {
-            for (i = 0; i < d; i++)
-                fprintf(f, "  ");
+            for (i = 0; i < d - 1; i++)
+                fprintf(f, "    ");
             fprintf(f, "};\n");
         }
         break;
@@ -96,7 +96,6 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
  */
 void config_print(config_t *cfg)
 {
-    printf("Sally configuration\n");
     config_setting_fprint(stdout, config_root_setting(cfg), 0);
 }
 
