@@ -156,6 +156,12 @@ If the strings are available as text lines, the parameter can be used
 to extract a numerical label from the start of the strings. The
 parameter is a regular expression matching labels, such as +1 and -1.
 
+=item B<reverse_str = 0;>
+
+If this parameter is set to 1, the bytes of all input strings will
+be reversed. Such reversing might help in situations where the 
+reading direction of the input strings is unspecified.
+
 =back
 
 =item B<};>
@@ -383,6 +389,7 @@ can be changed by using the command-line option B<--xx
        --decode_str <0|1>        Enable URI-decoding of strings.
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
+       --reverse_str <0|1>       Reverse (flip) all strings.
   -o,  --output_format <format>  Set output format for vectors.
 
 =head2 Feature options

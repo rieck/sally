@@ -130,14 +130,23 @@ void input_free(string_t *strs, int len)
 void input_preproc(string_t *strs, int len)
 {
     assert(strs);
-    int decode, j;
+    int decode, reverse, c, i, j, k;
 
     config_lookup_int(&cfg, "input.decode_str", &decode);
+    config_lookup_int(&cfg, "input.reverse_str", &reverse);
 
     for (j = 0; j < len; j++) {
         if (decode) {
             strs[j].len = decode_str(strs[j].str);
             strs[j].str = (char*) realloc(strs[j].str, strs[j].len);
+        }
+        
+        if (reverse) {
+            for (i = 0, k = strs[j].len - 1; i < k; i++, k--) {
+                c = strs[j].str[i];
+                strs[j].str[i] = strs[j].str[k];
+                strs[j].str[k] = c;
+            }      
         }
     }
 }
