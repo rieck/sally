@@ -143,10 +143,6 @@ int input_lines_read(string_t *strs, int len)
         }
         line[k + 1] = 0x00;
 
-        /* Skip empty lines */
-        if (strlen(line) == 0)
-            continue;
-
         strs[j].label = get_label(line);
         strs[j].str = line;
         strs[j].len = strlen(line);
