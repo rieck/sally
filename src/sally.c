@@ -298,6 +298,11 @@ static void sally_init()
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_create(input);
 
+    /* Load stop words */
+    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    if (strlen(cfg_str) > 0)
+        stopwords_load(cfg_str);
+
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash) {
@@ -386,7 +391,10 @@ static void sally_exit()
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_destroy(input);
 
-    /* Check for feature hash table */
+    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    if (strlen(cfg_str) > 0)
+        stopwords_destroy();
+
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash)
         fhash_destroy();

@@ -31,6 +31,9 @@
 #include "input_fasta.h"
 #include "input_stdin.h"
 
+/* Other stuff */
+#include "uthash.h"
+
 /**
  * Structure for input interface
  */
@@ -42,6 +45,19 @@ typedef struct
 } func_t;
 static func_t func;
 
+/**
+ * Structure for stop words
+ */
+typedef struct
+{
+    uint64_t hash;              /* Hash of stop word */
+    UT_hash_handle hh;          /* uthash handle */
+} stopword_t;
+
+/**< Table of stop word hashs */
+static stopword_t *stopwords = NULL;
+/**< Delimiter table */
+static char delim[256] = { DELIM_NOT_INIT };
 /** External variables */
 extern config_t cfg;
 
@@ -124,6 +140,65 @@ void input_free(string_t *strs, int len)
     }
 }
 
+/**
+ * Read in and hash stop words 
+ * @param stop word file
+ */
+void stopwords_load(const char *file)
+{
+    char buf[1024];
+    const char *dlm_str;
+    FILE *f;
+
+    info_msg(1, "Loading stop words from '%s'.", file);
+    if (!(f = fopen(file, "r"))) {
+        error("Could not read stop word file %s", file);
+        return;
+    }
+    
+    /* Read stop words */
+    while(fgets(buf, 1024, f)) {
+        int len = strip_newline(buf, strlen(buf));
+        if (len <= 0)
+            continue;
+            
+        /* Add stop word to hash table */
+        stopword_t *word = malloc(sizeof(stopword_t));
+        word->hash = hash_str(buf, len);
+        HASH_ADD(hh, stopwords, hash, sizeof(uint64_t), word); 
+    }
+    fclose(f);
+
+    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);    
+    if (delim[0] == DELIM_NOT_INIT)
+        decode_delim(dlm_str, delim);
+}
+ 
+/**
+ * Destroy stop words table
+ */
+void stopwords_destroy()
+{
+    stopword_t *s;
+
+    while(stopwords) {
+        s = stopwords;
+        HASH_DEL(stopwords, s);
+        free(s);
+    
+    delim[0] = DELIM_NOT_INIT;
+}
+
+/** 
+ * Filter stopwords in place
+ * @param str input string
+ * @return len of new string
+ */
+int stopwords_filter(char *str)
+{
+    return 0;
+}
+
 /** 
  * In-place preprocessing of strings
  */
@@ -134,7 +209,7 @@ void input_preproc(string_t *strs, int len)
 
     config_lookup_int(&cfg, "input.decode_str", &decode);
     config_lookup_int(&cfg, "input.reverse_str", &reverse);
-
+    
     for (j = 0; j < len; j++) {
         if (decode) {
             strs[j].len = decode_str(strs[j].str);

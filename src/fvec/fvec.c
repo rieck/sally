@@ -33,8 +33,6 @@
 #include "fhash.h"
 #include "fmath.h"
 #include "util.h"
-#include "md5.h"
-#include "murmur.h"
 #include "sally.h"
 #include "norm.h"
 #include "embed.h"
@@ -50,10 +48,8 @@ static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
-static feat_t hash_str(char *s, int l);
 
-/* Delimiter functions and table */
-static void decode_delim(const char *s);
+/* Delimiter table */
 static char delim[256] = { DELIM_NOT_INIT };
 
 /**
@@ -110,7 +106,7 @@ fvec_t *fvec_extract(char *x, int l)
 #endif
         {
             if (delim[0] == DELIM_NOT_INIT)
-                decode_delim(dlm_str);
+                decode_delim(dlm_str, delim);
         }
 
         /* Feature extraction */
@@ -187,33 +183,6 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
             free(c[i].data);
         }
     }
-}
-
-
-/**
- * Hashes a string to a feature dimension. Utility function to limit
- * the clatter of code.
- * @param s Byte sequence
- * @param l Length of sequence
- * @return hash value
- * 
- */
-static feat_t hash_str(char *s, int l)
-{
-    feat_t ret = 0;
-
-#ifdef ENABLE_MD5HASH
-    unsigned char buf[MD5_DIGEST_LENGTH];
-#endif
-
-#ifdef ENABLE_MD5HASH
-    MD5((unsigned char *) s, l, buf);
-    memcpy(&ret, buf, sizeof(feat_t));
-#else
-    ret = MurmurHash64B(s, l, 0x12345678);
-#endif
-
-    return ret;
 }
 
 /**
@@ -744,33 +713,6 @@ void fvec_save(fvec_t *fv, char *f)
 
     fvec_write(fv, z);
     gzclose(z);
-}
-
-/**
- * Decodes a string containing delimiters to a global array
- * @param s String containing delimiters
- */
-static void decode_delim(const char *s)
-{
-    char buf[5] = "0x00";
-    unsigned int i, j;
-
-    memset(delim, 0, 256);
-    for (i = 0; i < strlen(s); i++) {
-        if (s[i] != '%') {
-            delim[(unsigned int) s[i]] = 1;
-            continue;
-        }
-
-        /* Skip truncated sequence */
-        if (strlen(s) - i < 2)
-            break;
-
-        buf[2] = s[++i];
-        buf[3] = s[++i];
-        sscanf(buf, "%x", (unsigned int *) &j);
-        delim[j] = 1;
-    }
 }
 
 /**

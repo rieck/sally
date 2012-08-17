@@ -120,13 +120,9 @@ int input_lines_open(char *name)
 int input_lines_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
-    int read, i = 0, j = 0, k = 0;
+    int read, i = 0, j = 0;
     size_t size;
     char buf[32], *line = NULL;
-
-    static char strip[256] = {0};
-    strip[(int) '\n'] = 1;
-    strip[(int) '\r'] = 1;
 
     for (i = 0; i < len; i++) {
         line = NULL;
@@ -135,13 +131,9 @@ int input_lines_read(string_t *strs, int len)
             free(line);
             break;
         }
-
-        for (k = read -1; k >= 0; k--) {
-            if (!strip[(int) line[k]]) {
-                break;
-            }
-        }
-        line[k + 1] = 0x00;
+        
+        /* Strip newline characters */
+        strip_newline(line, read);
 
         strs[j].label = get_label(line);
         strs[j].str = line;

@@ -19,6 +19,8 @@
 #include "config.h"
 #include "common.h"
 #include "util.h"
+#include "murmur.h"
+#include "md5.h"
 
 /* External variable */
 extern int verbose;
@@ -270,5 +272,84 @@ int decode_str(char *str)
 
     return k;
 }
+
+/**
+ * Hashes a string to a feature dimension. Utility function to limit
+ * the clatter of code.
+ * @param s Byte sequence
+ * @param l Length of sequence
+ * @return hash value
+ * 
+ */
+uint64_t hash_str(char *s, int l)
+{
+    uint64_t ret = 0;
+
+#ifdef ENABLE_MD5HASH
+    unsigned char buf[MD5_DIGEST_LENGTH];
+#endif
+
+#ifdef ENABLE_MD5HASH
+    MD5((unsigned char *) s, l, buf);
+    memcpy(&ret, buf, sizeof(int64_t));
+#else
+    ret = MurmurHash64B(s, l, 0x12345678);
+#endif
+
+    return ret;
+}
+
+/**
+ * Strip newline characters in place
+ * @param str input string
+ * @param len length of string
+ */
+int strip_newline(char *str, int len)
+{
+    int k;
+    static char strip[256] = {0};
+    strip[(int) '\n'] = 1;
+    strip[(int) '\r'] = 1;
+
+    assert(str);
+
+    for (k = len - 1; k >= 0; k--) {
+        if (!strip[(int) str[k]]) {
+            break;
+        }
+    }
+    
+    str[k + 1] = 0x00;
+    return k + 1;
+}
+
+/**
+ * Decodes a string containing delimiters to a lookup table
+ * @param s String containing delimiters
+ * @param delim Lookup table of 256 bytes
+ */
+void decode_delim(const char *s, char *delim)
+{
+    char buf[5] = "0x00";
+    unsigned int i, j;
+
+    memset(delim, 0, 256);
+    for (i = 0; i < strlen(s); i++) {
+        if (s[i] != '%') {
+            delim[(unsigned int) s[i]] = 1;
+            continue;
+        }
+
+        /* Skip truncated sequence */
+        if (strlen(s) - i < 2)
+            break;
+
+        buf[2] = s[++i];
+        buf[3] = s[++i];
+        sscanf(buf, "%x", (unsigned int *) &j);
+        delim[j] = 1;
+    }
+}
+
 
 /** @} */
