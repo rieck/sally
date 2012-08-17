@@ -49,8 +49,8 @@ static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
 
-/* Delimiter table */
-static char delim[256] = { DELIM_NOT_INIT };
+/* Global elimiter table */
+char delim[256] = { DELIM_NOT_INIT };
 
 /**
  * Allocates and extracts a feature vector from a string.
@@ -100,15 +100,6 @@ fvec_t *fvec_extract(char *x, int l)
         /* Feature extraction */
         extract_ngrams(fv, x, l);
     } else {
-
-#ifdef ENABLE_OPENMP
-#pragma omp critical (delim)
-#endif
-        {
-            if (delim[0] == DELIM_NOT_INIT)
-                decode_delim(dlm_str, delim);
-        }
-
         /* Feature extraction */
         extract_wgrams(fv, x, l);
     }
@@ -716,13 +707,42 @@ void fvec_save(fvec_t *fv, char *f)
 }
 
 /**
+ * Decodes a string containing delimiters to a lookup table
+ * @param s String containing delimiters
+ * @param delim Lookup table of 256 bytes
+ */
+void fvec_delim_set(const char *s)
+{
+    char buf[5] = "0x00";
+    unsigned int i, j;
+
+    memset(delim, 0, 256);
+    for (i = 0; i < strlen(s); i++) {
+        if (s[i] != '%') {
+            delim[(unsigned int) s[i]] = 1;
+            continue;
+        }
+
+        /* Skip truncated sequence */
+        if (strlen(s) - i < 2)
+            break;
+
+        buf[2] = s[++i];
+        buf[3] = s[++i];
+        sscanf(buf, "%x", (unsigned int *) &j);
+        delim[j] = 1;
+    }
+}
+
+/**
  * Resets delimiters table. There is a global table of delimiter 
  * symbols which is only initialized once the first sequence is 
  * processed. This functions is used to trigger a re-initialization.
  */
-void fvec_reset_delim()
+void fvec_delim_reset()
 {
     delim[0] = DELIM_NOT_INIT;
 }
 
 /** @} */
+

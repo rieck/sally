@@ -46,6 +46,5 @@ void strtrim(char *x);
 int decode_str(char *str);
 uint64_t hash_str(char *s, int l); 
 int strip_newline(char *s, int l);
-void decode_delim(const char *s, char *delim);
 
 #endif /* UTIL_H */

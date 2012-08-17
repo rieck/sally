@@ -293,6 +293,11 @@ static void sally_init()
     if (verbose > 1)
         config_print(&cfg);
 
+    /* Set delimiters */
+    config_lookup_string(&cfg, "features.vect_delim", &cfg_str);
+    if (strlen(cfg_str) > 0) 
+        fvec_delim_set(cfg_str);
+
     /* Check for TFIDF weighting */
     config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     if (!strcasecmp(cfg_str, "tfidf"))

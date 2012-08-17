@@ -61,9 +61,9 @@ int test_static()
     test_printf("Extraction of feature vectors");
 
     for (i = 0; tests[i].str; i++) {
-        fvec_reset_delim();
         config_set_string(&cfg, "features.ngram_delim", tests[i].dlm);
         config_set_int(&cfg, "features.ngram_len", tests[i].nlen);
+        fvec_delim_set(tests[i].dlm); /* usually done in sally_init */
 
         /* Extract features */
         f = fvec_extract(tests[i].str, strlen(tests[i].str));
@@ -92,6 +92,7 @@ int test_stress()
 
     test_printf("Stress test for feature vectors");
     config_set_string(&cfg, "features.ngram_delim", "0");
+    fvec_delim_set("0"); /* usually done in sally_init */
     fhash_init();
 
     for (i = 0; i < STRESS_RUNS; i++) {
@@ -124,6 +125,7 @@ int test_stress_omp()
 
     test_printf("Stress test for feature vectors (OpenMP)");
     config_set_string(&cfg, "features.ngram_delim", "0");
+    fvec_delim_set("0"); /* usually done in sally_init */
     fhash_init();
 
 #ifdef ENABLE_OPENMP
@@ -161,9 +163,9 @@ int test_read_write()
 
     test_printf("reading and saving of feature vectors");
 
-    fvec_reset_delim();
     config_set_string(&cfg, "features.ngram_delim", " ");
     config_set_int(&cfg, "features.ngram_len", 2);
+    fvec_delim_set(" "); /* usually done in sally_init */
 
     /* Create and write feature vectors */
     z = gzopen(TEST_FILE, "w9");

@@ -53,11 +53,10 @@ typedef struct
     uint64_t hash;              /* Hash of stop word */
     UT_hash_handle hh;          /* uthash handle */
 } stopword_t;
-
-/**< Table of stop word hashs */
 static stopword_t *stopwords = NULL;
+
 /**< Delimiter table */
-static char delim[256] = { DELIM_NOT_INIT };
+extern char delim[256];
 /** External variables */
 extern config_t cfg;
 
@@ -147,7 +146,6 @@ void input_free(string_t *strs, int len)
 void stopwords_load(const char *file)
 {
     char buf[1024];
-    const char *dlm_str;
     FILE *f;
 
     info_msg(1, "Loading stop words from '%s'.", file);
@@ -168,10 +166,6 @@ void stopwords_load(const char *file)
         HASH_ADD(hh, stopwords, hash, sizeof(uint64_t), word); 
     }
     fclose(f);
-
-    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);    
-    if (delim[0] == DELIM_NOT_INIT)
-        decode_delim(dlm_str, delim);
 }
  
 /**
@@ -185,8 +179,7 @@ void stopwords_destroy()
         s = stopwords;
         HASH_DEL(stopwords, s);
         free(s);
-    
-    delim[0] = DELIM_NOT_INIT;
+    }
 }
 
 /** 

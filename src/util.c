@@ -323,33 +323,4 @@ int strip_newline(char *str, int len)
     return k + 1;
 }
 
-/**
- * Decodes a string containing delimiters to a lookup table
- * @param s String containing delimiters
- * @param delim Lookup table of 256 bytes
- */
-void decode_delim(const char *s, char *delim)
-{
-    char buf[5] = "0x00";
-    unsigned int i, j;
-
-    memset(delim, 0, 256);
-    for (i = 0; i < strlen(s); i++) {
-        if (s[i] != '%') {
-            delim[(unsigned int) s[i]] = 1;
-            continue;
-        }
-
-        /* Skip truncated sequence */
-        if (strlen(s) - i < 2)
-            break;
-
-        buf[2] = s[++i];
-        buf[3] = s[++i];
-        sscanf(buf, "%x", (unsigned int *) &j);
-        delim[j] = 1;
-    }
-}
-
-
 /** @} */

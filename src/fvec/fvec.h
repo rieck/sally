@@ -58,7 +58,10 @@ fvec_t *fvec_zero();
 fvec_t *fvec_read(gzFile);
 void fvec_save(fvec_t *fv, char *f);
 fvec_t *fvec_load(char *);
-void fvec_reset_delim();
+
+/* Delimiter functions */
+void fvec_delim_set(const char *s);
+void fvec_delim_reset();
 
 #include "fmath.h"
 #include "norm.h"
