@@ -32,6 +32,7 @@ static config_default_t defaults[] = {
     {"input", "fasta_regex", CONFIG_TYPE_STRING, {.str = " (\\+|-)?[0-9]+"}},
     {"input", "lines_regex", CONFIG_TYPE_STRING, {.str = "^(\\+|-)?[0-9]+"}},
     {"input", "reverse_str", CONFIG_TYPE_INT, {.num = 0}},
+    {"input", "stopword_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 4}},
     {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
     {"features", "ngram_pos", CONFIG_TYPE_INT, {.num = 0}},

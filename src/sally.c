@@ -41,6 +41,7 @@ static struct option longopts[] = {
     {"lines_regex", 1, NULL, 1002},
     {"decode_str", 1, NULL, 1005},
     {"reverse_str", 1, NULL, 1007},
+    {"stopword_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 1, NULL, 'p'},
@@ -97,6 +98,7 @@ static void print_usage(void)
            "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
            "       --reverse_str <0|1>       Reverse (flip) the input strings.\n"
+           "       --stopword_file <file>    Provide a file with stop words.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
@@ -164,6 +166,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1007:
             config_set_int(&cfg, "input.reverse_str", atoi(optarg));
+            break;
+        case 1008:
+            config_set_string(&cfg, "input.stopword_file", optarg);
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
