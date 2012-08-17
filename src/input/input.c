@@ -157,6 +157,9 @@ void stopwords_load(const char *file)
         int len = strip_newline(buf, strlen(buf));
         if (len <= 0)
             continue;
+
+        /* Decode URI-encoding */
+        decode_str(buf);
             
         /* Add stop word to hash table */
         stopword_t *word = malloc(sizeof(stopword_t));
@@ -183,10 +186,33 @@ void stopwords_destroy()
 /** 
  * Filter stopwords in place
  * @param str input string
+ * @param len length of string
  * @return len of new string
  */
-int stopwords_filter(char *str)
+int stopwords_filter(char *str, int len)
 {
+    int i, start = -1;
+    stopword_t* found;
+    
+    for (i = 0; i < len; i++) {
+        /* Start of word */
+        if (start == -1 && !delim[(int) str[i]]) {
+            start = i;
+        }
+        
+        /* End of word */
+        if (start != -1 && delim[(int) str[i]]) {
+            printf("word %s\n", str + start);
+            uint64_t hash = hash_str(str + start, i - start);
+            
+            /* Check table of stop words */
+            HASH_FIND(hh, stopwords, &hash, sizeof(uint64_t), found);
+            if (found)
+                printf(">> %s\n", str + start);
+                
+            start = -1;
+        }
+    } 
     return 0;
 }
 
@@ -213,6 +239,10 @@ void input_preproc(string_t *strs, int len)
                 strs[j].str[i] = strs[j].str[k];
                 strs[j].str[k] = c;
             }      
+        }
+        
+        if (stopwords) {
+            stopwords_filter(strs[j].str, strs[j].len);
         }
     }
 }
