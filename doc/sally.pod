@@ -162,6 +162,14 @@ If this parameter is set to 1, the bytes of all input strings will
 be reversed. Such reversing might help in situations where the 
 reading direction of the input strings is unspecified.
 
+=item B<stopword_file = "";>
+
+Stop words (irrelevant words) can be filtered from the strings by providing
+a file containing these words; one per line. Non-printable characters
+can be escaped using URI encoding (%XX).  If no delimiters are specified
+using B<ngram_delim>, all occurences of the stop words are removed.  If
+delimiters are given, only occurrences between delimiters are filtered.
+
 =back
 
 =item B<};>
