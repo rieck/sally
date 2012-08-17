@@ -1,7 +1,28 @@
 2012-08-17  Konrad Rieck <konrad@mlsec.org>
 
+  * src/input/input.c, src/sally.c: exit if stop word file no available but
+  requested
+
+  * src/fvec/fvec.c, src/fvec/fvec.h, src/input/input.c, src/sally.c,
+  src/util.c, src/util.h, tests/test_fvec.c: refactored delimiter setup
+
+  * src/fvec/fvec.c, src/input/Makefile.am, src/input/input.c,
+  src/input/input.h, src/input/input_lines.c, src/sally.c, src/util.c,
+  src/util.h: basic framework for stopwords
+
+  * .gitignore, src/sally.h: added missing header (thanks to Andreas Ziehe)
+
+  * doc/sally.pod, src/sally.c, src/sconfig.c, src/sconfig.h: stop words
+  require the definition of delimiters
+
+  * CHANGES, doc/Makefile.am: added missing file to automake
+
   * configure.in, doc/plots/enron.pdf, doc/plots/plot_runtime.py,
   doc/plots/sprot.pdf, src/fvec/fvec.c: added run-time eval code to master
+
+  * doc/example.cfg, doc/sally.pod: added documentation for stop words
+
+  * src/sally.c, src/sconfig.c: support for configuring stop words
 
 2012-08-16  Konrad Rieck <konrad@mlsec.org>
 
