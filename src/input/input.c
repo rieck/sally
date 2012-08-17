@@ -191,28 +191,38 @@ void stopwords_destroy()
  */
 int stopwords_filter(char *str, int len)
 {
-    int i, start = -1;
+    int i, k, start = -1;
     stopword_t* found;
     
-    for (i = 0; i < len; i++) {
+    for (i = 0, k = 0; i < len; i++) {
+    
+        int dlm = delim[(int) str[i]];
+        int end = (i == len - 1);
+    
         /* Start of word */
-        if (start == -1 && !delim[(int) str[i]]) {
+        if (start == -1 && !dlm) 
             start = i;
-        }
         
         /* End of word */
-        if (start != -1 && delim[(int) str[i]]) {
-            printf("word %s\n", str + start);
-            uint64_t hash = hash_str(str + start, i - start);
+        if (start != -1 && (dlm || end)) {
+            int len = (i - start) + (end ? 1 : 0);
+            uint64_t hash = hash_str(str + start, len);
             
-            /* Check table of stop words */
+            /* Check for stop word and copy if not */
             HASH_FIND(hh, stopwords, &hash, sizeof(uint64_t), found);
-            if (found)
-                printf(">> %s\n", str + start);
+            if (!found) {
+                memcpy(str + k, str + start, len);
+                k += len;
+            }
                 
             start = -1;
         }
+    
+        /* Always copy delimiter. Keep consecutive delimiters. */    
+        if (dlm) 
+            str[k++] = str[i];
     } 
+    str[k] = 0;
     return 0;
 }
 
