@@ -294,7 +294,7 @@ static void sally_init()
         config_print(&cfg);
 
     /* Set delimiters */
-    config_lookup_string(&cfg, "features.vect_delim", &cfg_str);
+    config_lookup_string(&cfg, "features.ngram_delim", &cfg_str);
     if (strlen(cfg_str) > 0) 
         fvec_delim_set(cfg_str);
 

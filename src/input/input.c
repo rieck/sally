@@ -149,10 +149,8 @@ void stopwords_load(const char *file)
     FILE *f;
 
     info_msg(1, "Loading stop words from '%s'.", file);
-    if (!(f = fopen(file, "r"))) {
-        error("Could not read stop word file %s", file);
-        return;
-    }
+    if (!(f = fopen(file, "r"))) 
+        fatal("Could not read stop word file %s", file);
     
     /* Read stop words */
     while(fgets(buf, 1024, f)) {
