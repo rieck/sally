@@ -141,6 +141,16 @@ AC_ARG_ENABLE(md5hash,
     ], [ ENABLE_MD5HASH=no ]
 )
 
+# evaluation of run-time
+AC_ARG_ENABLE(evaltime, 
+    [  --enable-evaltime       enable run-time evaluation (debug only) ],
+    [ 
+	if test "x$enableval" = "xyes" ; then
+		AC_DEFINE(ENABLE_EVALTIME, 1, [Enable run-time evaluation])
+        fi
+    ], []
+)
+
 AC_SUBST([INCLUDES])
 AC_SUBST([LIB_VERSION])
 

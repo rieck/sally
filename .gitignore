@@ -32,5 +32,4 @@ doc/sally.txt
 nbproject/
 sally.komodoproject
 src/sally
-src/sally.h
 tests/test_*

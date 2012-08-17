@@ -95,6 +95,10 @@ fvec_t *fvec_extract(char *x, int l)
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
 
+#ifdef EVALTIME    
+    double t1 = time_stamp();
+#endif
+
     /* N-grams of bytes */
     if (!dlm_str || strlen(dlm_str) == 0) {
         /* Feature extraction */
@@ -112,6 +116,10 @@ fvec_t *fvec_extract(char *x, int l)
         /* Feature extraction */
         extract_wgrams(fv, x, l);
     }
+    
+#ifdef EVALTIME    
+    double t2 = time_stamp();
+#endif
 
     /* Sort extracted features */
     qsort(fv->dim, fv->len, sizeof(feat_t), cmp_feat);
@@ -124,7 +132,12 @@ fvec_t *fvec_extract(char *x, int l)
     fvec_embed(fv, cfg_str);
     config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
     fvec_norm(fv, cfg_str);
-
+    
+#ifdef EVALTIME    
+    double t3 = time_stamp();
+    printf("strlen %u\textract %f\tembed %f\n", l, t2 - t1, t3 - t2);
+#endif    
+    
     return fv;
 }
 
