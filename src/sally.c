@@ -360,6 +360,9 @@ static void sally_process()
         /* Generic preprocessing of input */
         input_preproc(strs, read);
 
+#ifdef ENABLE_OPENMP
+#pragma omp parallel for
+#endif
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);

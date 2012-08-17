@@ -39,7 +39,7 @@ case $arg in
        PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" \
        CC="gcc" \
        CFLAGS="-g -pedantic -pipe -O2" \
-       ./configure --enable-openmp --enable-libarchive
+       ./configure --enable-libarchive
        ;;
 
    *)    
