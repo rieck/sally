@@ -223,7 +223,8 @@ static void sally_parse_options(int argc, char **argv)
     }
 
     /* Check configuration */
-    config_check(&cfg);
+    if(!config_check(&cfg))
+        exit(EXIT_FAILURE);
 
     argc -= optind;
     argv += optind;
@@ -274,7 +275,8 @@ static void sally_load_config(int argc, char **argv)
     }
 
     /* Check configuration */
-    config_check(&cfg);
+    if(!config_check(&cfg))
+        exit(EXIT_FAILURE);
 }
 
 

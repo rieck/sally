@@ -17,6 +17,7 @@
  * @{
  */
 
+#include "config.h"
 #include "common.h"
 #include "util.h"
 #include "sconfig.h"
@@ -111,11 +112,10 @@ void config_fprint(FILE *f, config_t *cfg)
 }
 
 /**
- * Checks if the configuration is valid. The function checks if all 
- * required parameters are set and adds default values if necessary.
+ * The functions add default values to unspecified parameters.
  * @param cfg configuration
  */
-void config_check(config_t *cfg)
+static void config_default(config_t *cfg)
 {
     int i, j;
     const char *s;
@@ -173,8 +173,29 @@ void config_check(config_t *cfg)
             config_setting_set_int(vs, defaults[i].val.num);
             break;
         }
-
     }
+}
+
+/**
+ * Checks if the configuration is valid and sane. 
+ * @return 1 if config is valid, 0 otherwise
+ */
+int config_check(config_t *cfg)
+{
+    const char *s1, *s2;
+
+    /* Add default values where missing */
+    config_default(cfg);    
+
+    /* Sanity checks */
+    config_lookup_string(cfg, "input.stopword_file", &s1);
+    config_lookup_string(cfg, "features.vect_delim", &s2);
+    if (strlen(s1) > 0 && strlen(s2) == 0) {
+        error("Stop words can only be used if delimiters are defined.");
+        return 0;
+    }
+    
+    return 1;
 }
 
 /** @} */
