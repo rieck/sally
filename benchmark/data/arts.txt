@@ -10,6 +10,6 @@
 
  Details
 
-   data.strings contains the training set of the original ARTS data.
+   arts.data contains the training set of the original ARTS data.
 
  
