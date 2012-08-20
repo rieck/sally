@@ -28,7 +28,7 @@
 #include <regex.h>
 
 /** Static variable */
-static gzFile *in; 
+static gzFile in;
 static regex_t re;
 static char *old_line = NULL;
 
@@ -46,38 +46,38 @@ static float get_label(char *desc)
 {
     char *endptr, *name = desc;
     regmatch_t pmatch[1];
-    
+
     /* No match found */
-    if (regexec(&re, desc, 1, pmatch, 0)) 
+    if (regexec(&re, desc, 1, pmatch, 0))
         return 0;
 
     name = desc + pmatch[0].rm_so;
     desc[pmatch[0].rm_eo] = 0;
-    
+
     /* Test direct conversion */
     float f = strtof(name, &endptr);
-    
+
     /* Compute hash value */
-    if (!endptr || strlen(endptr) > 0) 
+    if (!endptr || strlen(endptr) > 0)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
-    
+
     return f;
-} 
- 
+}
+
 /**
  * Opens a file for reading text fasta. 
  * @param name File name
  * @return number of fasta or -1 on error
  */
-int input_fasta_open(char *name) 
+int input_fasta_open(char *name)
 {
-    assert(name);    
+    assert(name);
     size_t read, size;
     char *line = NULL;
     const char *pattern;
 
     /* Compile regular expression for label */
-    config_lookup_string(&cfg, "input.fasta_regex", &pattern);    
+    config_lookup_string(&cfg, "input.fasta_regex", &pattern);
     if (regcomp(&re, pattern, REG_EXTENDED) != 0) {
         error("Could not compile regex for label");
         return -1;
@@ -90,7 +90,7 @@ int input_fasta_open(char *name)
     }
 
     int num = 0, cont = FALSE;
-    while(!gzeof(in)) {
+    while (!gzeof(in)) {
         line = NULL;
         read = gzgetline(&line, &size, in);
         if (read > 0)
@@ -105,7 +105,7 @@ int input_fasta_open(char *name)
     }
 
     /* Prepare reading */
-    gzrewind(in);    
+    gzrewind(in);
     return num;
 }
 
@@ -123,16 +123,16 @@ int input_fasta_read(string_t *strs, int len)
     char *line = NULL, *seq = NULL;
 
     while (i < len) {
-        
+
         /* Read line */
         if (old_line) {
             line = old_line;
             read = strlen(line) + 1;
         } else {
-            line = NULL;        
+            line = NULL;
             read = gzgetline(&line, &size, in);
         }
-        old_line = NULL;        
+        old_line = NULL;
 
         /* Trim line */
         if (read >= 0)
@@ -144,27 +144,27 @@ int input_fasta_read(string_t *strs, int len)
             strs[i].len = alloc - 1;
             i++;
         }
-        
+
         /* Stop on read error */
         if (read == -1) {
             free(line);
             break;
         }
-        
+
         /* Reset pointer for next chunk */
         if (i == len) {
             /* Save old line */
             old_line = line;
-#if 0            
+#if 0
             /* Alternative code with slow gzseek */
             gzseek(in, -read, SEEK_CUR);
             free(line);
-#endif            
+#endif
             break;
         }
-        
+
         /* Check for comment char */
-        if (line[0] == ';' || line[0] == '>') {            
+        if (line[0] == ';' || line[0] == '>') {
             /* Start of sequence */
             if (alloc == -1 || alloc > 1) {
                 strs[i].src = strdup(line);
@@ -173,18 +173,18 @@ int input_fasta_read(string_t *strs, int len)
                 alloc = 1;
             }
             goto skip;
-        } 
-        
+        }
+
         /* Skip text before first comment */
         if (alloc == -1)
             goto skip;
-        
+
         /* Append line to sequence */
         alloc += strlen(line);
         seq = realloc(seq, alloc * sizeof(char));
-        strncat(seq, line, strlen(line));        
-                
-skip:        
+        strncat(seq, line, strlen(line));
+
+      skip:
         free(line);
     }
 

@@ -45,12 +45,12 @@ void fhash_put(feat_t k, char *x, int l)
 {
     assert(x && l > 0);
     fentry_t *g, *h;
-    
+
     if (!enabled)
         return;
 
     insertions++;
- 
+
     /* Check for duplicate */
     HASH_FIND(hh, fhash, &k, sizeof(feat_t), g);
 
@@ -133,11 +133,12 @@ void fhash_destroy()
  * Prints the feature hash table. 
  * @param f File pointer
  */
-void fhash_print(FILE *f)
+void fhash_print(FILE * f)
 {
-    fprintf(f, "Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n", 
-             fhash_size(), insertions, collisions, 
-             (collisions * 100.0) / insertions);
+    fprintf(f,
+            "Feature hash table [size: %lu, ins: %lu, cols: %lu (%5.2f%%)]\n",
+            fhash_size(), insertions, collisions,
+            (collisions * 100.0) / insertions);
 }
 
 /**
@@ -153,7 +154,7 @@ unsigned long fhash_size()
  * Writes the feature hash table to a file stream.
  * @param z File pointer
  */
-void fhash_write(gzFile *z)
+void fhash_write(gzFile z)
 {
     fentry_t *f;
     int i;
@@ -175,15 +176,15 @@ void fhash_write(gzFile *z)
  * Reads the feature hash table from a file stream
  * @param z File pointer
  */
-void fhash_read(gzFile *z)
+void fhash_read(gzFile z)
 {
     int i, r;
     unsigned long len;
     char buf[512], str[512];
     feat_t key;
-    
+
     fhash_init();
-    
+
     gzgets(z, buf, 512);
     r = sscanf(buf, "fhash: len=%lu\n", (unsigned long *) &len);
     if (r != 1) {

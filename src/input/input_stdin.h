@@ -9,18 +9,12 @@
  * warranty. See the GNU General Public License for more details. 
  */
 
-#ifndef FMATH_H
-#define FMATH_H
+#ifndef INPUT_STDIN_H
+#define INPUT_STDIN_H
 
-#include "fvec.h"
+/* Stdin module */
+int input_stdin_open(char *);
+int input_stdin_read(string_t *, int);
+void input_stdin_close(void);
 
-void fvec_binarize(fvec_t *fv);
-fvec_t *fvec_clone(fvec_t *);
-double fvec_dot(fvec_t *fa, fvec_t *fb);
-void fvec_add(fvec_t *fa, fvec_t *fb);
-void fvec_times(fvec_t *fa, fvec_t *fb);
-void fvec_mul(fvec_t *f, double s);
-void fvec_log2(fvec_t *f);
-void fvec_invert(fvec_t *f);
-
-#endif /* FMATH_H */
+#endif /* INPUT_STDIN_H */

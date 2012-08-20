@@ -39,21 +39,21 @@ static FILE *f = NULL;
  * @param fn File name
  * @return number of regular files
  */
-int output_libsvm_open(char *fn) 
+int output_libsvm_open(char *fn)
 {
-    assert(fn);    
-    
+    assert(fn);
+
     f = fopen(fn, "w");
     if (!f) {
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
-    
+
     /* Write sally header */
-#if 0    
+#if 0
     sally_version(f, "# ", "Output module for LibSVM format");
-#endif    
-    
+#endif
+
     return TRUE;
 }
 
@@ -71,17 +71,17 @@ int output_libsvm_write(fvec_t **x, int len)
     for (j = 0; j < len; j++) {
         /* Print feature vector */
         fprintf(f, "%g ", x[j]->label);
-        for (i = 0; i < x[j]->len; i++) 
-            fprintf(f, "%llu:%g ", (long long unsigned int)  x[j]->dim[i] + 1, 
+        for (i = 0; i < x[j]->len; i++)
+            fprintf(f, "%llu:%g ", (long long unsigned int) x[j]->dim[i] + 1,
                     x[j]->val[i]);
 
         /* Print source of string */
         if (x[j]->src)
             fprintf(f, "# %s", x[j]->src);
-    
+
         fprintf(f, "\n");
     }
-    
+
     return TRUE;
 }
 

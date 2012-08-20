@@ -39,19 +39,19 @@ static char *path = NULL;
  * @param p Directory name
  * @return number of regular files or -1 on error
  */
-int input_dir_open(char *p) 
+int input_dir_open(char *p)
 {
-    assert(p);    
+    assert(p);
     struct dirent *dp;
     path = p;
-    
+
     /* Open directory */
     dir = opendir(path);
     if (!dir) {
         error("Could not open directory '%s'", path);
         return -1;
     }
-    
+
     /* Count files */
     int num_files = 0;
     while (dir && (dp = readdir(dir)) != NULL) {
@@ -73,34 +73,34 @@ int input_dir_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
     int i, j = 0, l;
-    
+
     /* Determine maximum path length and allocate buffer */
     int maxlen = fpathconf(dirfd(dir), _PC_NAME_MAX);
-    
+
     /* Load block of files */
     for (i = 0; i < len; i++) {
         struct dirent *buf, *dp;
         buf = malloc(offsetof(struct dirent, d_name) + maxlen + 1);
-        
+
         /* Read directory entry to local buffer */
         int r = readdir_r(dir, (struct dirent *) buf, &dp);
         if (r != 0 || !dp) {
             free(buf);
             return j;
         }
-        
+
         /* Skip all entries except for regular files and symlinks */
-        fix_dtype(path, dp);        
-        if (dp->d_type != DT_REG && dp->d_type != DT_LNK) 
+        fix_dtype(path, dp);
+        if (dp->d_type != DT_REG && dp->d_type != DT_LNK)
             goto skip;
-        
+
         strs[j].str = load_file(path, dp->d_name, &l);
         strs[j].src = strdup(dp->d_name);
         strs[j].len = l;
         strs[j].label = get_label(strs[j].src);
         j++;
-    skip:
-        free(buf);	
+      skip:
+        free(buf);
     }
 
     return j;
@@ -129,7 +129,7 @@ static char *load_file(char *path, char *name, int *size)
     char *x = NULL, file[512];
     struct stat st;
 
-#ifdef ENABLE_OPENMP    
+#ifdef ENABLE_OPENMP
 #pragma omp critical (snprintf)
 #endif
     {
@@ -139,14 +139,14 @@ static char *load_file(char *path, char *name, int *size)
         else
             snprintf(file, 512, "%s", path);
     }
-    
+
     /* Open file */
     FILE *fptr = fopen(file, "r");
     if (!fptr) {
         warning("Could not open file '%s'", file);
         return NULL;
     }
-    
+
     /* Allocate memory */
     stat(file, &st);
     *size = st.st_size;
@@ -154,13 +154,13 @@ static char *load_file(char *path, char *name, int *size)
         warning("Could not allocate memory for file data");
         return NULL;
     }
-    
+
     /* Read data */
     read = fread(x, sizeof(char), *size, fptr);
     fclose(fptr);
     if (*size != read)
         warning("Could not read all data from file '%s'", file);
-    
+
     return x;
 }
 
@@ -175,24 +175,24 @@ static float get_label(char *desc)
 {
     char *endptr;
     char *name = desc + strlen(desc) - 1;
-    
+
     /* Determine dot in file name */
     while (name != desc && *name != '.')
-        name--; 
-    
+        name--;
+
     /* Place pointer before '.' */
     if (name != desc)
         name++;
-    
+
     /* Test direct conversion */
     float f = strtof(name, &endptr);
-    
+
     /* Compute hash value */
-    if (!endptr || strlen(endptr) > 0) 
+    if (!endptr || strlen(endptr) > 0)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
-    
+
     return f;
-} 
+}
 
 static void fix_dtype(char *path, struct dirent *dp)
 {
@@ -211,4 +211,3 @@ static void fix_dtype(char *path, struct dirent *dp)
 
 
 /** @} */
-

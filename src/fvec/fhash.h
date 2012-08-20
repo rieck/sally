@@ -16,18 +16,19 @@
 
 #ifdef HAVE_UTHASH_UTHASH_H
 #include <uthash/uthash.h>
-#else 
+#else
 #ifdef HAVE_UTHASH_H
 #include <uthash.h>
 #else
 #include "uthash.h"
 #endif
-#endif 
+#endif
 
 /** 
  * Entry of feature hash
  */
-typedef struct {
+typedef struct
+{
     feat_t key;            /**< Feature key */
     char *data;            /**< Feature data */
     int len;               /**< Length of data */
@@ -42,8 +43,8 @@ void fhash_put(feat_t, char *, int);
 fentry_t *fhash_get(feat_t);
 unsigned long fhash_size();
 void fhash_print(FILE *);
-void fhash_write(gzFile *f);
-void fhash_read(gzFile *f);
+void fhash_write(gzFile f);
+void fhash_read(gzFile f);
 int fhash_enabled();
 
-#endif                          /* FHASH_H */
+#endif /* FHASH_H */

@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *               Christian Wressnegger (chwress@idalab.de)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -27,7 +28,7 @@
 #include <regex.h>
 
 /** Static variable */
-static gzFile *in; 
+static gzFile in;
 static regex_t re;
 static int line_num = 0;
 
@@ -48,13 +49,13 @@ static float get_label(char *line)
     regmatch_t pmatch[1];
 
     /* No match found */
-    if (regexec(&re, line, 1, pmatch, 0)) 
-	return 0;
+    if (regexec(&re, line, 1, pmatch, 0))
+        return 0;
 
     name = line + pmatch[0].rm_so;
     old = line[pmatch[0].rm_eo];
     line[pmatch[0].rm_eo] = 0;
-    
+
     /* Test direct conversion */
     float f = strtof(name, &endptr);
 
@@ -63,7 +64,7 @@ static float get_label(char *line)
         f = MurmurHash64B(name, strlen(name), 0xc0d3bab3) % 0xffff;
 
     line[pmatch[0].rm_eo] = old;
-    
+
     /* Shift string. This is very inefficient. I know */
     memmove(line, line + pmatch[0].rm_eo, strlen(line) - pmatch[0].rm_eo + 1);
     return f;
@@ -74,9 +75,9 @@ static float get_label(char *line)
  * @param name File name
  * @return number of lines or -1 on error
  */
-int input_lines_open(char *name) 
+int input_lines_open(char *name)
 {
-    assert(name);    
+    assert(name);
     const char *pattern;
 
     in = gzopen(name, "r");
@@ -93,12 +94,15 @@ int input_lines_open(char *name)
     }
 
     /* Count lines in file (I hope this is buffered)*/
-    int c, num_lines = 0;
+    int c = -1, prev, num_lines = 0;
     do {
+        prev = c;
         c = gzgetc(in);
         if (c == '\n')
             num_lines++;
     } while(c != -1);
+
+    if (prev >= 0 && prev != '\n') num_lines++;
 
     /* Prepare reading */
     gzrewind(in);
@@ -111,7 +115,7 @@ int input_lines_open(char *name)
  * Reads a block of files into memory.
  * @param strs Array for data
  * @param len Length of block
- * @return number of read files
+ * @return number of lines read into memory
  */
 int input_lines_read(string_t *strs, int len)
 {
@@ -121,19 +125,17 @@ int input_lines_read(string_t *strs, int len)
     char buf[32], *line = NULL;
 
     for (i = 0; i < len; i++) {
-        line = NULL;        
+        line = NULL;
         read = gzgetline(&line, &size, in);
         if (read == -1) {
             free(line);
             break;
         }
         
-        if (strlen(line) == 0) {
-            line_num++;
-            continue;
-        }
+        /* Strip newline characters */
+        strip_newline(line, read);
 
-	strs[i].label = get_label(line);
+        strs[j].label = get_label(line);
         strs[j].str = line;
         strs[j].len = strlen(line);
 
@@ -141,7 +143,7 @@ int input_lines_read(string_t *strs, int len)
         strs[j].src = strdup(buf);
         j++;
     }
-    
+
     return j;
 }
 
@@ -155,3 +157,4 @@ void input_lines_close()
 }
 
 /** @} */
+

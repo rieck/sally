@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_LINES_H
 #define INPUT_LINES_H
 
@@ -17,4 +17,4 @@ int input_lines_open(char *);
 int input_lines_read(string_t *, int);
 void input_lines_close(void);
 
-#endif                          /* INPUT_LINES_H */
+#endif /* INPUT_LINES_H */

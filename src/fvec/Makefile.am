@@ -10,3 +10,9 @@ libfvec_la_SOURCES	= fhash.c fhash.h fvec.c fvec.h \
 			  fmath.c fmath.h embed.c embed.h \
 			  norm.c norm.h
 
+beautify:
+	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \
+		-T fvec_t -T string_t -T gzFile -T feat_t \
+		-T fentry_t \
+		$(libfvec_la_SOURCES)
+	

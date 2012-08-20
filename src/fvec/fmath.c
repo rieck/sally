@@ -26,10 +26,10 @@
  * Binarizes the components of a feature vector.
  * @param fv Feature vector
  */
-void fvec_binarize(fvec_t *fv) 
+void fvec_binarize(fvec_t *fv)
 {
     assert(fv);
-    
+
     int i;
     for (i = 0; i < fv->len; i++)
         fv->val[i] = 1.0;
@@ -48,25 +48,25 @@ fvec_t *fvec_clone(fvec_t *o)
     assert(o);
     fvec_t *fv;
     unsigned int i;
-    
+
     /* Allocate feature vector */
     fv = calloc(1, sizeof(fvec_t));
     if (!fv) {
         error("Could not clone feature vector");
         return NULL;
     }
-    
+
     /* Clone structure */
     fv->len = o->len;
     fv->total = o->total;
-    
+
     if (o->src)
         fv->src = strdup(o->src);
-    
+
     /* Check for empty sequence */
     if (o->len == 0)
         return fv;
-    
+
     fv->dim = (feat_t *) malloc(o->len * sizeof(feat_t));
     fv->val = (float *) malloc(o->len * sizeof(float));
     if (!fv->dim || !fv->val) {
@@ -74,12 +74,12 @@ fvec_t *fvec_clone(fvec_t *o)
         fvec_destroy(fv);
         return NULL;
     }
-    
+
     for (i = 0; i < o->len; i++) {
         fv->dim[i] = o->dim[i];
         fv->val[i] = o->val[i];
     }
-    
+
     return fv;
 }
 
@@ -94,7 +94,7 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
     assert(fa && fb);
     feat_t *dim;
     float *val;
-    
+
     /* Allocate arrays */
     dim = (feat_t *) malloc((fa->len + fb->len) * sizeof(feat_t));
     val = (float *) malloc((fa->len + fb->len) * sizeof(float));
@@ -102,7 +102,7 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
         error("Could not allocate feature vector contents");
         return;
     }
-    
+
     /* Loop over features in a and b */
     while (i < fa->len && j < fb->len) {
         if (fa->dim[i] > fb->dim[j]) {
@@ -116,7 +116,7 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
             val[len++] = (float) (fa->val[i++] + fb->val[j++]);
         }
     }
-    
+
     /* Loop over remaining features  */
     while (j < fb->len) {
         dim[len] = fb->dim[j];
@@ -126,16 +126,16 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
         dim[len] = fa->dim[i];
         val[len++] = fa->val[i++];
     }
-    
+
     /* Free old memory */
     free(fa->dim);
     free(fa->val);
-    
+
     /* Update */
     fa->dim = dim;
     fa->val = val;
     fa->len = len;
-    
+
     /* Reallocate memory */
     fvec_realloc(fa);
 }
@@ -148,7 +148,7 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
 void fvec_times(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0, p, q, k;
-    
+
     /* Loop over dimensions fa */
     for (i = 0, j = 0; j < fa->len; j++) {
         /* Binary search */
@@ -164,7 +164,7 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
                 break;
             }
         } while (i != k);
-        
+
         /* No match */
         if (i == k)
             fa->val[j] = 0;
@@ -183,13 +183,13 @@ static double fvec_dot_bsearch(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0, p, q, k;
     double s = 0;
-    
+
     /* Check if fa is larger than fb */
     if (fa->len < fb->len) {
         fvec_t *tmp = fa;
         fa = fb, fb = tmp;
     }
-    
+
     /* Loop over dimensions fb */
     for (i = 0, j = 0; j < fb->len; j++) {
         /* Binary search */
@@ -206,7 +206,7 @@ static double fvec_dot_bsearch(fvec_t *fa, fvec_t *fb)
             }
         } while (i != k);
     }
-    
+
     return s;
 }
 
@@ -221,7 +221,7 @@ static double fvec_dot_loop(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0;
     double s = 0;
-    
+
     /* Loop over features in a and b */
     while (i < fa->len && j < fb->len) {
         if (fa->dim[i] > fb->dim[j]) {
@@ -232,7 +232,7 @@ static double fvec_dot_loop(fvec_t *fa, fvec_t *fb)
             s += fa->val[i++] * fb->val[j++];
         }
     }
-    
+
     return s;
 }
 
@@ -249,14 +249,14 @@ double fvec_dot(fvec_t *fa, fvec_t *fb)
 {
     assert(fa && fb);
     double a, b;
-    
+
     /* Sort vectors according to size */
     if (fa->len > fb->len) {
         a = (double) fa->len, b = (double) fb->len;
     } else {
         b = (double) fa->len, a = (double) fb->len;
     }
-    
+
     /* Choose dot functions */
     if (a + b > ceil(b * log2(a)))
         return fvec_dot_bsearch(fa, fb);
@@ -274,7 +274,7 @@ void fvec_mul(fvec_t *f, double s)
 {
     int i = 0;
     assert(f);
-    
+
     for (i = 0; i < f->len; i++)
         f->val[i] = (float) (f->val[i] * s);
 }
@@ -287,7 +287,7 @@ void fvec_log2(fvec_t *f)
 {
     int i = 0;
     assert(f);
-    
+
     for (i = 0; i < f->len; i++)
         f->val[i] = (float) log2(f->val[i]);
 }
@@ -300,7 +300,7 @@ void fvec_invert(fvec_t *f)
 {
     int i = 0;
     assert(f);
-    
+
     for (i = 0; i < f->len; i++)
         f->val[i] = (float) 1.0 / f->val[i];
 }

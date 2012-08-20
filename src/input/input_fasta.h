@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_FASTA_H
 #define INPUT_FASTA_H
 
@@ -17,4 +17,4 @@ int input_fasta_open(char *);
 int input_fasta_read(string_t *, int);
 void input_fasta_close(void);
 
-#endif                          /* INPUT_FASTA_H */
+#endif /* INPUT_FASTA_H */

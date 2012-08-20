@@ -37,7 +37,7 @@ int test_embed_tfidf()
     config_set_string(&cfg, "features.tfidf_file", TEST_TFIDF);
 
     idf_create(TEST_FILE);
-    
+
     input_config("lines");
     n = input_open(TEST_FILE);
     input_read(strs, n);
@@ -53,16 +53,16 @@ int test_embed_tfidf()
     fvec_invert(w);
     fvec_mul(w, n);
     fvec_log2(w);
-    
+
     /* Invert w for multipling out IDFs */
     fvec_invert(w);
 
-    test_printf("Testing TFIDF embedding");    
+    test_printf("Testing TFIDF embedding");
     config_set_string(&cfg, "features.vect_embed", "tfidf");
     for (i = 0, err = 0; i < n; i++) {
         fvec_t *fv = fvec_extract(strs[i].str, strs[i].len);
         fvec_times(fv, w);
-        
+
         /* Check if rest tf */
         double n = 0;
         for (j = 0; j < fv->len; j++)
@@ -72,10 +72,10 @@ int test_embed_tfidf()
     }
     test_return(err, n);
 
-    fvec_destroy(w);    
+    fvec_destroy(w);
     input_free(strs, n);
-    input_close();    
-    
+    input_close();
+
     idf_destroy();
     unlink(TEST_TFIDF);
 
@@ -107,9 +107,9 @@ int test_embed_bin()
         fvec_destroy(fv);
     }
     test_return(err, n);
-    
+
     input_free(strs, n);
-    input_close();    
+    input_close();
     return err;
 }
 
@@ -136,9 +136,9 @@ int test_norm_l2()
         fvec_destroy(fv);
     }
     test_return(err, n);
-    
+
     input_free(strs, n);
-    input_close();    
+    input_close();
     return err;
 }
 
@@ -165,9 +165,9 @@ int test_norm_l1()
         fvec_destroy(fv);
     }
     test_return(err, n);
-    
+
     input_free(strs, n);
-    input_close();    
+    input_close();
     return err;
 }
 
@@ -185,7 +185,7 @@ int main(int argc, char **argv)
     config_set_string(&cfg, "features.ngram_delim", " .,%0a%0d");
     config_set_int(&cfg, "features.ngram_len", 1);
     config_set_string(&cfg, "input.input_format", "lines");
-    
+
     err |= test_norm_l1();
     err |= test_norm_l2();
     err |= test_embed_tfidf();

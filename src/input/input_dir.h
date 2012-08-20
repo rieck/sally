@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_DIR_H
 #define INPUT_DIR_H
 
@@ -17,4 +17,4 @@ int input_dir_open(char *);
 int input_dir_read(string_t *, int);
 void input_dir_close(void);
 
-#endif                          /* INPUT_DIR_H */
+#endif /* INPUT_DIR_H */

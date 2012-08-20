@@ -16,4 +16,4 @@
 
 void fvec_norm(fvec_t *fv, const char *);
 
-#endif                          /* NORM_H */
+#endif /* NORM_H */

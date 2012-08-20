@@ -41,7 +41,7 @@ static uint32_t bytes = 0;
 /* Fields */
 #define NUM_FIELDS  4
 #define FIELD_LEN   8
-char *fields[] = { "data", "src", "label", "feat" }; 
+char *fields[] = { "data", "src", "label", "feat" };
 
 
 /**
@@ -56,7 +56,7 @@ static int fpad(FILE *f)
 
     for (i = 0; i < r; i++)
         fputc(0, f);
-    
+
     return r;
 }
 
@@ -182,7 +182,7 @@ static int fwrite_string(char *s, FILE *f)
     r += fwrite_uint32(l * 2, f);
 
     /* Write characters */
-    for (i = 0; i < l ; i++)
+    for (i = 0; i < l; i++)
         r += fwrite_uint16(s[i], f);
     r += fpad(f);
 
@@ -216,7 +216,7 @@ static int fwrite_fvec_data(fvec_t *fv, FILE *f)
     /* Row indices */
     r += fwrite_uint32(MAT_TYPE_INT32, f);
     r += fwrite_uint32(fv->len * sizeof(uint32_t), f);
-    for (i = 0; i < fv->len; i++) 
+    for (i = 0; i < fv->len; i++)
         r += fwrite_uint32(fv->dim[i] & 0x7FFFFFFF, f);
     r += fpad(f);
 
@@ -229,10 +229,10 @@ static int fwrite_fvec_data(fvec_t *fv, FILE *f)
     /* Data  */
     r += fwrite_uint32(MAT_TYPE_DOUBLE, f);
     r += fwrite_uint32(fv->len * sizeof(double), f);
-    for (i = 0; i < fv->len; i++) 
+    for (i = 0; i < fv->len; i++)
         r += fwrite_double(fv->val[i], f);
     r += fpad(f);
-  
+
     /* Update size in tag */
     fseek(f, -(r + 4), SEEK_CUR);
     fwrite_uint32(r, f);
@@ -257,13 +257,13 @@ static int fwrite_field_names(FILE *f)
 
     r += fwrite_uint32(MAT_TYPE_INT8, f);
     r += fwrite_uint32(NUM_FIELDS * FIELD_LEN, f);
-    for (i = 0; i < NUM_FIELDS; i++)  {
+    for (i = 0; i < NUM_FIELDS; i++) {
         int l = strlen(fields[i]);
         assert(i < 8);
         fwrite(fields[i], 1, l, f);
-        r += l + fpad(f); 
+        r += l + fpad(f);
     }
-    
+
     return r;
 }
 
@@ -297,7 +297,7 @@ static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
 
     /* Header */
     r += fwrite_array_flags(0, MAT_CLASS_CELL, 0, f);
-    if (fhash_enabled()) 
+    if (fhash_enabled())
         r += fwrite_array_dim(1, fv->len, f);
     else
         r += fwrite_array_dim(1, 0, f);
@@ -306,7 +306,7 @@ static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
     /* Features */
     for (i = 0; fhash_enabled() && i < fv->len; i++) {
 
-        fentry_t *fe = fhash_get(fv->dim[i]);        
+        fentry_t *fe = fhash_get(fv->dim[i]);
         for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
             if (isprint(fe->data[j]) && !strchr("%", fe->data[k])) {
                 buf[k] = fe->data[j];
@@ -368,29 +368,29 @@ static int fwrite_fvec_label(fvec_t *fv, FILE *f)
  * @param fn File name
  * @return number of regular files
  */
-int output_matlab_open(char *fn) 
+int output_matlab_open(char *fn)
 {
-    assert(fn);  
+    assert(fn);
     int r = 0;
-    
+
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
     if (bits > 31) {
         error("Matlab can not handle features with more than 31 bits");
         return FALSE;
     }
-    
-    /* Open main file */    
+
+    /* Open main file */
     f = fopen(fn, "w");
     if (!f) {
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
-    
+
     /* Write matlab header */
     r += sally_version(f, "", "Output module for Matlab format (v5)");
     while (r < 124 && r > 0)
         r += fprintf(f, " ");
-    
+
     /* Write version header */
     r += fwrite_uint16(0x0100, f);
     r += fwrite_uint16(0x4d49, f);
@@ -398,11 +398,11 @@ int output_matlab_open(char *fn)
         error("Could not write header to output file '%s'.", fn);
         return FALSE;
     }
-    
+
     /* Write tag of struct array */
     fwrite_uint32(MAT_TYPE_ARRAY, f);
-    fwrite_uint32(0, f);   
- 
+    fwrite_uint32(0, f);
+
     /* Here we go. Start a struct rray */
     r = fwrite_array_flags(0, MAT_CLASS_STRUCT, 0, f);
     r += fwrite_array_dim(1, 0, f);
@@ -411,7 +411,7 @@ int output_matlab_open(char *fn)
 
     elements = 0;
     bytes = r;
-    
+
     return TRUE;
 }
 
@@ -433,7 +433,7 @@ int output_matlab_write(fvec_t **x, int len)
         bytes += fwrite_fvec_feat(x[j], f);
         elements++;
     }
-    
+
     return TRUE;
 }
 

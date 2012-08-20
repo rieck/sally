@@ -22,7 +22,8 @@
 
 #define MD5_DIGEST_LENGTH 	16
 
-struct MD5Context {
+struct MD5Context
+{
     uint32_t buf[4];
     uint32_t bits[2];
     unsigned char in[64];

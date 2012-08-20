@@ -1,24 +1,155 @@
-2012-02-06  Konrad Rieck <konrad@mlsec.org>
+2012-08-17  Konrad Rieck <konrad@mlsec.org>
 
-  * configure.in: updated incorrect version number
+  * src/input/input.c, src/sally.c: exit if stop word file no available but
+  requested
 
-  * CHANGES: new release done
+  * src/fvec/fvec.c, src/fvec/fvec.h, src/input/input.c, src/sally.c,
+  src/util.c, src/util.h, tests/test_fvec.c: refactored delimiter setup
 
-  * configure.in: new release
+  * src/fvec/fvec.c, src/input/Makefile.am, src/input/input.c,
+  src/input/input.h, src/input/input_lines.c, src/sally.c, src/util.c,
+  src/util.h: basic framework for stopwords
+
+  * .gitignore, src/sally.h: added missing header (thanks to Andreas Ziehe)
+
+  * doc/sally.pod, src/sally.c, src/sconfig.c, src/sconfig.h: stop words
+  require the definition of delimiters
+
+  * CHANGES, doc/Makefile.am: added missing file to automake
+
+  * configure.in, doc/plots/enron.pdf, doc/plots/plot_runtime.py,
+  doc/plots/sprot.pdf, src/fvec/fvec.c: added run-time eval code to master
+
+  * doc/example.cfg, doc/sally.pod: added documentation for stop words
+
+  * src/sally.c, src/sconfig.c: support for configuring stop words
+
+2012-08-16  Konrad Rieck <konrad@mlsec.org>
+
+  * doc/example.cfg, doc/sally.pod, src/input/input.c, src/sally.c,
+  src/sconfig.c: support for reversing of strings
+
+  * README.md, doc/sally.pod: fixed wrong email in docs
+
+  * compile, doc/Makefile.am, doc/example.cfg, doc/sally.cfg, doc/sally.pod,
+  src/Makefile.am, src/sally.c, src/sally.h.in: removed global configuration
+  file
+
+  * src/sally.c, src/sconfig.c: support for printing the default configuration
+
+2012-08-13  Konrad Rieck <konrad@mlsec.org>
+
+  * src/input/input.c, src/input/input_lines.c: added christian as author
+
+  * CHANGES, README.md, doc/sally.pod: added new authors
+
+  * compile, doc/sally.pod, src/input/input_stdin.c, src/input/input_stdin.h:
+  fixes to stdin module
+
+2012-08-09  Alexander Bikadorov <abiku@cs.tu-berlin.de>
+
+  * doc/sally.cfg, doc/sally.pod, src/input/Makefile.am, src/input/input.c,
+  src/input/input_stdin.c, src/input/input_stdin.h: added stdin input module
+
+2012-08-06  Konrad Rieck <konrad@mlsec.org>
+
+  * doc/sally.cfg, src/sconfig.c: synchronized sally.cfg and sconfig.c (thx to
+  chwress)
+
+2012-05-26  Konrad Rieck <konrad@mlsec.org>
+
+  * CHANGES, Makefile.am, README, README.md: added md README
+
+2012-05-14  Konrad Rieck <konrad@mlsec.org>
+
+  * contrib/sally_sparsematrix.r, doc/sally.pod, src/sally.c: minor fixes to
+  man page
+
+  * README, doc/sally.pod: fixed typo
+
+  * CHANGES, README, configure.in: fixed configure
+
+2012-05-13  Konrad Rieck <konrad@mlsec.org>
+
+  * compile, src/fvec/fvec.c: fixed broken md5 copy
+
+  * src/fvec/fhash.c, src/fvec/fhash.h, src/fvec/fvec.c, src/fvec/fvec.h,
+  src/input/input_fasta.c, src/input/input_lines.c, src/util.c, src/util.h,
+  tests/test_fhash.c, tests/test_fvec.c: fixed gzfile pointer madness
+
+  * CHANGES, README, compile: added note about zlib dep
+
+  * CHANGES, compile, configure.in: new release
+
+  * README, doc/sally.pod: spell check
+
+2012-04-23  Konrad Rieck <konrad@mlsec.org>
+
+  * tests/Makefile.am, tests/test_embed.c, tests/test_fhash.c,
+  tests/test_fvec.c: code cleanup 6
+
+  * src/Makefile.am, src/common.h, src/md5.c, src/md5.h, src/murmur.c,
+  src/murmur.h, src/sally.c, src/sconfig.c, src/sconfig.h, src/uthash.h,
+  src/util.c, src/util.h: code cleanup 5
+
+  * src/Makefile.am, src/sally.c: code cleanup 4
+
+  * src/input/Makefile.am, src/output/Makefile.am, src/output/output.c,
+  src/output/output.h, src/output/output_cluto.c, src/output/output_cluto.h,
+  src/output/output_libsvm.c, src/output/output_libsvm.h,
+  src/output/output_matlab.c, src/output/output_matlab.h,
+  src/output/output_text.c, src/output/output_text.h: code cleanup 3
+
+  * src/input/Makefile.am, src/input/input.c, src/input/input.h,
+  src/input/input_arc.c, src/input/input_arc.h, src/input/input_dir.c,
+  src/input/input_dir.h, src/input/input_fasta.c, src/input/input_fasta.h,
+  src/input/input_lines.c, src/input/input_lines.h: code cleanup 2
+
+  * src/fvec/Makefile.am, src/fvec/embed.c, src/fvec/embed.h, src/fvec/fhash.c,
+  src/fvec/fhash.h, src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c,
+  src/fvec/fvec.h, src/fvec/norm.c, src/fvec/norm.h: code cleanup 1
+
+2012-03-01  Konrad Rieck <konrad@mlsec.org>
+
+  * doc/plots/enron.pdf, doc/plots/plot_runtime.py, doc/plots/sprot.pdf:
+  changed legend
+
+  * doc/plots/enron.pdf, doc/plots/plot_runtime.py, doc/plots/sprot.pdf: some
+  results
+
+2012-02-21  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fvec.c, src/sally.c: removed some brackets
+
+  * src/fvec/fvec.c, src/fvec/norm.c: support for signed embedding added
+
+  * doc/sally.cfg, src/sally.c, src/sconfig.c: added framework for new option
+
+2012-02-10  Konrad Rieck <konrad@mlsec.org>
+
+  * src/common.h, src/libsally/common.h, src/libsally/embed.c,
+  src/libsally/embed.h, src/libsally/norm.c, src/libsally/norm.h,
+  src/libsally/util.c, src/libsally/util.h, src/util.c, src/util.h: first
+  cleanup of lib dir
+
+  * configure.in, src/Makefile.am, src/common.h, src/fvec/Makefile.am,
+  src/fvec/embed.c, src/fvec/embed.h, src/fvec/fhash.c, src/fvec/fhash.h,
+  src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c, src/fvec/fvec.h,
+  src/fvec/norm.c, src/fvec/norm.h, src/libsally/Makefile.am,
+  src/libsally/common.h, src/libsally/embed.c, src/libsally/embed.h,
+  src/libsally/fhash.c, src/libsally/fhash.h, src/libsally/fmath.c,
+  src/libsally/fmath.h, src/libsally/fvec.c, src/libsally/fvec.h,
+  src/libsally/md5.c, src/libsally/md5.h, src/libsally/murmur.c,
+  src/libsally/murmur.h, src/libsally/norm.c, src/libsally/norm.h,
+  src/libsally/uthash.h, src/libsally/util.c, src/libsally/util.h, src/md5.c,
+  src/md5.h, src/murmur.c, src/murmur.h, src/output/Makefile.am, src/uthash.h,
+  src/util.c, src/util.h, tests/Makefile.am: destroyed structure. hmm.
 
 2012-02-05  Konrad Rieck <konrad@mlsec.org>
-
-  * doc/sally.pod: added note about sorted n-grams
-
-  * doc/sally.pod: added note about decoding
 
   * doc/sally.cfg, src/fvec/fvec.c: code for sorting bytes in n-grams
 
   * src/fvec/fvec.c, src/fvec/fvec.h: code for sorting words in n-grams
-
-  * src/util.c: minor fix to decoding function
-
-  * src/sally.c: missin comma added
 
   * doc/sally.cfg, src/sally.c, src/sconfig.c: added config switches
 
@@ -26,13 +157,9 @@
   src/input/input.h, src/sally.c, src/sconfig.c, src/util.c, src/util.h: added
   support for decoding strings with URI encoding
 
-  * README: further fixed README
-
   * README, bootstrap: switched to libtoolize
 
 2012-02-04  Konrad Rieck <konrad@mlsec.org>
-
-  * .gitignore: another dir to ignore
 
   * src/fvec/fhash.c, src/util.c, src/util.h: moved decode function to util
 
@@ -40,59 +167,18 @@
 
   * bootstrap, compile, tests/test_fhash.c: sync
 
-2011-10-20  Konrad Rieck <konrad@mlsec.org>
-
-  * compile: Adapted flags to GWDG cluster
-
 2011-10-19  Konrad Rieck <konrad@mlsec.org>
-
-  * compile: adapted compile script
-
-  * src/sally.c: added cmd switch
-
-  * src/fvec/fvec.c: first running version of pos ngrams
 
   * src/fvec/fvec.c, src/sally.c, src/sconfig.c: half version of positional
   n-grams. explicit reprepresentation at least incorrect
 
-  * src/fvec/fvec.c: moved hash computation to extra func
-
-  * src/fvec/fvec.c: moved cfg into extraction functions
-
   * doc/sally.cfg, doc/sally.pod, src/sconfig.c: config for positional n-grams
 
-  * src/fvec/fvec.c: fixed bug from debuggin
-
-2011-08-22  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/input/input_fasta.c: fixed nasty bug in fasta module
-
-  * compile: minor changes
-
-2011-08-16  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * bootstrap: removed annoying -x in bootstrap script
-
-2011-07-12  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/output/output_text.c: fixed annoying bug in feature output (credits to
-  t. krueger)
-
-2011-07-10  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * CHANGES: sync
-
 2011-07-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * doc/sally.pod: further comments about run-time behavior
 
   * doc/sally.cfg, doc/sally.pod: added note about dimensionality
 
 2011-07-05  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * configure.in: version change
-
-  * src/output/output_cluto.c: minor bug fix in output module
 
   * .gitignore, CHANGES, compile, doc/sally.cfg, doc/sally.pod,
   src/output/Makefile.am, src/output/output.c, src/output/output_cluto.c,
@@ -103,37 +189,15 @@
   * CHANGES, README, TODO, configure.in, doc/Makefile.am, src/fvec/fhash.c:
   added missing config file
 
-2011-03-09  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * doc/sally.pod: minor fix
-
 2011-02-21  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
-  * CHANGES: final release
-
-  * doc/sally.pod: minor typos fixed
-
   * configure.in, src/sally.c: new release approaching
-
-  * doc/sally.pod: further extended man page
-
-  * doc/sally.pod: extended man page
 
 2011-01-17  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * src/Makefile.am, src/input/input_lines.c, src/sally.c: linux fixes
 
-2011-01-11  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/sally.c: fixed bug in command line arguments
-
 2011-01-06  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/sally.c: fixed minor bugs in config parsing
-
-  * src/sally.c: additional check of config
-
-  * .gitignore: filter for auto-generated header
 
   * doc/Makefile.am, doc/example.cfg, doc/sally.cfg, src/Makefile.am,
   src/fvec/embed.c, src/sally.c, src/sally.h, src/sally.h.in,
@@ -142,12 +206,8 @@
 
 2011-01-04  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
-  * src/sally.c: updated help screen. longopts code will follow tommorrow.
-
   * doc/example.cfg, doc/sally.pod, src/sally.c, src/sconfig.c: changed names
   of format parameters
-
-  * src/input/input_lines.c: removed minor memory leak
 
   * doc/example.cfg, src/input/input_fasta.c, src/input/input_lines.c: fixed
   regex matching
@@ -159,16 +219,8 @@
 
 2011-01-02  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
-  * doc/sally.pod: started to update the man pagee
-
   * doc/Makefile.am, doc/example.cfg, src/sconfig.c: extended example
   configuration
-
-2010-12-21  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * contrib/sally_sparsematrix.r: important fix: added newline to eof
-
-  * contrib/sally_sparsematrix.r: fixed wrong skip lines
 
 2010-12-17  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
@@ -176,10 +228,6 @@
   contrib/sally_struct2mat.m: sanitized contributions directory
 
   * contrib/sally_sparsematrix.r, contrib/sally_struct2mat.m: new contrib
-
-2010-12-10  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/input/input_lines.c: removed space from src field of line module
 
 2010-10-08  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
@@ -198,8 +246,6 @@
   directory and simple matlab function
 
 2010-10-01  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * doc/sally.pod: updated manpage
 
   * doc/example.cfg, src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c,
   src/sconfig.c: removed trim functionality as it badly interfers with
@@ -224,21 +270,12 @@
   src/output/output_matlab.c, src/output/output_text.c: improved documentation
   of output and input modules
 
-  * src/output/output_matlab.c: started rewrite of matlab module
-
 2010-09-30  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * CHANGES, MANPAGE, Makefile.am, README, TODO, configure.in, doc/Makefile.am,
   doc/git2changes.py: updated documentation
 
-  * src/input/input_fasta.c: replaced strlcat with strncat for compatibility.
-  got a bad feeling now
-
 2010-09-29  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * README: update to README
-
-  * doc/sally.pod: spell fixes in manual
 
   * configure.in, doc/example.cfg: release version 0.5.0
 
@@ -249,8 +286,6 @@
   * README, doc/sally.pod: further extensions to manual
 
   * README, doc/sally.pod: minor fix to manual
-
-  * TODO: new TODOs
 
 2010-09-23  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
@@ -291,17 +326,9 @@
   * configure.in, m4/pkg.m4, src/fmath.c, src/fmath.h: added code from Cujo
   project
 
-2010-09-14  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/fmath.c: fixed bug
-
 2010-09-07  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
   * README, doc/doxygen.cfg, doc/sally.pod: extended documentation
-
-  * configure.in: new version with matlab support
-
-  * doc/sally.pod: spell fixes in man page
 
   * README, doc/sally.pod: updated documentation
 
@@ -315,8 +342,6 @@
 
   * src/output/Makefile.am, src/output/output.c, src/output/output_matlab.c,
   src/output/output_matlab.h: template for matlab support
-
-  * src/fmath.c: commented clone function
 
 2010-09-04  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
@@ -350,16 +375,12 @@
   * src/common.h, src/input/input_dir.c: added patch for filesystems that do
   not return d_type
 
-  * src/common.h: enabled GNU libc functions
-
   * compile, src/fvec.c, src/input/input_dir.c, tests/test_fvec.c: fixes to
   disable all openmp directives
 
 2010-08-27  Konrad Rieck <konrad@mlsec.org>
 
   * configure.in, doc/example.cfg, src/output/output_list.c: next alpha release
-
-  * src/sally.c: removed openmp in main loop
 
   * doc/example.cfg, src/fvec.c, src/input/input_dir.c,
   src/input/input_lines.c, src/sally.c, src/util.c, src/util.h: minor fixes and
@@ -395,8 +416,6 @@
 
 2010-08-26  Konrad Rieck <konrad.rieck@tu-berlin.de>
 
-  * tests/test_fvec.c: forgot test files
-
   * doc/example.cfg, src/fmath.c, src/sally.c: updated documentation
 
   * doc/example.cfg, src/fhash.c, src/fhash.h, src/fvec.c,
@@ -405,10 +424,6 @@
   for exporting list of features
 
 2010-08-20  Konrad Rieck <konrad.rieck@tu-berlin.de>
-
-  * src/sally.c: added info messages
-
-  * src/sally.c: fixed nasty bug in exportmake
 
   * compile, src/fhash.c, src/fmath.c, src/fvec.c, src/input/input_arc.c,
   src/output/output_libsvm.c, src/sally.c: fixed nasty bug in export
@@ -452,11 +467,7 @@
 
   * src/sconfig.c, src/sconfig.h: configuration stuff
 
-  * configure.in: added checks for libconfig, libm and libz
-
   * src/input/input_arc.c, src/input/input_dir.c: minor fixes
-
-  * src/input/README: input format
 
   * src/input/README, src/input/input.c, src/input/input_arc.c,
   src/input/input_dir.c: added short tutorial on how to develop input modules
@@ -466,8 +477,6 @@
   improved interfaces
 
 2010-08-15  Konrad Rieck <konrad@mlsec.org>
-
-  * TODO: added TODO file with new formats
 
   * src/input/README, src/input/input.h: improved interface
 
@@ -488,8 +497,6 @@
 
   * src/in_arc.c, src/in_arc.h: support for reading archives on-line
 
-  * src/in_dir.c: fixed concurrency problem
-
   * src/Makefile.am, src/in_dir.c, src/in_dir.h, src/tool.c: splitted input
   code to modules
 
@@ -504,8 +511,6 @@
   src/import.c, src/import.h, src/sally.c, src/tool.c, src/util.c, src/util.h:
   incorporated feature vector array
 
-  * doc/sally.pod: forgot pod file
-
   * Makefile.am, README, configure.in, doc/Makefile.am, src/Makefile.am,
   src/common.h, src/export.c, src/export.h, src/fhash.c, src/fhash.h,
   src/fmath.c, src/fmath.h, src/fvec.c, src/fvec.h, src/import.c, src/import.h,
@@ -519,10 +524,6 @@
   src/sally.h, src/tool.c, src/tool.h, src/util.c, src/util.h,
   tests/Makefile.am, tests/test_fhash.c, tests/tests.c, tests/tests.h: changed
   scope and description of project
-
-  * src/import.h: added import templates
-
-  * src/import.c: added import templates
 
   * src/export.c, src/fvec.c, src/fvec.h: added support for src field in
   feature vector
@@ -557,12 +558,8 @@
 
   * src/farray.c, src/farray.h: arrays of feature vectors
 
-  * src/tool.c: added parsing of options
-
   * src/Makefile.am, src/fvec.c, src/fvec.h, src/sally.c, src/sally.h,
   src/tool.h: added feature arrays
-
-  * .gitignore: added test files
 
   * src/common.h, tests/test_fmap.c, tests/tests.h: fixed nasty bug: wrong
   definition of FALSE
@@ -584,12 +581,6 @@
 
   * .gitignore, compile, src/Makefile.am, src/common.h, src/sally.c,
   src/sally.h, src/tool.c, src/tool.h: added templates for library and tool
-
-  * doc/sally.pod: smallest possible change to a repository
-
-  * .gitignore: updated ignored files
-
-  * .gitignore: git ignore file added
 
   * Makefile.am, README, bootstrap, configure.in, doc/Makefile.am,
   doc/sally.pod, m4/ac_openmp.m4, src/Makefile.am, tests/Makefile.am: added

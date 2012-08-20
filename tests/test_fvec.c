@@ -20,7 +20,8 @@ int verbose = 5;
 config_t cfg;
 
 /* Test structure */
-typedef struct {
+typedef struct
+{
     char *str;
     char *dlm;
     int nlen;
@@ -60,10 +61,10 @@ int test_static()
     test_printf("Extraction of feature vectors");
 
     for (i = 0; tests[i].str; i++) {
-        fvec_reset_delim();
         config_set_string(&cfg, "features.ngram_delim", tests[i].dlm);
         config_set_int(&cfg, "features.ngram_len", tests[i].nlen);
-        
+        fvec_delim_set(tests[i].dlm); /* usually done in sally_init */
+
         /* Extract features */
         f = fvec_extract(tests[i].str, strlen(tests[i].str));
 
@@ -91,8 +92,9 @@ int test_stress()
 
     test_printf("Stress test for feature vectors");
     config_set_string(&cfg, "features.ngram_delim", "0");
+    fvec_delim_set("0"); /* usually done in sally_init */
     fhash_init();
-    
+
     for (i = 0; i < STRESS_RUNS; i++) {
         config_set_int(&cfg, "features.ngram_len", rand() % 10 + 1);
 
@@ -123,6 +125,7 @@ int test_stress_omp()
 
     test_printf("Stress test for feature vectors (OpenMP)");
     config_set_string(&cfg, "features.ngram_delim", "0");
+    fvec_delim_set("0"); /* usually done in sally_init */
     fhash_init();
 
 #ifdef ENABLE_OPENMP
@@ -138,11 +141,11 @@ int test_stress_omp()
 
         /* Extract features */
         f = fvec_extract(buf, strlen(buf));
-        
+
         /* Destroy features */
         fvec_destroy(f);
     }
-    
+
     fhash_destroy();
     test_return(err, STRESS_RUNS);
     return err;
@@ -156,13 +159,13 @@ int test_read_write()
 {
     int i, j, err = 0;
     fvec_t *f, *g;
-    gzFile *z;
+    gzFile z;
 
     test_printf("reading and saving of feature vectors");
 
-    fvec_reset_delim();
     config_set_string(&cfg, "features.ngram_delim", " ");
     config_set_int(&cfg, "features.ngram_len", 2);
+    fvec_delim_set(" "); /* usually done in sally_init */
 
     /* Create and write feature vectors */
     z = gzopen(TEST_FILE, "w9");
@@ -192,7 +195,7 @@ int test_read_write()
                 break;
             }
             if (fabs(f->val[j] - g->val[j]) > 10e-9) {
-                test_error("(%d) f->val[%d] %f != g->val[%d] %f", i, j, 
+                test_error("(%d) f->val[%d] %f != g->val[%d] %f", i, j,
                            f->val[j], j, g->val[j]);
                 break;
             }
@@ -223,9 +226,9 @@ int main(int argc, char **argv)
 
     err |= test_static();
     err |= test_stress();
-#ifdef ENABLE_OPENMP    
+#ifdef ENABLE_OPENMP
     err |= test_stress_omp();
-#endif    
+#endif
     err |= test_read_write();
 
     config_destroy(&cfg);

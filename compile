@@ -9,41 +9,36 @@ fi
 
 # Apply configuration
 case $arg in
-   gwd*)
-       echo "Configuration: Cluster (GWDG)"
-       CC="gcc" \
-       PKG_CONFIG_PATH="$HOME/local/lib/pkgconfig" \
-       CPPFLAGS="-I $HOME/local/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -L$HOME/local/lib" \
-       ./configure --enable-libarchive --prefix=$HOME/local
-       ;;       
-
-   node*)
-       echo "Configuration: Cluster (TU Berlin)"
+   login*|node*|gwd*)
+       echo "Configuration: Cluster (TU Berlin, GWDG, IFI)"
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O3 -march=native -L$HOME/usr/lib" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -L$HOME/usr/lib" \
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
-
-   twoface*|ltrieck*)
-       echo "Configuration: Twoface/Rieck"
+   scarecrow*|sec01*)
+       echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
-       CFLAGS="-g -pedantic -pipe" \
-       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
+       CFLAGS="-g -pedantic -pipe -O2" \
+       ./configure --enable-libarchive --prefix=/opt/rieck
        ;;
-
-   ubuntu)    
-       echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -DDEBUG"  \
-       ./configure --enable-libarchive --enable-openmp
+   schulle*)
+       echo "Configuration: Schulle (ESX Cluster)"
+       PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" \
+       CC="gcc" \
+       CFLAGS="-g -pedantic -pipe -O2" \
+       ./configure --enable-libarchive
        ;;
-
+   evaltime)
+       echo "Configuration: Run-time evaluation"
+       CC="gcc" \
+       CFLAGS="-g -pedantic -pipe -O2" \
+       ./configure --enable-libarchive --enable-evaltime
+       ;;
    *)    
-       echo "Configuration: Standard"
-       CFLAGS="-g -pedantic -pipe -DDEBUG" \
-       ./configure 
+       echo "Unknown system or configuration"
+       exit
        ;;
 esac
 
@@ -54,7 +49,7 @@ fi
 
 echo
 echo "Done. Press <enter> to compile"
-read
+read x
 
 # Compile
 make clean 

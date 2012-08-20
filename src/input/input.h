@@ -1,3 +1,4 @@
+/** Placeholder for non-initialized delimiters */
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
  * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
@@ -8,18 +9,22 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef INPUT_H
 #define INPUT_H
+
+/** Placeholder for non-initialized delimiters */
+#define DELIM_NOT_INIT  42
 
 /**
  * Structure for a string
  */
-typedef struct {
-    char *str;      /* String data (not necessary c-style) */
-    int len;        /* Length of string */
-    char *src;      /* Optional description of source */
-    float label;    /* Optional label of string */
+typedef struct
+{
+    char *str;                  /* String data (not necessary c-style) */
+    int len;                    /* Length of string */
+    char *src;                  /* Optional description of source */
+    float label;                /* Optional label of string */
 } string_t;
 
 /* Configuration */
@@ -32,4 +37,8 @@ int input_open(char *);
 int input_read(string_t *, int);
 void input_close(void);
 
-#endif                          /* INPUT_H */
+/* Additional functions */
+void stopwords_load(const char *f);
+void stopwords_destroy();
+
+#endif /* INPUT_H */

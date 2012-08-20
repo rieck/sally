@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef OUTPUT_TEXT_H
 #define OUTPUT_TEXT_H
 
@@ -17,4 +17,4 @@ int output_text_open(char *);
 int output_text_write(fvec_t **, int);
 void output_text_close(void);
 
-#endif                          /* OUTPUT_TEXT_H */
+#endif /* OUTPUT_TEXT_H */

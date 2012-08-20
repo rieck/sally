@@ -8,7 +8,7 @@
  * option) any later version.  This program is distributed without any
  * warranty. See the GNU General Public License for more details. 
  */
- 
+
 #ifndef OUTPUT_LIBSVM_H
 #define OUTPUT_LIBSVM_H
 
@@ -17,4 +17,4 @@ int output_libsvm_open(char *);
 int output_libsvm_write(fvec_t **, int);
 void output_libsvm_close(void);
 
-#endif                          /* OUTPUT_LIBSVM_H */
+#endif /* OUTPUT_LIBSVM_H */

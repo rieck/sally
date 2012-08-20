@@ -4,7 +4,7 @@
 AUTOMAKE_OPTIONS = foreign
 SUBDIRS = src doc tests contrib .
 ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = README COPYING CHANGES
+EXTRA_DIST = README.md COPYING CHANGES
 
 clean-local:
 	rm -f *~
