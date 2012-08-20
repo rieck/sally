@@ -652,6 +652,65 @@ fvec_t *fvec_read(gzFile z)
     return NULL;
 }
 
+/**
+ * Reads a liblinear weight vector form a file stream
+ * @param f File pointer
+ * @return The weights as feature vector
+ */
+fvec_t* const fvec_read_liblinear(FILE* const f)
+{
+    assert(f != NULL);
+
+    /* Allocate feature vector (zero'd) */
+    fvec_t* const vec = (fvec_t*) calloc(1, sizeof(fvec_t));
+    if (vec == NULL)
+    {
+        error("Could not load feature vector");
+        return NULL;
+    }
+
+    vec->src = strdup("liblinear");
+
+	char* line = NULL;
+	size_t len = 0;
+
+	while (getline(&line, &len, f) != -1 && strncmp(line, "w", 1) != 0)
+	{
+		if (strncmp(line, "nr_feature", 10) == 0)
+		{
+			vec->len = atoi(line +11);
+		}
+	}
+
+    /* Empty feature vector */
+    if (vec->len == 0)
+    {
+    	return vec;
+    }
+
+    /* Allocate arrays */
+    vec->dim = (feat_t *) malloc(vec->len * sizeof(feat_t));
+    vec->val = (float *) malloc(vec->len * sizeof(float));
+    if (vec->dim == NULL || vec->val == NULL)
+    {
+        error("Could not allocate feature vector contents");
+        fvec_destroy(vec);
+        return NULL;
+    }
+
+	ssize_t read = getline(&line, &len, f);
+	for (unsigned int i = 0; i < vec->len && read != -1; i++)
+	{
+		vec->dim[i] = i;
+		vec->val[i] = atof(line);
+		read = getline(&line, &len, f);
+	}
+	free(line);
+
+	/* Shrink the */
+    count_feat(vec);
+    return vec;
+}
 
 /**
  * Writes a feature vector to a file stream

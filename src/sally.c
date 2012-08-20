@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -14,6 +14,7 @@
 #include "sally.h"
 #include "input.h"
 #include "output.h"
+#include "output_scores.h"
 #include "fvec.h"
 #include "util.h"
 #include "sconfig.h"
@@ -26,9 +27,10 @@ config_t cfg;
 static char *input = NULL;
 static char *output = NULL;
 static long entries = 0;
+static long eval_mode = FALSE;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhP"
+#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhPw:"
 
 /**
  * Array of options of getopt_long()
@@ -58,6 +60,7 @@ static struct option longopts[] = {
     {"quiet", 0, NULL, 'q'},
     {"version", 0, NULL, 'V'},
     {"help", 0, NULL, 'h'},
+    { "weight_vec", 1, NULL, 'w' },
     {NULL, 0, NULL, 0}
 };
 
@@ -117,7 +120,10 @@ static void print_usage(void)
            "  -q,  --quiet                   Be quiet during processing.\n"
            "  -P,  --print_config            Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
-           "  -h,  --help                    Print this help screen.\n" "\n");
+           "  -h,  --help                    Print this help screen.\n"
+           "\nEvaluation options:\n"
+           "  -w,  --weight_vec              The filename of the liblinear weight vector.\n"
+           "\n");
 }
 
 /**
@@ -140,6 +146,7 @@ static void sally_parse_options(int argc, char **argv)
     int ch;
 
     optind = 0;
+    int eval_mode = FALSE;
 
     while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
         switch (ch) {
@@ -200,6 +207,10 @@ static void sally_parse_options(int argc, char **argv)
         case 'o':
             config_set_string(&cfg, "output.output_format", optarg);
             break;
+        case 'w':
+            eval_mode = TRUE;
+            config_set_string(&cfg, "eval.weights", optarg);
+            break;
         case 'q':
             verbose = 0;
             break;
@@ -220,6 +231,12 @@ static void sally_parse_options(int argc, char **argv)
             exit(EXIT_SUCCESS);
             break;
         }
+    }
+
+    if (eval_mode) {
+        const char* const SCORES = "scores";
+        info_msg(1, "Evaluation mode: Overriding output_format setting with '%s'", SCORES);
+        config_set_string(&cfg, "output.output_format", SCORES);
     }
 
     /* Check configuration */
@@ -329,6 +346,8 @@ static void sally_init()
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
     if (!output_open(output))
         fatal("Coult not open output destination");
+
+    eval_mode = (strcmp(cfg_str, "scores") == 0);
 }
 
 /**
@@ -340,18 +359,38 @@ static void sally_process()
     long read, i, j;
     int chunk;
 
+	/* Load weight vector */
+	fvec_t* w = NULL;
+
+    if (eval_mode)
+    {
+        const char* cfg_str;
+
+        config_lookup_string(&cfg, "eval.weights", &cfg_str);
+        FILE* f = (cfg_str != NULL ? fopen(cfg_str, "r") : NULL);
+        if (f == NULL)
+        {
+            fatal("Cannot open weight vector");
+        }
+
+        w = fvec_read_liblinear(f);
+        fclose(f);
+    }
+
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */
     fvec_t **fvec = alloca(sizeof(fvec_t *) * chunk);
     string_t *strs = alloca(sizeof(string_t) * chunk);
+    double* const scores = (eval_mode ? alloca(sizeof (double) * chunk) : NULL);
 
     if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
 
     info_msg(1, "Processing %d strings in chunks of %d.", entries, chunk);
 
+    double totalTime = 0;
     for (i = 0, read = 0; i < entries; i += read) {
         read = input_read(strs, chunk);
         if (read <= 0)
@@ -360,6 +399,9 @@ static void sally_process()
         /* Generic preprocessing of input */
         input_preproc(strs, read);
 
+        struct timeval start, end;
+        gettimeofday(&start, NULL);
+
 #ifdef ENABLE_OPENMP
 #pragma omp parallel for
 #endif
@@ -367,10 +409,25 @@ static void sally_process()
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
             fvec_set_source(fvec[j], strs[j].src);
-        }
 
-        if (!output_write(fvec, read))
+            if (eval_mode)
+            {
+                scores[j] = fvec_dot(fvec[j], w);
+            }
+        }
+        gettimeofday(&end, NULL);
+        double diff = TO_SEC(end) -TO_SEC(start);
+        totalTime += diff;
+
+        int ret = (eval_mode ?
+                    output_scores_write(scores, read):
+                    output_write(fvec, read)
+                  );
+
+        if (!ret)
+        {
             fatal("Failed to write vectors to output '%s'", output);
+        }
 
         /* Free memory */
         input_free(strs, read);
@@ -380,6 +437,12 @@ static void sally_process()
             fhash_reset();
 
         prog_bar(0, entries, i + read);
+    }
+
+    if (eval_mode)
+    {
+		info_msg(1, "Net calculation time: %.4f seconds", totalTime);
+		fvec_destroy(w);
     }
 }
 
@@ -409,7 +472,6 @@ static void sally_exit()
 
     /* Destroy configuration */
     config_destroy(&cfg);
-
 }
 
 /**
@@ -426,4 +488,6 @@ int main(int argc, char **argv)
     sally_init();
     sally_process();
     sally_exit();
+
+    return EXIT_SUCCESS;
 }

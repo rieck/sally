@@ -421,6 +421,10 @@ can be changed by using the command-line option B<--xx
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.
 
+=head2 Evaluation options
+
+  -w,  --weight_vec              The filename of the liblinear weight vector.
+
 =head1 FILES
 
 =over 4

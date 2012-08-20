@@ -45,6 +45,7 @@ static config_default_t defaults[] = {
     {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
+    { "eval", "weights", CONFIG_TYPE_STRING, { .str = NULL } },
     {NULL}
 };
 
@@ -89,6 +90,7 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
         break;
     default:
         error("Unsupported type for configuration setting '%s'", n);
+        break;
     }
 }
 

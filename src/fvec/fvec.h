@@ -56,6 +56,7 @@ void fvec_set_source(fvec_t *fv, char *s);
 void fvec_write(fvec_t *f, gzFile);
 fvec_t *fvec_zero();
 fvec_t *fvec_read(gzFile);
+fvec_t* const fvec_read_liblinear(FILE* const f);
 void fvec_save(fvec_t *fv, char *f);
 fvec_t *fvec_load(char *);
 

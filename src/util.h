@@ -47,4 +47,6 @@ int decode_str(char *str);
 uint64_t hash_str(char *s, int l); 
 int strip_newline(char *s, int l);
 
+#define TO_SEC(t) ((t).tv_sec+((t).tv_usec/1000000.0))
+
 #endif /* UTIL_H */
