@@ -104,10 +104,6 @@ fvec_t *fvec_extract(char *x, int l)
         extract_wgrams(fv, x, l);
     }
     
-#ifdef ENABLE_EVALTIME    
-    double t2 = time_stamp();
-#endif
-
     /* Sort extracted features */
     qsort(fv->dim, fv->len, sizeof(feat_t), cmp_feat);
 
@@ -121,8 +117,7 @@ fvec_t *fvec_extract(char *x, int l)
     fvec_norm(fv, cfg_str);
     
 #ifdef ENABLE_EVALTIME
-    double t3 = time_stamp();
-    printf("strlen:%u\textract:%f\tembed:%f\n", l, t2 - t1, t3 - t2);
+    printf("strlen %u embed %f\n", l, time_stamp() - t1);
 #endif    
     
     return fv;
