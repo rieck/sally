@@ -1,7 +1,7 @@
 #!/bin/sh 
 
 BYTE_SETS="arts sprot"
-WORD_SETS="enron rfc sentences"
+WORD_SETS="enron rfc"
 RUNS=`seq 1 5`
 
 # Octave experiments
@@ -16,8 +16,8 @@ for SET in $WORD_SETS ; do
         echo -n "$SET " >> $OUT
         FILE="'data/$SET.data'"        
         /usr/bin/time -f 'time %U memory %M' -a -o $OUT \
-            matlab -nodisplay -nojvm \
-                   -r "matlab($FILE,'/dev/null', 3, '%0a%0d .,:;?!'); exit" 
+            matlab -nodisplay -nojvm -nodesktop \
+                   -r "matlab($FILE,'/dev/null', 5, '%0a%0d .,:;?!'); exit" 
     done
 done
 
@@ -29,7 +29,7 @@ for SET in $BYTE_SETS ; do
         echo -n "$SET " >> $OUT
         FILE="'data/$SET.data'"
         /usr/bin/time -f 'time %U memory %M' -a -o $OUT \
-            matlab -nodisplay -nojvm \
-                   -r "matlab($FILE,'/dev/null', 3, ''); exit" 
+            matlab -nodisplay -nojvm -nodesktop \
+                   -r "matlab($FILE,'/dev/null', 5, ''); exit" 
     done
 done

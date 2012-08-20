@@ -1,6 +1,6 @@
 #!/bin/sh 
 
-SETS="arts enron rfc sentences sprot"
+SETS="arts enron rfc sprot"
 RUNS=`seq 1 5`
 
 # Sally experiments

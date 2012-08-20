@@ -1,7 +1,7 @@
 #!/bin/sh 
 
 BYTE_SETS="arts sprot"
-WORD_SETS="enron rfc sentences"
+WORD_SETS="enron rfc"
 RUNS=`seq 1 5`
 
 # Sally experiments
@@ -15,7 +15,7 @@ for SET in $WORD_SETS ; do
     for RUN in $RUNS ; do
         echo -n "$SET " >> $OUT
         /usr/bin/time -f 'time %U memory %M' -a -o $OUT \
-            ./python.py data/$SET.data 3 "%0a%0d .,:;!?" > /dev/null
+            ./python.py data/$SET.data 5 "%0a%0d .,:;!?" > /dev/null
     done
 done
 
@@ -26,7 +26,7 @@ for SET in $BYTE_SETS ; do
     for RUN in $RUNS ; do
         echo -n "$SET " >> $OUT
         /usr/bin/time -f 'time %U memory %M' -a -o $OUT \
-            ./python.py data/$SET.data 3 "" > /dev/null
+            ./python.py data/$SET.data 5 "" > /dev/null
     done
 done
 
