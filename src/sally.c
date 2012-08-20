@@ -328,7 +328,7 @@ static void sally_init()
     output_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
     if (!output_open(output))
-        fatal("Coult not open output destination");
+        fatal("Could not open output destination");
 }
 
 /**
