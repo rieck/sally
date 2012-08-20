@@ -1,0 +1,3 @@
+Collection of 1 million random sentences from Wikipedia by David MacIver
+
+http://www.drmaciver.com/2009/12/i-want-one-meelyun-sentences/

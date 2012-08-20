@@ -1,0 +1,15 @@
+
+ References
+     
+   So"ren Sonnenburg, Alexander Zien, and Gunnar Ra"tsch. ARTS: Accurate
+   Recognition of Transcription Starts in Human. Bioinformatics,
+   22(14):e472-480, 2006.
+
+   http://www.fml.tuebingen.mpg.de/raetsch/projects/arts/
+
+
+ Details
+
+   data.strings contains the training set of the original ARTS data.
+
+ 

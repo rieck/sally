@@ -1,0 +1,10 @@
+
+References
+
+   Swiss-Prot 
+
+   Bairoch A., Apweiler R.  The SWISS-PROT protein sequence database: its
+   relevance to human molecular medical research J. Mol. Med.
+   75:312-316(1997).  PUBMED: 97325419
+
+   http://expasy.org/sprot/
