@@ -426,4 +426,6 @@ int main(int argc, char **argv)
     sally_init();
     sally_process();
     sally_exit();
+
+    return EXIT_SUCCESS;
 }
