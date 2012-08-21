@@ -123,7 +123,7 @@ static void print_usage(void)
            "  -c,  --config_file <file>      Set configuration file.\n"
            "  -v,  --verbose                 Increase verbosity.\n"
            "  -q,  --quiet                   Be quiet during processing.\n"
-           "  -C,  --print_config            Print the configuration.\n"
+           "  -C,  --print_config            Print the current configuration.\n"
            "  -D,  --print_defaults          Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
            "  -h,  --help                    Print this help screen.\n" "\n");
@@ -220,8 +220,8 @@ static void sally_parse_options(int argc, char **argv)
             exit(EXIT_SUCCESS);
             break;
         case 'C':
-        	print_conf = 1;
-        	break;
+            print_conf = 1;
+            break;
         case 'V':
             print_version();
             exit(EXIT_SUCCESS);
