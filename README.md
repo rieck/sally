@@ -90,5 +90,5 @@ efficient Murmur hash is used for this task.  In certain critical
 cases it may be useful to use a cryptographic hash as MD5.
 
 Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
-			Christian Wressnegger (chwress@idalab.de);
+			Christian Wressnegger (christian@mlsec.org);
 			Alexander Bikadorov (abiku@cs.tu-berlin.de)
