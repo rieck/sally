@@ -50,6 +50,8 @@ static struct option longopts[] = {
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 1, NULL, 1006},
+    {"thres_low", 1, NULL, 1009},    
+    {"thres_high", 1, NULL, 1010},   /* <- last entry */   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
     {"tfidf_file", 1, NULL, 1004},
@@ -116,6 +118,8 @@ static void print_usage(void)
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
            "       --vect_sign <0|1>         Enable signed embedding.\n"
+           "       --thres_low <float>       Enable minimum threshold for vectors.\n"
+           "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
            "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
@@ -178,6 +182,12 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1008:
             config_set_string(&cfg, "input.stopword_file", optarg);
+            break;
+        case 1009:
+            config_set_float(&cfg, "features.thres_low", atof(optarg));
+            break;
+        case 1010:
+            config_set_float(&cfg, "features.thres_high", atof(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
