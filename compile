@@ -9,31 +9,20 @@ fi
 
 # Apply configuration
 case $arg in
-   gwd*)
-       echo "Configuration: Cluster (GWDG)"
-       CC="gcc" \
-       PKG_CONFIG_PATH="$HOME/local/lib/pkgconfig" \
-       CPPFLAGS="-I $HOME/local/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -L$HOME/local/lib" \
-       ./configure --enable-libarchive --prefix=$HOME/local
-       ;;       
-
-   node*)
-       echo "Configuration: Cluster (TU Berlin)"
+   login*|node*|gwd*)
+       echo "Configuration: Cluster (TU Berlin, GWDG, IFI)"
        CC="gcc" \
        PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
        CPPFLAGS="-I $HOME/usr/include" \
-       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -march=native -L$HOME/usr/lib" \
+       CFLAGS="-fomit-frame-pointer -pedantic -pipe -O2 -L$HOME/usr/lib" \
        ./configure --enable-libarchive --prefix=$HOME/usr
        ;;       
-
    scarecrow*|sec01*)
        echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
        CFLAGS="-g -pedantic -pipe -O2" \
-       ./configure --enable-openmp --enable-libarchive --prefix=/opt/rieck
+       ./configure --enable-libarchive --prefix=/opt/rieck
        ;;
-
    schulle*)
        echo "Configuration: Schulle (ESX Cluster)"
        PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" \
@@ -41,11 +30,15 @@ case $arg in
        CFLAGS="-g -pedantic -pipe -O2" \
        ./configure --enable-libarchive
        ;;
-
-   *)    
-       echo "Configuration: Standard"
+   evaltime)
+       echo "Configuration: Run-time evaluation"
+       CC="gcc" \
        CFLAGS="-g -pedantic -pipe -O2" \
-       ./configure 
+       ./configure --enable-libarchive --enable-evaltime
+       ;;
+   *)    
+       echo "Unknown system or configuration"
+       exit
        ;;
 esac
 
@@ -56,7 +49,7 @@ fi
 
 echo
 echo "Done. Press <enter> to compile"
-read
+read x
 
 # Compile
 make clean 

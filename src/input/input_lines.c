@@ -1,7 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
  * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
- *               Christian Wressnegger (chwress@idalab.de)
+ *               Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -125,6 +125,10 @@ int input_lines_read(string_t *strs, int len)
     char buf[32], *line = NULL;
 
     for (i = 0; i < len; i++) {
+#ifdef ENABLE_EVALTIME 
+        double t1 = time_stamp();   
+#endif    
+    
         line = NULL;
         read = gzgetline(&line, &size, in);
         if (read == -1) {
@@ -142,6 +146,10 @@ int input_lines_read(string_t *strs, int len)
         snprintf(buf, 32, "line%d", line_num++);
         strs[j].src = strdup(buf);
         j++;
+
+#ifdef ENABLE_EVALTIME 
+        printf("strlen %d read %f\n", strs[j-1].len, time_stamp() - t1);
+#endif    
     }
 
     return j;
