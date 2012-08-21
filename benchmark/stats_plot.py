@@ -7,9 +7,9 @@ sample = 1000
 
 for dataset in datasets:
     plt.clf(); 
-    plt.figure(figsize=(4.5,3.5))
+    plt.figure(figsize=(4.5, 3))
 
-    dfile = 'results/sally-%s.stats' % dataset
+    dfile = 'results/sally-%s.stats.gz' % dataset
     x = np.loadtxt(dfile, usecols=(1, 3))
     
     # Add different times (read, embed, write)
