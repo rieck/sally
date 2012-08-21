@@ -200,7 +200,7 @@ int config_check(config_t *cfg)
     
     config_lookup_float(cfg, "features.thres_low", &f1);
     config_lookup_float(cfg, "features.thres_high", &f2);
-    if (f1 != 0.0 && f2 != 0 && f1 > f2) {
+    if (f1 != 0.0 && f2 != 0.0 && f1 > f2) {
         error("Minimum threshold larger than maximum threshold.");
         return 0;
     }
