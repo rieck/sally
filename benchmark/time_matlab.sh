@@ -1,6 +1,6 @@
 #!/bin/sh 
 
-BYTE_SETS="arts sprot"
+BYTE_SETS="sprot arts"
 WORD_SETS="enron rfc"
 RUNS=`seq 1 5`
 
