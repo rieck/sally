@@ -277,6 +277,20 @@ is used to define a sign for each feature.  Collisions are still possible,
 yet their impact is lessened as colliding features not necessary induce
 larger values.
 
+=item B<thres_low = 0;>
+
+This parameter defines a minimum threshold for the entries in each vector. 
+Values below the threshold are removed.  The parameter can be used to filter
+low-valued features from the vectors, such as very infrequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
+=item B<thres_high = 0;>
+
+This parameter defines a maximum threshold for the entries in each vector. 
+Values above the threshold are removed.  The parameter can be used to filter
+high-valued features from the vectors, such as very frequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
 =item B<hash_bits = 22;>
 
 B<sally> uses a hash function to map individual features to dimensions. 
