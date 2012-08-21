@@ -185,6 +185,7 @@ static void config_default(config_t *cfg)
 int config_check(config_t *cfg)
 {
     const char *s1, *s2;
+    double f1, f2;
 
     /* Add default values where missing */
     config_default(cfg);    
@@ -194,6 +195,13 @@ int config_check(config_t *cfg)
     config_lookup_string(cfg, "features.vect_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
         error("Stop words can only be used if delimiters are defined.");
+        return 0;
+    }
+    
+    config_lookup_float(cfg, "features.thres_low", &f1);
+    config_lookup_float(cfg, "features.thres_high", &f2);
+    if (f1 != 0.0 && f2 != 0 && f1 > f2) {
+        error("Minimum threshold larger than maximum threshold.");
         return 0;
     }
     
