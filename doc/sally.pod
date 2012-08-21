@@ -416,7 +416,8 @@ can be changed by using the command-line option B<--xx
 
   -c,  --config_file <file>      Set configuration file.
   -v,  --verbose                 Increase verbosity.
-  -P,  --print_config            Print the default configuration.
+  -C,  --print_config            Print the configuration.
+  -D,  --print_defaults          Print the default configuration.
   -q,  --quiet                   Be quiet during processing.
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.

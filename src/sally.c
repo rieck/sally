@@ -20,6 +20,7 @@
 
 /* Global variables */
 int verbose = 1;
+int print_conf = 0;
 config_t cfg;
 
 /* Local variables */
@@ -28,7 +29,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhP"
+#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -54,7 +55,8 @@ static struct option longopts[] = {
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
-    {"print_config", 0, NULL, 'P'},
+    {"print_config", 0, NULL, 'C'},
+    {"print_defaults", 0, NULL, 'D'},
     {"quiet", 0, NULL, 'q'},
     {"version", 0, NULL, 'V'},
     {"help", 0, NULL, 'h'},
@@ -73,9 +75,15 @@ int sally_version(FILE *f, char *p, char *m)
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }
 
-static void print_config(void)
+static void print_defaults(void)
 {
     sally_version(stdout, "# ", "Default configuration");
+    config_print(&cfg);
+}
+
+static void print_config(void)
+{
+    sally_version(stdout, "# ", "Current configuration");
     config_print(&cfg);
 }
 
@@ -115,7 +123,8 @@ static void print_usage(void)
            "  -c,  --config_file <file>      Set configuration file.\n"
            "  -v,  --verbose                 Increase verbosity.\n"
            "  -q,  --quiet                   Be quiet during processing.\n"
-           "  -P,  --print_config            Print the default configuration.\n"
+           "  -C,  --print_config            Print the configuration.\n"
+           "  -D,  --print_defaults          Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
            "  -h,  --help                    Print this help screen.\n" "\n");
 }
@@ -206,10 +215,13 @@ static void sally_parse_options(int argc, char **argv)
         case 'v':
             verbose++;
             break;
-        case 'P':
-            print_config();
+        case 'D':
+            print_defaults();
             exit(EXIT_SUCCESS);
             break;
+        case 'C':
+        	print_conf = 1;
+        	break;
         case 'V':
             print_version();
             exit(EXIT_SUCCESS);
@@ -235,13 +247,16 @@ static void sally_parse_options(int argc, char **argv)
     argv += optind;
 
     /* Check remaining arguments */
-    if (argc != 2) {
-        print_usage();
-        exit(EXIT_FAILURE);
-    }
+    if (!print_conf)
+    {
+        if (argc != 2) {
+            print_usage();
+            exit(EXIT_FAILURE);
+        }
 
-    input = argv[0];
-    output = argv[1];
+        input = argv[0];
+        output = argv[1];
+    }
 }
 
 
@@ -272,15 +287,15 @@ static void sally_load_config(int argc, char **argv)
     config_init(&cfg);
 
     if (!cfg_file) {
-        warning("No config file given. Using defaults (see -P)");
-    } else { 
+        warning("No config file given. Using defaults (see -D)");
+    } else {
         if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
             fatal("Could not read configuration (%s in line %d)",
                   config_error_text(&cfg), config_error_line(&cfg));
     }
 
     /* Check configuration */
-    if(!config_check(&cfg))
+    if (!config_check(&cfg))
         exit(EXIT_FAILURE);
 }
 
@@ -428,9 +443,14 @@ int main(int argc, char **argv)
     sally_load_config(argc, argv);
     sally_parse_options(argc, argv);
 
-    sally_init();
-    sally_process();
-    sally_exit();
-
+    if (print_conf) {
+        print_config();
+    }
+    else
+    {
+	    sally_init();
+	    sally_process();
+	    sally_exit();
+    }
     return EXIT_SUCCESS;
 }
