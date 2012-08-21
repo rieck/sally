@@ -20,6 +20,9 @@ typedef uint64_t feat_t;
 /** Placeholder for non-initialized delimiters */
 #define DELIM_NOT_INIT	42
 
+/** Zero value in each feature */
+#define FVEC_ZERO	1e-9
+ 
 /**
  * Sparse feature vector. The vector is stored as a sorted list 
  * of non-zero dimensions containing real numbers. The dimensions

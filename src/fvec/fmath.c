@@ -305,4 +305,47 @@ void fvec_invert(fvec_t *f)
         f->val[i] = (float) 1.0 / f->val[i];
 }
 
+/** 
+ * Apply thresholds to the values of a vector. Values below or above the 
+ * thresholds are removed. If set to 0, the thresholding is diabled.
+ * @param f Feature vector
+ * @param tl Minimum threshold
+ * @param th Maximum threshold
+ */
+void fvec_thres(fvec_t *f, double tl, double th) 
+{
+    int i;
+    assert(f);
+    
+    for (i = 0; i < f->len; i++) {
+        if (tl != 0.0 && f->val[i] < tl) 
+            f->val[i] = 0.0;
+        if (th != 0.0 && f->val[i] > th)
+            f->val[i] = 0.0;
+    }
+
+    fvec_sparsify(f);
+}
+
+void fvec_sparsify(fvec_t *f)
+{
+    int i, j;
+    assert(f);
+
+    for (i = 0, j = 0; i < f->len; i++) {
+        /* Copy entries. TODO: This could be far more efficient. */
+        if (i != j) {
+            f->val[j] = f->val[i];
+            f->dim[j] = f->dim[i];
+        }
+        /* Count only non-zero elements only */
+        if (fabs(f->val[i]) > FVEC_ZERO ) 
+            j++;
+    }
+    
+    f->len = j;
+    fvec_realloc(f);
+}
+
+
 /** @} */

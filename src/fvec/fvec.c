@@ -62,6 +62,7 @@ fvec_t *fvec_extract(char *x, int l)
 {
     fvec_t *fv;
     const char *dlm_str, *cfg_str;
+    double flt1, flt2;
     assert(x && l >= 0);
 
     /* Allocate feature vector */
@@ -115,6 +116,13 @@ fvec_t *fvec_extract(char *x, int l)
     fvec_embed(fv, cfg_str);
     config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
     fvec_norm(fv, cfg_str);
+
+    /* Apply thresholding */    
+    config_lookup_float(&cfg, "features.thres_low", &flt1);    
+    config_lookup_float(&cfg, "features.thres_high", &flt2);
+    if (flt1 != 0.0 || flt2 != 0.0)
+        fvec_thres(fv, flt1, flt2);
+    
     
 #ifdef ENABLE_EVALTIME
     printf("strlen %u embed %f\n", l, time_stamp() - t1);
