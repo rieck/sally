@@ -56,7 +56,7 @@ static struct option longopts[] = {
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
     {"print_config", 0, NULL, 'C'},
-    {"print_default", 0, NULL, 'D'},
+    {"print_defaults", 0, NULL, 'D'},
     {"quiet", 0, NULL, 'q'},
     {"version", 0, NULL, 'V'},
     {"help", 0, NULL, 'h'},
@@ -75,7 +75,7 @@ int sally_version(FILE *f, char *p, char *m)
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }
 
-static void print_default(void)
+static void print_defaults(void)
 {
     sally_version(stdout, "# ", "Default configuration");
     config_print(&cfg);
@@ -124,7 +124,7 @@ static void print_usage(void)
            "  -v,  --verbose                 Increase verbosity.\n"
            "  -q,  --quiet                   Be quiet during processing.\n"
            "  -C,  --print_config            Print the configuration.\n"
-           "  -D,  --print_default           Print the default configuration.\n"
+           "  -D,  --print_defaults          Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
            "  -h,  --help                    Print this help screen.\n" "\n");
 }
@@ -216,7 +216,7 @@ static void sally_parse_options(int argc, char **argv)
             verbose++;
             break;
         case 'D':
-            print_default();
+            print_defaults();
             exit(EXIT_SUCCESS);
             break;
         case 'C':
