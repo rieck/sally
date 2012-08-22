@@ -141,6 +141,21 @@ fvec_t *fvec_zero()
 }
 
 /**
+ * Truncates the given features vector down to 0-length
+ */
+void fvec_truncate(fvec_t* const fv)
+{
+	assert(fv != NULL);
+
+    fv->len = 0;
+    if (fv->dim) free(fv->dim);
+    if (fv->val) free(fv->val);
+
+    fv->dim = NULL;
+    fv->val = NULL;
+}
+
+/**
  * Caches a feature for later addition to the feature hash table
  * @param c Pointer to cache
  * @param fv Feature vector
