@@ -149,6 +149,11 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0, p, q, k;
 
+    if (fb->len <= 0) {
+    	fvec_truncate(fa);
+    	return;
+    }
+
     /* Loop over dimensions fa */
     for (i = 0, j = 0; j < fa->len; j++) {
         /* Binary search */
