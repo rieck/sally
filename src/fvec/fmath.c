@@ -70,7 +70,7 @@ fvec_t *fvec_clone(fvec_t *o)
     fv->dim = (feat_t *) malloc(o->len * sizeof(feat_t));
     fv->val = (float *) malloc(o->len * sizeof(float));
     if (!fv->dim || !fv->val) {
-        error("Could not allocate feature vector");
+        error("Could not allocate feature vector contents");
         fvec_destroy(fv);
         return NULL;
     }

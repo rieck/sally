@@ -76,15 +76,12 @@ fvec_t *fvec_extract(char *x, int l)
     if (l == 0)
         return fv;
 
-    /* Initialize feature vector */
-    fv->len = 0;
-    fv->total = 0;
+    /* Allocate arrays */
     fv->dim = (feat_t *) malloc(l * sizeof(feat_t));
     fv->val = (float *) malloc(l * sizeof(float));
-    fv->src = NULL;
 
     if (!fv->dim || !fv->val) {
-        error("Could not allocate feature vector");
+        error("Could not allocate feature vector contents");
         fvec_destroy(fv);
         return NULL;
     }
@@ -517,26 +514,29 @@ void fvec_realloc(fvec_t *fv)
     feat_t *p_dim = NULL;
     float *p_val = NULL;
 
-    if (fv->len > 0)
+    if (fv->len <= 0)
     {
-        /*
-         * Explicit reallocation. Don't use realloc(). On some platforms
-         * realloc() will not shrink memory blocks or copy to smaller sizes.
-         * Consequently, realloc() may result in memory leaks.
-         */
-        p_dim = malloc(fv->len * sizeof(feat_t));
-        p_val = malloc(fv->len * sizeof(float));
-        if (!p_dim || !p_val) {
-            error("Could not re-allocate feature vector");
-            free(p_dim);
-            free(p_val);
-            return;
-        }
-
-        /* Copy to new feature vector */
-        memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
-        memcpy(p_val, fv->val, fv->len * sizeof(float));
+    	fvec_truncate(fv);
+    	return;
     }
+
+	/*
+	 * Explicit reallocation. Don't use realloc(). On some platforms
+	 * realloc() will not shrink memory blocks or copy to smaller sizes.
+	 * Consequently, realloc() may result in memory leaks.
+	 */
+	p_dim = malloc(fv->len * sizeof(feat_t));
+	p_val = malloc(fv->len * sizeof(float));
+	if (!p_dim || !p_val) {
+		error("Could not re-allocate feature vector");
+		free(p_dim);
+		free(p_val);
+		return;
+	}
+
+	/* Copy to new feature vector */
+	memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
+	memcpy(p_val, fv->val, fv->len * sizeof(float));
 
     /* Free old */
     free(fv->dim);
