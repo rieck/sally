@@ -70,7 +70,7 @@ command-line option by B<--xx "yy">.
 
 If no configuration file is provided, B<sally> resorts to a default 
 configuration. This default configuration can be dumped using the 
-command-line option B<-P>.
+command-line option B<-D>.
 
 =head2 Input formats
 

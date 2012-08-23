@@ -1,4 +1,29 @@
+2012-08-21  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c, src/fvec/fvec.h:
+  implemented thresholding of vectors
+
+  * src/sally.c, src/sconfig.c: config for thresholding
+
+  * doc/example.cfg, doc/sally.pod: docs for thresholding
+
+  * doc/sally.pod, src/sally.c: minor fixes
+
+2012-08-21  chwress <https://github.com/chwress>
+
+  * README.md, doc/sally.pod, src/input/input.c, src/input/input_lines.c:
+  update the eMail address of chwress
+
+  * doc/sally.pod, src/sally.c: naming ("print_default" -> "print_defaults")
+
+2012-08-20  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fvec.c, src/input/input_lines.c, src/output/output_libsvm.c: added
+  timing output
+
 2012-08-17  Konrad Rieck <konrad@mlsec.org>
+
+  * compile, configure.in, src/sally.c: re-enabled openmp code
 
   * src/input/input.c, src/sally.c: exit if stop word file no available but
   requested
