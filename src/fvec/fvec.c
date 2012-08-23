@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -52,13 +53,30 @@ static void cache_flush(fentry_t *c, fvec_t *fv);
 /* Global elimiter table */
 char delim[256] = { DELIM_NOT_INIT };
 
+
 /**
  * Allocates and extracts a feature vector from a string.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
+ *
  * @return feature vector
  */
 fvec_t *fvec_extract(char *x, int l)
+{
+	return fvec_extract_ex(x, l, 1);
+}
+
+/**
+ * Allocates and extracts a feature vector from a string.
+ * @param x String of bytes (with space delimiters)
+ * @param l Length of sequence
+ * @param postprocess Indicates whether the extracted feature should be
+ *                    post-processed regarding embedding, normalization,
+ *                    feature thresholds, etc.
+ *
+ * @return feature vector
+ */
+fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
 {
     fvec_t *fv;
     const char *dlm_str, *cfg_str;
@@ -108,18 +126,20 @@ fvec_t *fvec_extract(char *x, int l)
     /* Count features  */
     count_feat(fv);
 
-    /* Compute embedding and normalization */
-    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
-    fvec_embed(fv, cfg_str);
-    config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
-    fvec_norm(fv, cfg_str);
+    if (postprocess) {
+        /* Compute embedding and normalization */
+        config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
+        fvec_embed(fv, cfg_str);
+        config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
+        fvec_norm(fv, cfg_str);
 
-    /* Apply thresholding */    
-    config_lookup_float(&cfg, "features.thres_low", &flt1);    
-    config_lookup_float(&cfg, "features.thres_high", &flt2);
-    if (flt1 != 0.0 || flt2 != 0.0)
-        fvec_thres(fv, flt1, flt2);
-    
+        /* Apply thresholding */
+        config_lookup_float(&cfg, "features.thres_low", &flt1);
+        config_lookup_float(&cfg, "features.thres_high", &flt2);
+        if (flt1 != 0.0 || flt2 != 0.0) {
+            fvec_thres(fv, flt1, flt2);
+        }
+    }
     
 #ifdef ENABLE_EVALTIME
     printf("strlen %u embed %f\n", l, time_stamp() - t1);

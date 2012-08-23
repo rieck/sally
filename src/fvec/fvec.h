@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -51,6 +52,7 @@ typedef struct
 
 /* Functions */
 fvec_t *fvec_extract(char *, int l);
+fvec_t *fvec_extract_ex(char *x, int l, int postprocess);
 void fvec_destroy(fvec_t *);
 void fvec_print(FILE *, fvec_t *);
 void fvec_realloc(fvec_t *);
