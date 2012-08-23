@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org);
+ *                    Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -352,5 +353,48 @@ void fvec_sparsify(fvec_t *f)
     fvec_realloc(f);
 }
 
+/**
+ * Element-wise comparison of one feature vector with another
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ *
+ * @returns 1 if the two vectors are equal, 0 otherwise
+ */
+int fvec_equals(fvec_t *fa, fvec_t *fb)
+{
+	int b;
+    unsigned long i = 0, j = 0, p, q, k;
+
+    if (fa->len != fb->len) {
+    	return 0;
+    }
+
+    if (fa == fb) {
+    	return 1;
+    }
+
+    /* Loop over dimensions fa */
+    for (i = 0, j = 0; j < fa->len; j++) {
+    	b = 0;
+        /* Binary search */
+        p = i, q = fb->len;
+        do {
+            k = i, i = ((q - p) >> 1) + p;
+            if (fb->dim[i] > fa->dim[j]) {
+                q = i;
+            } else if (fb->dim[i] < fa->dim[j]) {
+                p = i;
+            } else {
+                b = 1;
+                break;
+            }
+        } while (i != k);
+
+        /* No match */
+        if (!b) return 0;
+    }
+
+    return 1;
+}
 
 /** @} */
