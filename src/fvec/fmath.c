@@ -365,19 +365,19 @@ int fvec_equals(fvec_t *fa, fvec_t *fb)
     unsigned long i = 0;
 
     if (fa->len != fb->len) {
-    	return 0;
+    	return FALSE;
     }
 
     if (fa == fb) {
-    	return 1;
+    	return TRUE;
     }
 
     for (i = 0; i < fa->len; i++) {
         if (fa->dim[i] != fb->dim[i] || fabs(fa->val[i] - fb->val[i]) > 1e-6)
-    		return 0;
+    		return FALSE;
     }
 
-    return 1;
+    return TRUE;
 }
 
 /** @} */

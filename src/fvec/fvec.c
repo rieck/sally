@@ -63,7 +63,7 @@ char delim[256] = { DELIM_NOT_INIT };
  */
 fvec_t *fvec_extract(char *x, int l)
 {
-	return fvec_extract_ex(x, l, 1);
+	return fvec_extract_ex(x, l, TRUE);
 }
 
 /**
