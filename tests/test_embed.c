@@ -63,7 +63,7 @@ int test_embed_tfidf()
         test_error("(%d) internal idf values seem to be wrong", i);
     }
 
-    /* Invert w for multipling out IDFs */
+    /* Invert w for multiplying out IDFs */
     fvec_invert(w);
 
     config_set_string(&cfg, "features.vect_embed", "tfidf");

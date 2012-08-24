@@ -50,7 +50,7 @@ static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
 
-/* Global elimiter table */
+/* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
 
 
@@ -216,7 +216,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
  * libc and this is just some ugly code).
  * @param v1 first char 
  * @param v2 second char
- * @return comparisong result as integer
+ * @return comparison result as integer
  */
 static int chrcmp(const void *v1, const void *v2)
 {
@@ -234,7 +234,7 @@ static int chrcmp(const void *v1, const void *v2)
  * Compares two words (not necessary null terminated)
  * @param v1 first word 
  * @param v2 second word
- * @return comparisong result as integer
+ * @return comparison result as integer
  */
 static int wordcmp(const void *v1, const void *v2)
 {
@@ -349,7 +349,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
 
     /* Extract n-grams */
     for (k = i = 0; i < j; i++) {
-        /* Count delimiters and remember start poisition */
+        /* Count delimiters and remember start position */
         if (t[i] == d && ++q == 1)
             s = i;
 
@@ -364,7 +364,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
             if (sort)
                 fstr = sort_words(fstr, flen, d);
 
-            /* Positonal n-grams code */
+            /* Positional n-grams code */
             if (pos) {
                 memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
                 flen += sizeof(unsigned long);
@@ -443,7 +443,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         if (sort)
             qsort(fstr, flen, 1, chrcmp);
 
-        /* Positonal n-grams code */
+        /* Positional n-grams code */
         if (pos) {
             memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
             flen += sizeof(unsigned long);
@@ -477,7 +477,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
 
 
 /**
- * Compares two features values (hashs)
+ * Compares two features values (hashes)
  * @param x feature X
  * @param y feature Y
  * @return result as a signed integer
@@ -492,7 +492,7 @@ static int cmp_feat(const void *x, const void *y)
 }
 
 /** 
- * Counts featues in a preliminary feature vector
+ * Counts features in a preliminary feature vector
  * @param fv Valid feature vector
  */
 static void count_feat(fvec_t *fv)

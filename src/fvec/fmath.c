@@ -313,7 +313,7 @@ void fvec_invert(fvec_t *f)
 
 /** 
  * Apply thresholds to the values of a vector. Values below or above the 
- * thresholds are removed. If set to 0, the thresholding is diabled.
+ * thresholds are removed. If set to 0, the thresholding is disabled.
  * @param f Feature vector
  * @param tl Minimum threshold
  * @param th Maximum threshold

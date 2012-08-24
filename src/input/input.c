@@ -227,7 +227,7 @@ int stopwords_filter(char *str, int len)
 }
 
 /** 
- * In-place preprocessing of strings
+ * In-place pre-processing of strings
  */
 void input_preproc(string_t *strs, int len)
 {

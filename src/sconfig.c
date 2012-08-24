@@ -12,7 +12,7 @@
 /** 
  * @defgroup sconfig Configuration functions
  * Functions for configuration of the Sally tool. Additionally default
- * values for each configruation parameter are specified in this module. 
+ * values for each configuration parameter are specified in this module.
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -91,6 +91,7 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
         break;
     default:
         error("Unsupported type for configuration setting '%s'", n);
+        break;
     }
 }
 
