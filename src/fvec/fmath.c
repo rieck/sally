@@ -142,23 +142,49 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
 }
 
 /** 
- * Element-wise multiplication of one feature vector with another (a = a x b)
+ * Element-wise multiplication of a feature vector with another (a = a x b).
+ * The function uses a loop to compute the multiplication.
  * @param fa Feature vector (a)
  * @param fb Feature vector (b)
  */
-void fvec_times(fvec_t *fa, fvec_t *fb)
+static void fvec_times_loop(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0;
+
+    /* Loop over features in a and b */
+    while (i < fa->len && j < fb->len) {
+        if (fa->dim[i] > fb->dim[j]) {
+            j++;
+        } else if (fa->dim[i] < fb->dim[j]) {
+            fa->val[i++] = 0.0;
+        } else {
+            fa->val[i++] *= fb->val[j++];
+        }
+    }
+    
+    /* Zero-out remaining values in fa */
+    while(i < fa->len)
+        fa->val[i++] = 0.0;
+        
+    /* The parent function should sparsify fa. */
+}
+
+/** 
+ * Element-wise multiplication of a feature vector with another (a = a x b).
+ * The function uses binary search to compute the multiplication. Note that
+ * the elements can not be swapped for efficiency!
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+static void fvec_times_bsearch(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0, p, q, k;
-
-    if (fb->len <= 0) {
-    	fvec_truncate(fa);
-    	return;
-    }
+    int found;
 
     /* Loop over dimensions fa */
     for (i = 0, j = 0; j < fa->len; j++) {
         /* Binary search */
-        p = i, q = fb->len;
+        p = i, q = fb->len, found = FALSE;
         do {
             k = i, i = ((q - p) >> 1) + p;
             if (fb->dim[i] > fa->dim[j]) {
@@ -166,15 +192,42 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
             } else if (fb->dim[i] < fa->dim[j]) {
                 p = i;
             } else {
-                fa->val[j] = fb->val[i] * fa->val[j];
+                fa->val[j] *= fb->val[i];
+                found = TRUE;
                 break;
             }
         } while (i != k);
 
-        /* No match */
-        if (i == k)
-            fa->val[j] = 0;
+        /* No match. Zero-out value in fa */
+        if (!found)
+            fa->val[j] = 0.0;
     }
+    
+    /* The parent function should sparsify fa. */
+}
+
+/** 
+ * Element-wise multiplication of one feature vector with another (a = a x b)
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+void fvec_times(fvec_t *fa, fvec_t *fb)
+{
+    assert(fa && fb);
+    double a, b;
+
+    if (fb->len <= 0) {
+    	fvec_truncate(fa);
+    	return;
+    }
+
+    /* Choose times functions */
+    if (a + b > ceil(a * log2(b)))
+        fvec_times_bsearch(fa, fb);
+    else
+        fvec_times_loop(fa, fb);
+        
+    fvec_sparsify(fa);
 }
 
 
@@ -256,7 +309,7 @@ double fvec_dot(fvec_t *fa, fvec_t *fb)
     assert(fa && fb);
     double a, b;
 
-    /* Sort vectors according to size */
+    /* Swap vectors according to size */
     if (fa->len > fb->len) {
         a = (double) fa->len, b = (double) fb->len;
     } else {
@@ -339,13 +392,13 @@ void fvec_sparsify(fvec_t *f)
     assert(f);
 
     for (i = 0, j = 0; i < f->len; i++) {
-        /* Copy entries. TODO: This could be far more efficient. */
+        /* Copy entries. */
         if (i != j) {
             f->val[j] = f->val[i];
             f->dim[j] = f->dim[i];
         }
         /* Count only non-zero elements only */
-        if (fabs(f->val[i]) > FVEC_ZERO ) 
+        if (fabs(f->val[i]) > FVEC_ZERO) 
             j++;
     }
     
