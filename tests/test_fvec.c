@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org);
+ *                    Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -92,40 +93,94 @@ int test_arithmetic()
 {
 	int i = 0, err = 0;
 	double d1, d2 = 0.0;
-    fvec_t *fv1, *fv2, *empty;
+    fvec_t *fa, *fb, *fc, *fd, *empty;
 
 	test_printf("Arithmetic operations for feature vectors");
 
-    init_sally(tests[0]);
-    fv1 = fvec_extract(tests[0].str, strlen(tests[0].str));
+    init_sally(tests[2]);
+    fa = fvec_extract(tests[2].str, strlen(tests[2].str)); /* nlen = 1, len = 3 */
+
+    init_sally(tests[5]);
+    fb = fvec_extract(tests[5].str, strlen(tests[5].str)); /* nlen = 2, len = 3 */
+
     empty = fvec_extract("", 0);
 
-	/* Multiplication with an empty feature vector */ i++;
-    fv2 = fvec_clone(fv1);
 
-    fvec_times(fv2, empty);
-    fvec_sparsify(fv2);
-    if (fv2->len != 0) {
+    /* Simple vector comparison */ i++;
+    if (!fvec_equals(fa, fa)) {
     	err++;
-    	test_error("(%d) len %d != 0", i, fv2->len);
+    	test_error("(%d) fa == fa", i);
     }
 
-    fvec_destroy(fv2);
+    fc = fvec_clone(fa);
+    if (!fvec_equals(fa, fc)) {
+    	err++;
+    	test_error("(%d) fa == fc", i);
+    }
+
+    fc->val[1] = 666;
+    if (fvec_equals(fa, fc)) {
+    	err++;
+    	test_error("(%d) fa != fc", i);
+    }
+
+    fd = fvec_clone(fa);
+    fc->len = 1;
+    fd->len = 1;
+    if (!fvec_equals(fc, fd)) {
+    	err++;
+    	test_error("(%d) fc == fd", i);
+    }
+    fvec_destroy(fc);
+    fvec_destroy(fd);
+
+    if (fvec_equals(fa, fb)) {
+    	err++;
+    	test_error("(%d) fa != fb", i);
+    }
+    if (fvec_equals(fb, fa)) {
+    	err++;
+    	test_error("(%d) fb != fa", i);
+    }
+    if (fvec_equals(fa, empty)) {
+    	err++;
+    	test_error("(%d) fa != []", i);
+    }
+    if (fvec_equals(empty, fa)) {
+    	err++;
+    	test_error("(%d) [] != fa", i);
+    }
+    if (!fvec_equals(empty, empty)) {
+    	err++;
+    	test_error("(%d) [] == []", i);
+    }
+
+	/* Element-wise multiplication with an empty feature vector */ i++;
+    fc = fvec_clone(fa);
+
+    fvec_times(fc, empty);
+    fvec_sparsify(fc);
+    if (fc->len != 0) {
+    	err++;
+    	test_error("(%d) len %d != 0", i, fc->len);
+    }
+
+    fvec_destroy(fc);
 
 	/* Addition with an empty feature vector */ i++;
-    fv2 = fvec_clone(fv1);
+    fc = fvec_clone(fa);
 
-    fvec_add(fv2, empty);
-    if (0 /*fvec_compare(fv1, fv2) */) {
+    fvec_add(fc, empty);
+    if (!fvec_equals(fa, fc)) {
     	err++;
     	test_error("(%d) addition failed!", i);
     }
 
-    fvec_destroy(fv2);
+    fvec_destroy(fc);
 
 	/* Dot product with an empty feature vector */ i++;
-    d1 = fvec_dot(empty, fv1);
-    d2 = fvec_dot(fv1, empty);
+    d1 = fvec_dot(empty, fa);
+    d2 = fvec_dot(fa, empty);
 
     if (d1 != 0 || d2 != 0) {
     	err++;
@@ -133,22 +188,23 @@ int test_arithmetic()
     }
 
 	/* Scalar multiplication with 0 */ i++;
-    fv2 = fvec_clone(fv1);
+    fc = fvec_clone(fa);
 
-    fvec_mul(fv2, 0.0);
-    fvec_sparsify(fv2);
-    if (fv2->len != 0) {
+    fvec_mul(fc, 0.0);
+    fvec_sparsify(fc);
+    if (fc->len != 0) {
     	err++;
     	test_error("(%d) scalar product failed!", i);
     }
 
-    fvec_destroy(fv2);
+    fvec_destroy(fc);
 
     /* TODO: Test all implemented arithmetic operations for
      * sparse feature vectors
      */
 
-    fvec_destroy(fv1);
+    fvec_destroy(fa);
+    fvec_destroy(fb);
     fvec_destroy(empty);
 
 	test_return(err, i);

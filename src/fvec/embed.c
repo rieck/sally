@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -102,7 +103,7 @@ void idf_create(char *input)
             continue;
 
         for (j = 0; j < read; j++) {
-            fvec_t *x = fvec_extract(strs[j].str, strs[j].len);
+            fvec_t *x = fvec_extract_ex(strs[j].str, strs[j].len, TRUE);
             fvec_binarize(x);
             fvec_add(idf_weights, x);
             fvec_destroy(x);
@@ -131,6 +132,21 @@ void idf_create(char *input)
 void idf_destroy()
 {
     fvec_destroy(idf_weights);
+}
+
+/**
+ * Compares the idf weights to the given feature vector in
+ * order to verify the validity of the internally computed
+ * values.
+ * @param f The reference vector.
+ *
+ * @return An indicator for whether the internal id values
+ *         are correct/ sane or not.
+ */
+int idf_check(fvec_t *f)
+{
+	assert(f != NULL);
+	return (idf_weights != NULL && fvec_equals(idf_weights, f));
 }
 
 /** @} */
