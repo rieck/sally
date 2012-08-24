@@ -118,6 +118,12 @@ int test_arithmetic()
     	test_error("(%d) fa == fc", i);
     }
 
+    fc->val[1] = 666;
+    if (fvec_equals(fa, fc)) {
+    	err++;
+    	test_error("(%d) fa != fc", i);
+    }
+
     fd = fvec_clone(fa);
     fc->len = 1;
     fd->len = 1;

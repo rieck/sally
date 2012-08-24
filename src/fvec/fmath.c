@@ -362,8 +362,7 @@ void fvec_sparsify(fvec_t *f)
  */
 int fvec_equals(fvec_t *fa, fvec_t *fb)
 {
-	int b;
-    unsigned long i = 0, j = 0, p, q, k;
+    unsigned long i = 0;
 
     if (fa->len != fb->len) {
     	return 0;
@@ -373,25 +372,9 @@ int fvec_equals(fvec_t *fa, fvec_t *fb)
     	return 1;
     }
 
-    /* Loop over dimensions fa */
-    for (i = 0, j = 0; j < fa->len; j++) {
-    	b = 0;
-        /* Binary search */
-        p = i, q = fb->len;
-        do {
-            k = i, i = ((q - p) >> 1) + p;
-            if (fb->dim[i] > fa->dim[j]) {
-                q = i;
-            } else if (fb->dim[i] < fa->dim[j]) {
-                p = i;
-            } else {
-                b = 1;
-                break;
-            }
-        } while (i != k);
-
-        /* No match */
-        if (!b) return 0;
+    for (i = 0; i < fa->len; i++) {
+        if (fa->dim[i] != fb->dim[i] || fabs(fa->val[i] - fb->val[i]) > 1e-6)
+    		return 0;
     }
 
     return 1;
