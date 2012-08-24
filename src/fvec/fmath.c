@@ -222,10 +222,11 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
     }
 
     /* Choose times functions */
-    if (a + b > ceil(a * log2(b)))
+    if (a + b > ceil(a * log2(b))) {
         fvec_times_bsearch(fa, fb);
-    else
+    } else {
         fvec_times_loop(fa, fb);
+    }
         
     fvec_sparsify(fa);
 }
