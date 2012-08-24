@@ -214,9 +214,9 @@ static void fvec_times_bsearch(fvec_t *fa, fvec_t *fb)
 void fvec_times(fvec_t *fa, fvec_t *fb)
 {
     assert(fa && fb);
-    double a, b;
+    double a = fa->len, b = fb->len;
 
-    if (fb->len <= 0) {
+    if (b <= 0) {
     	fvec_truncate(fa);
     	return;
     }
