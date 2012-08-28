@@ -254,10 +254,6 @@ static void sally_parse_options(int argc, char **argv)
         exit(EXIT_SUCCESS);
     }
 
-    if (!user_conf) {
-        warning("No config file given. Using defaults (see -D)");
-    }
-
     argc -= optind;
     argv += optind;
     
@@ -268,6 +264,11 @@ static void sally_parse_options(int argc, char **argv)
     } else {
         input = argv[0];
         output = argv[1];
+    }
+    
+    /* Last but not least. Warn about default config */
+    if (!user_conf) {
+        warning("No config file given. Using defaults (see -D)");
     }
 }
 
