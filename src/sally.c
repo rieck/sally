@@ -80,15 +80,13 @@ int sally_version(FILE *f, char *p, char *m)
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }
 
-static void print_defaults(void)
+/**
+ * Print configuration
+ * @param msg Text to add to output
+ */
+static void print_config(char *msg)
 {
-    sally_version(stdout, "# ", "Default configuration");
-    config_print(&cfg);
-}
-
-static void print_config(void)
-{
-    sally_version(stdout, "# ", "Current configuration");
+    sally_version(stdout, "# ", msg);
     config_print(&cfg);
 }
 
@@ -224,7 +222,7 @@ static void sally_parse_options(int argc, char **argv)
             verbose++;
             break;
         case 'D':
-            print_defaults();
+            print_config("Default configuration");
             exit(EXIT_SUCCESS);
             break;
         case 'C':
@@ -457,7 +455,7 @@ int main(int argc, char **argv)
     sally_parse_options(argc, argv);
 
     if (print_conf) {
-        print_config();
+        print_config("Current configuration");
     }
     else
     {
