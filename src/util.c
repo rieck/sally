@@ -186,7 +186,7 @@ size_t gzgetline(char **s, size_t * n, gzFile f)
 
         c = gzgetc(f);
         if (c == -1)
-            break;
+            return -1;
 
         (*s)[(*n)++] = c;
     }
