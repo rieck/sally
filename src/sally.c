@@ -250,18 +250,18 @@ static void sally_parse_options(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    /* We are through with parsing. Print the config if requested */
+    if (print_conf) {
+        print_config("Current configuration");
+        exit(EXIT_SUCCESS);
+    }
+
     if (!user_conf) {
         warning("No config file given. Using defaults (see -D)");
     }
 
     argc -= optind;
     argv += optind;
-    
-    /* We are through with parsing. Print the config if requested */
-    if (print_conf) {
-        print_config("Current configuration");
-        exit(EXIT_SUCCESS);
-    }
     
     /* Check for input and output arguments */
     if (argc != 2) {
