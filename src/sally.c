@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -65,6 +66,8 @@ static struct option longopts[] = {
     {NULL, 0, NULL, 0}
 };
 
+static const int OPT_CONFIGFILE = 0;
+
 /**
  * Prints version and copyright information to a file stream
  * @param f File pointer
@@ -88,12 +91,6 @@ static void print_config(void)
     sally_version(stdout, "# ", "Current configuration");
     config_print(&cfg);
 }
-
-/**
- * Main processing function
- * @param in Input file
- * @param out Output file
- */
 
 /**
  * Print usage of command line tool
@@ -150,7 +147,7 @@ static void print_version(void)
  */
 static void sally_parse_options(int argc, char **argv)
 {
-    int ch;
+    int ch, user_conf = FALSE;
 
     optind = 0;
 
@@ -158,6 +155,7 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
+        	user_conf = TRUE;
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -250,8 +248,9 @@ static void sally_parse_options(int argc, char **argv)
 #endif
 
     /* Check configuration */
-    if(!config_check(&cfg))
+    if(!config_check(&cfg)) {
         exit(EXIT_FAILURE);
+    }
 
     argc -= optind;
     argv += optind;
@@ -262,6 +261,10 @@ static void sally_parse_options(int argc, char **argv)
         if (argc != 2) {
             print_usage();
             exit(EXIT_FAILURE);
+        }
+
+        if (!user_conf) {
+            warning("No config file given. Using defaults (see -D)");
         }
 
         input = argv[0];
@@ -277,36 +280,36 @@ static void sally_parse_options(int argc, char **argv)
  */
 static void sally_load_config(int argc, char **argv)
 {
-    char *cfg_file = NULL;
-    int ch;
+	struct option* const opt_conf = &longopts[OPT_CONFIGFILE];
+    char* cfg_file = NULL;
 
-    /* Check for config file in command line */
-    while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
-        switch (ch) {
-        case 'c':
-            cfg_file = optarg;
-            break;
-        case '?':
-        default:
-            /* empty */
-            break;
-        }
+    /* Check for config file in command line. We avoid getopt_long, though.
+     * This is because we only looking for one specific argument and don't
+     * want to trigger a warning for unknown arguments (yet). */
+    for (int i = 1; i < argc; i++) {
+    	if (strnlen(argv[i], 2) >= 2) {
+    		/* This also interprets -cxx as -c just as getopt_long would do */
+    		if (argv[i][1] == opt_conf->val || !strcmp(argv[i] +2, opt_conf->name)) {
+    			if (i +1 < argc) {
+    				cfg_file = argv[i +1];
+    			}
+    		}
+    	}
     }
 
     /* Init and load configuration */
     config_init(&cfg);
 
-    if (!cfg_file) {
-        warning("No config file given. Using defaults (see -D)");
-    } else {
+    if (cfg_file != NULL) {
         if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
             fatal("Could not read configuration (%s in line %d)",
                   config_error_text(&cfg), config_error_line(&cfg));
     }
 
     /* Check configuration */
-    if (!config_check(&cfg))
+    if (!config_check(&cfg)) {
         exit(EXIT_FAILURE);
+    }
 }
 
 
