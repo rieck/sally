@@ -411,6 +411,7 @@ can be changed by using the command-line option B<--xx
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
        --reverse_str <0|1>       Reverse (flip) all strings.
+       --stopword_file <file>    Provide a file with stop words.
   -o,  --output_format <format>  Set output format for vectors.
 
 =head2 Feature options
@@ -422,6 +423,8 @@ can be changed by using the command-line option B<--xx
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
        --vect_sign <0|1>         Enabled signed embedding.
+       --thres_low <float>       Enable minimum threshold for vectors.
+       --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
        --explicit_hash <0|1>     Enable explicit hash representation.
        --tfidf_file <file>       Set file name for TFIDF weighting.
@@ -430,9 +433,9 @@ can be changed by using the command-line option B<--xx
 
   -c,  --config_file <file>      Set configuration file.
   -v,  --verbose                 Increase verbosity.
+  -q,  --quiet                   Be quiet during processing.
   -C,  --print_config            Print the current configuration.
   -D,  --print_defaults          Print the default configuration.
-  -q,  --quiet                   Be quiet during processing.
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.
 
