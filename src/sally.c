@@ -153,7 +153,7 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
-        	user_conf = TRUE;
+            user_conf = TRUE;
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -250,21 +250,24 @@ static void sally_parse_options(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
+    if (!user_conf) {
+        warning("No config file given. Using defaults (see -D)");
+    }
+
     argc -= optind;
     argv += optind;
-
-    /* Check remaining arguments */
-    if (!print_conf)
-    {
-        if (argc != 2) {
-            print_usage();
-            exit(EXIT_FAILURE);
-        }
-
-        if (!user_conf) {
-            warning("No config file given. Using defaults (see -D)");
-        }
-
+    
+    /* We are through with parsing. Print the config if requested */
+    if (print_conf) {
+        print_config("Current configuration");
+        exit(EXIT_SUCCESS);
+    }
+    
+    /* Check for input and output arguments */
+    if (argc != 2) {
+        print_usage();
+        exit(EXIT_FAILURE);
+    } else {
         input = argv[0];
         output = argv[1];
     }
@@ -454,14 +457,9 @@ int main(int argc, char **argv)
     sally_load_config(argc, argv);
     sally_parse_options(argc, argv);
 
-    if (print_conf) {
-        print_config("Current configuration");
-    }
-    else
-    {
-	    sally_init();
-	    sally_process();
-	    sally_exit();
-    }
+    sally_init();
+    sally_process();
+    sally_exit();
+
     return EXIT_SUCCESS;
 }
