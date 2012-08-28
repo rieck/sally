@@ -66,8 +66,6 @@ static struct option longopts[] = {
     {NULL, 0, NULL, 0}
 };
 
-static const int OPT_CONFIGFILE = 0;
-
 /**
  * Prints version and copyright information to a file stream
  * @param f File pointer
@@ -281,21 +279,23 @@ static void sally_parse_options(int argc, char **argv)
  */
 static void sally_load_config(int argc, char **argv)
 {
-	struct option* const opt_conf = &longopts[OPT_CONFIGFILE];
     char* cfg_file = NULL;
+    int ch;
 
-    /* Check for config file in command line. We avoid getopt_long, though.
-     * This is because we only looking for one specific argument and don't
-     * want to trigger a warning for unknown arguments (yet). */
-    for (int i = 1; i < argc; i++) {
-    	if (strnlen(argv[i], 2) >= 2) {
-    		/* This also interprets -cxx as -c just as getopt_long would do */
-    		if (argv[i][1] == opt_conf->val || !strcmp(argv[i] +2, opt_conf->name)) {
-    			if (i +1 < argc) {
-    				cfg_file = argv[i +1];
-    			}
-    		}
-    	}
+    /* Check for config file in command line */
+    while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
+        switch (ch) {
+        case 'c':
+            cfg_file = optarg;
+            break;
+        case '?':
+            print_usage();
+            exit(EXIT_SUCCESS);
+            break;
+        default:                                                                    
+            /* empty */
+            break;
+        }
     }
 
     /* Init and load configuration */
