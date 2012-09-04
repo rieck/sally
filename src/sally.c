@@ -52,6 +52,8 @@ static struct option longopts[] = {
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 1, NULL, 1006},
+    {"thres_low", 1, NULL, 1009},    
+    {"thres_high", 1, NULL, 1010},   /* <- last entry */   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
     {"tfidf_file", 1, NULL, 1004},
@@ -78,23 +80,15 @@ int sally_version(FILE *f, char *p, char *m)
     return fprintf(f, "%sSally %s - %s\n", p, PACKAGE_VERSION, m);
 }
 
-static void print_defaults(void)
-{
-    sally_version(stdout, "# ", "Default configuration");
-    config_print(&cfg);
-}
-
-static void print_config(void)
-{
-    sally_version(stdout, "# ", "Current configuration");
-    config_print(&cfg);
-}
-
 /**
- * Main processing function
- * @param in Input file
- * @param out Output file
+ * Print configuration
+ * @param msg Text to add to output
  */
+static void print_config(char *msg)
+{
+    sally_version(stdout, "# ", msg);
+    config_print(&cfg);
+}
 
 /**
  * Print usage of command line tool
@@ -119,6 +113,8 @@ static void print_usage(void)
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
            "       --vect_sign <0|1>         Enable signed embedding.\n"
+           "       --thres_low <float>       Enable minimum threshold for vectors.\n"
+           "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
            "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
@@ -152,7 +148,7 @@ static void print_version(void)
  */
 static void sally_parse_options(int argc, char **argv)
 {
-    int ch;
+    int ch, user_conf = FALSE;
 
     optind = 0;
     int eval_mode = FALSE;
@@ -161,6 +157,7 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
+            user_conf = TRUE;
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -185,6 +182,12 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1008:
             config_set_string(&cfg, "input.stopword_file", optarg);
+            break;
+        case 1009:
+            config_set_float(&cfg, "features.thres_low", atof(optarg));
+            break;
+        case 1010:
+            config_set_float(&cfg, "features.thres_high", atof(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
@@ -227,7 +230,7 @@ static void sally_parse_options(int argc, char **argv)
             verbose++;
             break;
         case 'D':
-            print_defaults();
+            print_config("Default configuration");
             exit(EXIT_SUCCESS);
             break;
         case 'C':
@@ -257,22 +260,31 @@ static void sally_parse_options(int argc, char **argv)
     }
 
     /* Check configuration */
-    if(!config_check(&cfg))
+    if(!config_check(&cfg)) {
         exit(EXIT_FAILURE);
+    }
+
+    /* We are through with parsing. Print the config if requested */
+    if (print_conf) {
+        print_config("Current configuration");
+        exit(EXIT_SUCCESS);
+    }
 
     argc -= optind;
     argv += optind;
-
-    /* Check remaining arguments */
-    if (!print_conf)
-    {
-        if (argc != 2) {
-            print_usage();
-            exit(EXIT_FAILURE);
-        }
-
+    
+    /* Check for input and output arguments */
+    if (argc != 2) {
+        print_usage();
+        exit(EXIT_FAILURE);
+    } else {
         input = argv[0];
         output = argv[1];
+    }
+    
+    /* Last but not least. Warn about default config */
+    if (!user_conf) {
+        warning("No config file given. Using defaults (see -D)");
     }
 }
 
@@ -284,7 +296,7 @@ static void sally_parse_options(int argc, char **argv)
  */
 static void sally_load_config(int argc, char **argv)
 {
-    char *cfg_file = NULL;
+    char* cfg_file = NULL;
     int ch;
 
     /* Check for config file in command line */
@@ -294,7 +306,10 @@ static void sally_load_config(int argc, char **argv)
             cfg_file = optarg;
             break;
         case '?':
-        default:
+            print_usage();
+            exit(EXIT_SUCCESS);
+            break;
+        default:                                                                    
             /* empty */
             break;
         }
@@ -303,17 +318,16 @@ static void sally_load_config(int argc, char **argv)
     /* Init and load configuration */
     config_init(&cfg);
 
-    if (!cfg_file) {
-        warning("No config file given. Using defaults (see -D)");
-    } else {
+    if (cfg_file != NULL) {
         if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
             fatal("Could not read configuration (%s in line %d)",
                   config_error_text(&cfg), config_error_line(&cfg));
     }
 
     /* Check configuration */
-    if (!config_check(&cfg))
+    if (!config_check(&cfg)) {
         exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -505,14 +519,9 @@ int main(int argc, char **argv)
     sally_load_config(argc, argv);
     sally_parse_options(argc, argv);
 
-    if (print_conf) {
-        print_config();
-    }
-    else
-    {
-	    sally_init();
-	    sally_process();
-	    sally_exit();
-    }
+    sally_init();
+    sally_process();
+    sally_exit();
+
     return EXIT_SUCCESS;
 }

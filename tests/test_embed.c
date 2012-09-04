@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -36,7 +37,9 @@ int test_embed_tfidf()
     config_set_string(&cfg, "features.vect_norm", "none");
     config_set_string(&cfg, "features.tfidf_file", TEST_TFIDF);
 
+    unlink(TEST_TFIDF);
     idf_create(TEST_FILE);
+    test_printf("Testing TFIDF embedding");
 
     input_config("lines");
     n = input_open(TEST_FILE);
@@ -54,20 +57,25 @@ int test_embed_tfidf()
     fvec_mul(w, n);
     fvec_log2(w);
 
-    /* Invert w for multipling out IDFs */
+    if (!idf_check(w))
+    {
+    	err++;
+        test_error("(%d) internal idf values seem to be wrong", i);
+    }
+
+    /* Invert w for multiplying out IDFs */
     fvec_invert(w);
 
-    test_printf("Testing TFIDF embedding");
     config_set_string(&cfg, "features.vect_embed", "tfidf");
     for (i = 0, err = 0; i < n; i++) {
         fvec_t *fv = fvec_extract(strs[i].str, strs[i].len);
         fvec_times(fv, w);
 
         /* Check if rest tf */
-        double n = 0;
+        double d = 0;
         for (j = 0; j < fv->len; j++)
-            n += fv->val[j];
-        err += fabs(n - 1.0) > 1e-6;
+            d += fv->val[j];
+        err += fabs(d - 1.0) > 1e-6;
         fvec_destroy(fv);
     }
     test_return(err, n);

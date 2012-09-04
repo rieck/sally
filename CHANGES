@@ -1,4 +1,62 @@
+2012-08-24  chwress <chwress@github>
+
+  * src/fvec/fmath.c, src/fvec/fvec.c, src/input/input.c, src/sconfig.c,
+  src/util.c, tests/test_embed.c: fix some typos in the code documentation
+
+  * src/fvec/embed.c, src/fvec/fmath.c, src/fvec/fvec.c: nicely make use of
+  TRUE & FALSE defines
+
+  * src/fvec/fmath.c, tests/test_fvec.c: make fvec_equals actually work (thx
+  konrad)
+
+2012-08-23  Konrad Rieck <konrad@mlsec.org>
+
+  * CHANGES, doc/sally.pod: new switch for default config is D
+
+2012-08-23  chwress <chwress@github>
+
+  * src/fvec/embed.c, src/fvec/embed.h, tests/test_embed.c: introduce idf_check
+  for being able to properly unit-test the internal computed idf values
+
+  * src/fvec/fmath.c, src/fvec/fmath.h, tests/test_fvec.c: introduce the
+  fvec_equals(.,.) function
+
+  * src/fvec/embed.c, src/fvec/fvec.c, src/fvec/fvec.h: the 1-pass of the
+  tf*idf embedding (determining the idf values) must not "post-process" the raw
+  feature vector
+
+2012-08-22  chwress <chwress@github>
+
+  * src/fvec/fmath.c, src/fvec/fvec.c: unify the feature vector creation
+
+  * src/fvec/fvec.c, src/fvec/fvec.h: introduce fvec_truncate
+
+2012-08-21  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fmath.c, src/fvec/fmath.h, src/fvec/fvec.c, src/fvec/fvec.h:
+  implemented thresholding of vectors
+
+  * src/sally.c, src/sconfig.c: config for thresholding
+
+  * doc/example.cfg, doc/sally.pod: docs for thresholding
+
+  * doc/sally.pod, src/sally.c: minor fixes
+
+2012-08-21  chwress <https://github.com/chwress>
+
+  * README.md, doc/sally.pod, src/input/input.c, src/input/input_lines.c:
+  update the eMail address of chwress
+
+  * doc/sally.pod, src/sally.c: naming ("print_default" -> "print_defaults")
+
+2012-08-20  Konrad Rieck <konrad@mlsec.org>
+
+  * src/fvec/fvec.c, src/input/input_lines.c, src/output/output_libsvm.c: added
+  timing output
+
 2012-08-17  Konrad Rieck <konrad@mlsec.org>
+
+  * compile, configure.in, src/sally.c: re-enabled openmp code
 
   * src/input/input.c, src/sally.c: exit if stop word file no available but
   requested

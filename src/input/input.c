@@ -222,12 +222,12 @@ int stopwords_filter(char *str, int len)
         if (dlm) 
             str[k++] = str[i];
     } 
-    str[k] = 0;
-    return 0;
+
+    return k;
 }
 
 /** 
- * In-place preprocessing of strings
+ * In-place pre-processing of strings
  */
 void input_preproc(string_t *strs, int len)
 {
@@ -252,7 +252,7 @@ void input_preproc(string_t *strs, int len)
         }
         
         if (stopwords) {
-            stopwords_filter(strs[j].str, strs[j].len);
+            strs[j].len = stopwords_filter(strs[j].str, strs[j].len);
         }
     }
 }

@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -49,19 +50,37 @@ static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, fvec_t *fv);
 
-/* Global elimiter table */
+/* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
+
 
 /**
  * Allocates and extracts a feature vector from a string.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
+ *
  * @return feature vector
  */
 fvec_t *fvec_extract(char *x, int l)
 {
+    return fvec_extract_ex(x, l, TRUE);
+}
+
+/**
+ * Allocates and extracts a feature vector from a string.
+ * @param x String of bytes (with space delimiters)
+ * @param l Length of sequence
+ * @param postprocess Indicates whether the extracted feature should be
+ *                    post-processed regarding embedding, normalization,
+ *                    feature thresholds, etc.
+ *
+ * @return feature vector
+ */
+fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
+{
     fvec_t *fv;
     const char *dlm_str, *cfg_str;
+    double flt1, flt2;
     assert(x && l >= 0);
 
     /* Allocate feature vector */
@@ -71,19 +90,16 @@ fvec_t *fvec_extract(char *x, int l)
         return NULL;
     }
 
-    /* Initialize feature vector */
-    fv->len = 0;
-    fv->total = 0;
-    fv->dim = (feat_t *) malloc(l * sizeof(feat_t));
-    fv->val = (float *) malloc(l * sizeof(float));
-    fv->src = NULL;
-
     /* Check for empty sequence */
     if (l == 0)
         return fv;
 
+    /* Allocate arrays */
+    fv->dim = (feat_t *) malloc(l * sizeof(feat_t));
+    fv->val = (float *) malloc(l * sizeof(float));
+
     if (!fv->dim || !fv->val) {
-        error("Could not allocate feature vector");
+        error("Could not allocate feature vector contents");
         fvec_destroy(fv);
         return NULL;
     }
@@ -110,11 +126,20 @@ fvec_t *fvec_extract(char *x, int l)
     /* Count features  */
     count_feat(fv);
 
-    /* Compute embedding and normalization */
-    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
-    fvec_embed(fv, cfg_str);
-    config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
-    fvec_norm(fv, cfg_str);
+    if (postprocess) {
+        /* Compute embedding and normalization */
+        config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
+        fvec_embed(fv, cfg_str);
+        config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
+        fvec_norm(fv, cfg_str);
+
+        /* Apply thresholding */
+        config_lookup_float(&cfg, "features.thres_low", &flt1);
+        config_lookup_float(&cfg, "features.thres_high", &flt2);
+        if (flt1 != 0.0 || flt2 != 0.0) {
+            fvec_thres(fv, flt1, flt2);
+        }
+    }
     
 #ifdef ENABLE_EVALTIME
     printf("strlen %u embed %f\n", l, time_stamp() - t1);
@@ -130,6 +155,21 @@ fvec_t *fvec_extract(char *x, int l)
 fvec_t *fvec_zero()
 {
     return fvec_extract("", 0);
+}
+
+/**
+ * Truncates the given features vector down to 0-length
+ */
+void fvec_truncate(fvec_t* const fv)
+{
+	assert(fv != NULL);
+
+    fv->len = 0;
+    if (fv->dim) free(fv->dim);
+    if (fv->val) free(fv->val);
+
+    fv->dim = NULL;
+    fv->val = NULL;
 }
 
 /**
@@ -176,7 +216,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
  * libc and this is just some ugly code).
  * @param v1 first char 
  * @param v2 second char
- * @return comparisong result as integer
+ * @return comparison result as integer
  */
 static int chrcmp(const void *v1, const void *v2)
 {
@@ -194,7 +234,7 @@ static int chrcmp(const void *v1, const void *v2)
  * Compares two words (not necessary null terminated)
  * @param v1 first word 
  * @param v2 second word
- * @return comparisong result as integer
+ * @return comparison result as integer
  */
 static int wordcmp(const void *v1, const void *v2)
 {
@@ -309,7 +349,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
 
     /* Extract n-grams */
     for (k = i = 0; i < j; i++) {
-        /* Count delimiters and remember start poisition */
+        /* Count delimiters and remember start position */
         if (t[i] == d && ++q == 1)
             s = i;
 
@@ -324,7 +364,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
             if (sort)
                 fstr = sort_words(fstr, flen, d);
 
-            /* Positonal n-grams code */
+            /* Positional n-grams code */
             if (pos) {
                 memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
                 flen += sizeof(unsigned long);
@@ -403,7 +443,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
         if (sort)
             qsort(fstr, flen, 1, chrcmp);
 
-        /* Positonal n-grams code */
+        /* Positional n-grams code */
         if (pos) {
             memcpy(fstr + flen, &(fv->len), sizeof(unsigned long));
             flen += sizeof(unsigned long);
@@ -437,7 +477,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l)
 
 
 /**
- * Compares two features values (hashs)
+ * Compares two features values (hashes)
  * @param x feature X
  * @param y feature Y
  * @return result as a signed integer
@@ -452,7 +492,7 @@ static int cmp_feat(const void *x, const void *y)
 }
 
 /** 
- * Counts featues in a preliminary feature vector
+ * Counts features in a preliminary feature vector
  * @param fv Valid feature vector
  */
 static void count_feat(fvec_t *fv)
@@ -491,26 +531,32 @@ static void count_feat(fvec_t *fv)
  */
 void fvec_realloc(fvec_t *fv)
 {
-    feat_t *p_dim;
-    float *p_val;
+    feat_t *p_dim = NULL;
+    float *p_val = NULL;
 
-    /*
-     * Explicit reallocation. Don't use realloc(). On some platforms 
-     * realloc() will not shrink memory blocks or copy to smaller sizes.
-     * Consequently, realloc() may result in memory leaks. 
-     */
-    p_dim = malloc(fv->len * sizeof(feat_t));
-    p_val = malloc(fv->len * sizeof(float));
-    if (!p_dim || !p_val) {
-        error("Could not re-allocate feature vector");
-        free(p_dim);
-        free(p_val);
-        return;
+    if (fv->len <= 0)
+    {
+    	fvec_truncate(fv);
+    	return;
     }
 
-    /* Copy to new feature vector */
-    memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
-    memcpy(p_val, fv->val, fv->len * sizeof(float));
+	/*
+	 * Explicit reallocation. Don't use realloc(). On some platforms
+	 * realloc() will not shrink memory blocks or copy to smaller sizes.
+	 * Consequently, realloc() may result in memory leaks.
+	 */
+	p_dim = malloc(fv->len * sizeof(feat_t));
+	p_val = malloc(fv->len * sizeof(float));
+	if (!p_dim || !p_val) {
+		error("Could not re-allocate feature vector");
+		free(p_dim);
+		free(p_val);
+		return;
+	}
+
+	/* Copy to new feature vector */
+	memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
+	memcpy(p_val, fv->val, fv->len * sizeof(float));
 
     /* Free old */
     free(fv->dim);

@@ -12,7 +12,7 @@
 /** 
  * @defgroup sconfig Configuration functions
  * Functions for configuration of the Sally tool. Additionally default
- * values for each configruation parameter are specified in this module. 
+ * values for each configuration parameter are specified in this module.
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
@@ -41,6 +41,8 @@ static config_default_t defaults[] = {
     {"features", "vect_embed", CONFIG_TYPE_STRING, {.str = "cnt"}},
     {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},
     {"features", "vect_sign", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "thres_low", CONFIG_TYPE_FLOAT, {.flt = 0}},
+    {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},    
     {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 22}},
     {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
@@ -185,6 +187,7 @@ static void config_default(config_t *cfg)
 int config_check(config_t *cfg)
 {
     const char *s1, *s2;
+    double f1, f2;
 
     /* Add default values where missing */
     config_default(cfg);    
@@ -194,6 +197,13 @@ int config_check(config_t *cfg)
     config_lookup_string(cfg, "features.vect_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
         error("Stop words can only be used if delimiters are defined.");
+        return 0;
+    }
+    
+    config_lookup_float(cfg, "features.thres_low", &f1);
+    config_lookup_float(cfg, "features.thres_high", &f2);
+    if (f1 != 0.0 && f2 != 0.0 && f1 > f2) {
+        error("Minimum threshold larger than maximum threshold.");
         return 0;
     }
     

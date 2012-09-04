@@ -70,7 +70,7 @@ command-line option by B<--xx "yy">.
 
 If no configuration file is provided, B<sally> resorts to a default 
 configuration. This default configuration can be dumped using the 
-command-line option B<-P>.
+command-line option B<-D>.
 
 =head2 Input formats
 
@@ -277,6 +277,20 @@ is used to define a sign for each feature.  Collisions are still possible,
 yet their impact is lessened as colliding features not necessary induce
 larger values.
 
+=item B<thres_low = 0;>
+
+This parameter defines a minimum threshold for the entries in each vector. 
+Values below the threshold are removed.  The parameter can be used to filter
+low-valued features from the vectors, such as very infrequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
+=item B<thres_high = 0;>
+
+This parameter defines a maximum threshold for the entries in each vector. 
+Values above the threshold are removed.  The parameter can be used to filter
+high-valued features from the vectors, such as very frequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
 =item B<hash_bits = 22;>
 
 B<sally> uses a hash function to map individual features to dimensions. 
@@ -397,6 +411,7 @@ can be changed by using the command-line option B<--xx
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
        --reverse_str <0|1>       Reverse (flip) all strings.
+       --stopword_file <file>    Provide a file with stop words.
   -o,  --output_format <format>  Set output format for vectors.
 
 =head2 Feature options
@@ -408,6 +423,8 @@ can be changed by using the command-line option B<--xx
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
        --vect_sign <0|1>         Enabled signed embedding.
+       --thres_low <float>       Enable minimum threshold for vectors.
+       --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
        --explicit_hash <0|1>     Enable explicit hash representation.
        --tfidf_file <file>       Set file name for TFIDF weighting.
@@ -416,9 +433,9 @@ can be changed by using the command-line option B<--xx
 
   -c,  --config_file <file>      Set configuration file.
   -v,  --verbose                 Increase verbosity.
+  -q,  --quiet                   Be quiet during processing.
   -C,  --print_config            Print the current configuration.
   -D,  --print_defaults          Print the default configuration.
-  -q,  --quiet                   Be quiet during processing.
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.
 

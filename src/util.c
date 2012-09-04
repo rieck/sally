@@ -166,7 +166,7 @@ void prog_bar(long a, long b, long c)
  * searching the Web for a couple of minutes to find a suitable 
  * implementation. Unfortunately, I could not find anything 
  * appropriate. Some people confused fgets() with getline(), 
- * others were arguing on licences over and over.
+ * others were arguing on licenses over and over.
  */
 size_t gzgetline(char **s, size_t * n, gzFile f)
 {
@@ -186,7 +186,7 @@ size_t gzgetline(char **s, size_t * n, gzFile f)
 
         c = gzgetc(f);
         if (c == -1)
-            break;
+            return -1;
 
         (*s)[(*n)++] = c;
     }
