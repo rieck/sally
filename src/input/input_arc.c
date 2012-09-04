@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -49,8 +50,17 @@ int input_arc_open(char *name)
     a = archive_read_new();
     archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
-    int r = archive_read_open_filename(a, name, 4096);
+
+    FILE* f = fopen(name, "r");
+    if (f == NULL)
+    {
+    	error("Failed to open '%s", name);
+    	return -1;
+    }
+
+    int r = archive_read_open_FILE(a, f);
     if (r != 0) {
+        fclose(f);
         error("%s", archive_error_string(a));
         return -1;
     }
@@ -58,9 +68,10 @@ int input_arc_open(char *name)
     /* Count regular files in archive */
     int num_files = 0;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        const struct stat *s = archive_entry_stat(entry);
-        if (S_ISREG(s->st_mode))
-            num_files++;
+        if (archive_entry_filetype(entry) == AE_IFREG)
+        {
+        	num_files++;
+        }
         archive_read_data_skip(a);
     }
     archive_read_finish(a);
@@ -69,7 +80,9 @@ int input_arc_open(char *name)
     a = archive_read_new();
     archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
-    archive_read_open_filename(a, name, 4096);
+
+    fseek(f, 0, SEEK_SET);
+    archive_read_open_FILE(a, f);
     return num_files;
 }
 
