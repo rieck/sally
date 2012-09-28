@@ -9,7 +9,7 @@
 
 \title{\textbf{Sally Version __VERSION__}\\  
        --- User Manual ---}
-\author{Konrad Rieck}
+\author{Konrad Rieck, Christian Wressnegger, and Alexander Bikadorov}
 \maketitle
 
 \tableofcontents

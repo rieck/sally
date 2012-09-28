@@ -1,3 +1,7 @@
+2012-08-28  Konrad Rieck <konrad@mlsec.org>
+
+  * CHANGES, doc/sally.pod: added misc docs to manual
+
 2012-08-24  chwress <chwress@github>
 
   * src/fvec/fmath.c, src/fvec/fvec.c, src/input/input.c, src/sconfig.c,
