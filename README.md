@@ -39,7 +39,7 @@ Corresponding packages
 
 + Debian and Ubuntu Linux: `libz-dev libconfig8-dev libarchive-dev`  
 + MacOS X with Homebrew:   `libconfig libarchive (homebrew-dupes)`  
-+ MacOS X with MacPorts:   `libconfig-ht libarchive`  
++ MacOS X with MacPorts:   `libconfig-hr libarchive`  
 
 The source code of the libraries is available here:
 
