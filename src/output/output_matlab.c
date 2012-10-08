@@ -308,7 +308,7 @@ static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
 
         fentry_t *fe = fhash_get(fv->dim[i]);
         for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
-            if (isprint(fe->data[j]) && !strchr("%", fe->data[k])) {
+            if (isprint(fe->data[j]) && !strchr("%", fe->data[j])) {
                 buf[k] = fe->data[j];
                 k += 1;
             } else {
