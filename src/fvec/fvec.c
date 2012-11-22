@@ -48,7 +48,7 @@ static void extract_ngrams(fvec_t *, char *x, int l, int p);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
-static void cache_flush(fentry_t *c, fvec_t *fv);
+static void cache_flush(fentry_t *c, int l);
 
 /* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
@@ -196,11 +196,11 @@ void fvec_truncate(fvec_t* const fv)
  */
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l)
 {
-    c[fv->len].len = l;
-    c[fv->len].key = fv->dim[fv->len];
-    c[fv->len].data = malloc(l);
-    if (c[fv->len].data)
-        memcpy(c[fv->len].data, t, l);
+    c->len = l;
+    c->key = fv->dim[fv->len];
+    c->data = malloc(l);
+    if (c->data)
+        memcpy(c->data, t, l);
     else
         error("Could not allocate feature data");
 }
@@ -208,9 +208,9 @@ static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l)
 /**
  * Flushs all features from the cache to the feature hash table.
  * @param c Pointer to cache
- * @param fv Feature vector
+ * @param l Length of cache
  */
-static void cache_flush(fentry_t *c, fvec_t *fv)
+static void cache_flush(fentry_t *c, int l)
 {
     int i;
 
@@ -219,7 +219,7 @@ static void cache_flush(fentry_t *c, fvec_t *fv)
 #pragma omp critical
 #endif
     {
-        for (i = 0; i < fv->len; i++) {
+        for (i = 0; i < l; i++) {
             fhash_put(c[i].key, c[i].data, c[i].len);
             free(c[i].data);
         }
@@ -324,7 +324,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 {
     assert(fv && x && l > 0);
     int nlen, sort, bits, sign, flen;
-    unsigned int i, j = l, k = 0, s = 0, q = 0, d;
+    unsigned int i, j = l, k = 0, s = 0, q = 0, d, ci = 0;
     char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
 
@@ -338,7 +338,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
     if (fhash_enabled())
-        cache = malloc(l * sizeof(fentry_t));
+        cache = calloc(l, sizeof(fentry_t));
 
     /* Find first delimiter symbol */
     for (d = 0; !delim[(unsigned char) d] && d < 256; d++);
@@ -381,7 +381,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
             /* Positional n-grams code */
             if (pos) {
-                unsigned long p = fv->len + pos;
+                unsigned long p = ci + pos;
                 memcpy(fstr + flen, &p, sizeof(unsigned long));
                 flen += sizeof(unsigned long);
             }
@@ -396,7 +396,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
             /* Cache feature and key */
             if (fhash_enabled())
-                cache_put(cache, fv, fstr, flen);
+                cache_put(&cache[ci++], fv, fstr, flen);
 
             k = s + 1, i = s, q = 0;
             fv->len++;
@@ -409,7 +409,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
   clean:
     if (fhash_enabled()) {
-        cache_flush(cache, fv);
+        cache_flush(cache, ci);
         free(cache);
     }
     free(t);
@@ -428,7 +428,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 {
     assert(fv && x);
 
-    unsigned int i = 0;
+    unsigned int i = 0, ci = 0;
     int nlen, sort, bits, flen, sign;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
@@ -443,7 +443,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
     if (fhash_enabled()) 
-        cache = malloc(l * sizeof(fentry_t));
+        cache = calloc(l, sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
@@ -461,7 +461,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 
         /* Positional n-grams code */
         if (pos) {
-            unsigned long p = fv->len + pos;
+            unsigned long p = ci + pos;
             memcpy(fstr + flen, &p, sizeof(unsigned long));
             flen += sizeof(unsigned long);
         }
@@ -476,7 +476,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 
         /* Cache feature */
         if (fhash_enabled())
-            cache_put(cache, fv, fstr, flen);
+            cache_put(&cache[ci++], fv, fstr, flen);
 
         t++;
         fv->len++;
@@ -488,7 +488,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
         return;
 
     /* Flush cache */
-    cache_flush(cache, fv);
+    cache_flush(cache, ci);
     free(cache);
 }
 
