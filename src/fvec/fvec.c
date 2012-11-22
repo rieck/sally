@@ -308,7 +308,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
 {
     assert(fv && x && l > 0);
     int nlen, pos, sort, bits, sign, flen;
-    unsigned int i, j = l, k = 0, s = 0, q = 0, d;
+    unsigned int i, j = l;
+    unsigned int dlm = 0;
+    unsigned int fstart, fnext = 0, fnum = 0;
     char *t = malloc(l + 1), *fstr;
     fentry_t *cache = NULL;
 
@@ -326,14 +328,14 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         cache = malloc(l * sizeof(fentry_t));
 
     /* Find first delimiter symbol */
-    for (d = 0; !delim[(unsigned char) d] && d < 256; d++);
+    for (dlm = 0; !delim[(unsigned char) dlm] && dlm < 256; dlm++);
 
     /* Remove redundant delimiters */
     for (i = 0, j = 0; i < l; i++) {
         if (delim[(unsigned char) x[i]]) {
             if (j == 0 || delim[(unsigned char) t[j - 1]])
                 continue;
-            t[j++] = (char) d;
+            t[j++] = (char) dlm;
         } else {
             t[j++] = x[i];
         }
@@ -344,25 +346,25 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
         goto clean;
 
     /* Add trailing delimiter */
-    if (t[j - 1] != d)
-        t[j++] = (char) d;
+    if (t[j - 1] != dlm)
+        t[j++] = (char) dlm;
 
     /* Extract n-grams */
-    for (k = i = 0; i < j; i++) {
+    for (fstart = i = 0; i < j; i++) {
         /* Count delimiters and remember start position */
-        if (t[i] == d && ++q == 1)
-            s = i;
+        if (t[i] == dlm && ++fnum == 1)
+            fnext = i;
 
         /* Store n-gram */
-        if (q == nlen && i - k > 0) {
+        if (fnum == nlen && i - fstart > 0) {
             /* Copy feature string and add slack */
-            flen = i - k;
+            flen = i - fstart;
             fstr = malloc(flen + sizeof(unsigned long));
-            memcpy(fstr, t + k, flen);
+            memcpy(fstr, t + fstart, flen);
 
             /* Sorted n-grams code */
             if (sort)
-                fstr = sort_words(fstr, flen, d);
+                fstr = sort_words(fstr, flen, dlm);
 
             /* Positional n-grams code */
             if (pos) {
@@ -382,7 +384,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l)
             if (fhash_enabled())
                 cache_put(cache, fv, fstr, flen);
 
-            k = s + 1, i = s, q = 0;
+            fstart = fnext + 1, i = fnext, fnum = 0;
             fv->len++;
             free(fstr);
         }
