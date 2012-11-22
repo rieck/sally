@@ -398,10 +398,11 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
             /* Cache feature and key */
             if (fhash_enabled())
-                cache_put(&cache[ci++], fv, fstr, flen);
+                cache_put(&cache[ci], fv, fstr, flen);
 
             fstart = fnext + 1, i = fnext, fnum = 0;
             fv->len++;
+            ci++;
             free(fstr);
         }
     }
@@ -478,10 +479,11 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 
         /* Cache feature */
         if (fhash_enabled())
-            cache_put(&cache[ci++], fv, fstr, flen);
+            cache_put(&cache[ci], fv, fstr, flen);
 
         t++;
         fv->len++;
+        ci++;
         free(fstr);
     }
     fv->total += fv->len;
