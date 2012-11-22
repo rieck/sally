@@ -338,7 +338,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
     if (fhash_enabled())
-        cache = malloc(l * sizeof(fentry_t) * (pos ? pos : 1));
+        cache = malloc(l * sizeof(fentry_t));
 
     /* Find first delimiter symbol */
     for (d = 0; !delim[(unsigned char) d] && d < 256; d++);
@@ -443,7 +443,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
     if (fhash_enabled()) 
-        cache = malloc(l * sizeof(fentry_t) * (pos ? pos : 1));
+        cache = malloc(l * sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
         /* Check for sequence end */
