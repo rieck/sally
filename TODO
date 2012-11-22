@@ -2,6 +2,11 @@
 .Oo Sally - A Tool for Embedding Strings in Vector Spaces
     Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
 
+Known Bugs
+--
+  Problems with libarchive 3.x. archive_read_next_header(.) seems to 
+  return only 65535 header and only up to 65535 files can be processed.
+
 New Embeddings
 --
   Implement support for Sparse Kernel Feature Analysis or Accelerated Kernel

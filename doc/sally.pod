@@ -13,7 +13,7 @@ B<sally> [B<options>] [B<-c> I<config>] I<input> I<output>
 B<sally> is a small tool for mapping a set of strings to a set of
 vectors. This mapping is referred to as embedding and allows for
 applying techniques of machine learning and data mining for analysis
-of string data. B<sally> can applied to several types of string data,
+of string data. B<sally> can be applied to several types of string data,
 such as text documents, DNA sequences or log files, where it can
 handle common formats such as directories, archives and text files of
 string data.
@@ -53,7 +53,7 @@ such that high-dimensional vectors with millions of dimensions can be
 handled efficiently.  All features are indexed by a hash function,
 where the bit width of this function can be adjusted according to the
 characteristics of the data.  In several settings, a hash width
-between 24 and 28 bit already suffices to store millions of features
+between 22 and 26 bit already suffices to store millions of features
 with little loss of accuracy.
 
 =head1 CONFIGURATION
@@ -61,12 +61,16 @@ with little loss of accuracy.
 The configuration of B<sally> is specified in a configuration file.
 This file is structured into the three sections B<input>, B<features>
 and B<output>, which define the parameters of the input format, the
-feature extraction and the output format, respectively.
+feature extraction and the output format, respectively. 
 
 All parameters of the configuration can be also be specified on the
 command-line. That is, if a parameter is specified in the
 configuration as B<xx = "yy">, it can be alternatively supplied as a
 command-line option by B<--xx "yy">.
+
+If no configuration file is provided, B<sally> resorts to a default 
+configuration. This default configuration can be dumped using the 
+command-line option B<-D>.
 
 =head2 Input formats
 
@@ -113,6 +117,12 @@ is given as I<input> to B<sally>. Labels are extracted from the
 description of each sequence using a regular expression. Comments are
 allowed if they are preceded by either ';' or '>'.
 
+=item I<"stdin"> 
+
+A single string is read from standard input stream. The I<input> 
+parameter must be present but is not used and should set be to 
+I<input = "-">. No label information is supported by this input format.
+
 =back 
 
 =item B<chunk_size = 256;>
@@ -125,11 +135,12 @@ processing of data.
 
 =item B<decode_str = 0;>
 
-If this parameter is set to 1, B<sally> automatically decodes strings 
-that contain URI-encoded characters. That is, substrings of the form %XX 
-are replaced with the byte represented by the hexadecimal number XX. This
-feature comes handy, if binary data is provided using the textual input format B<lines>. For example, HTTP requests can be stored in a single line
-if linebreaks are represented by "%0a%0d".
+If this parameter is set to 1, B<sally> automatically decodes strings that
+contain URI-encoded characters.  That is, substrings of the form %XX are
+replaced with the byte represented by the hexadecimal number XX.  This
+feature comes handy, if binary data is provided using the textual input
+format "lines".  For example, HTTP requests can be stored in a single line
+if line-breaks are represented by "%0a%0d".
 
 =item B<fasta_regex = " (\\+|-)?[0-9]+";>
 
@@ -144,6 +155,19 @@ labels, such as +1 and -1.
 If the strings are available as text lines, the parameter can be used
 to extract a numerical label from the start of the strings. The
 parameter is a regular expression matching labels, such as +1 and -1.
+
+=item B<reverse_str = 0;>
+
+If this parameter is set to 1, the bytes of all input strings will
+be reversed. Such reversing might help in situations where the 
+reading direction of the input strings is unspecified.
+
+=item B<stopword_file = "";>
+
+Stop words (irrelevant words) can be filtered from the strings by providing
+a file containing these words; one per line. Non-printable characters
+can be escaped using URI encoding (%XX). Stop words can only be filtered, if 
+a set of delimiters is defined using B<ngram_delim>.
 
 =back
 
@@ -168,12 +192,13 @@ following parameters.
 
 =item B<ngram_delim = "%0a%0d";>
 
-The parameter B<ngram_len> specifies the numbers of consecutive words
-that are considered as one feature, while the parameter B<ngram_delim>
-defines characters for delimiting these words.  The characters can be
-either specified as bytes or as hexadecimal numbers prefixed by "%".
-The following types of features can be extracted using these
-parameters:
+The parameter B<ngram_len> specifies the numbers of consecutive words that
+are considered as one feature, while the parameter B<ngram_delim> defines
+characters for delimiting these words.  The characters can be either
+specified as bytes or as hexadecimal numbers prefixed by "%".  If no
+delimiters are given, i.e. the parameter B<ngram_delim> is an empty string,
+B<sally> considers each byte as an individual word.  The following types of
+different feature types can be extracted using these parameters:
 
 =over 14
 
@@ -252,13 +277,27 @@ is used to define a sign for each feature.  Collisions are still possible,
 yet their impact is lessened as colliding features not necessary induce
 larger values.
 
+=item B<thres_low = 0;>
+
+This parameter defines a minimum threshold for the entries in each vector. 
+Values below the threshold are removed.  The parameter can be used to filter
+low-valued features from the vectors, such as very infrequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
+=item B<thres_high = 0;>
+
+This parameter defines a maximum threshold for the entries in each vector. 
+Values above the threshold are removed.  The parameter can be used to filter
+high-valued features from the vectors, such as very frequent words. 
+If the parameter is set to 0, the thresholding is disabled.
+
 =item B<hash_bits = 22;>
 
 B<sally> uses a hash function to map individual features to dimensions. 
 This parameter specifies the number of bits used by this hash function and
 defines the maximum dimensionality of the vector space with 2 ** bits.  As
 the embedding of B<sally> is usually sparse and only a small fraction of
-dimensions is non-zero, 20 to 24 bits are often sufficient for representing
+dimensions is non-zero, 22 to 26 bits are often sufficient for representing
 the data.  If this parameter is chosen too small, the embedding may suffer
 from collisions of features in the vector space.  If it is chosen too large,
 several application may choke from the vast amount of dimensions.
@@ -317,14 +356,20 @@ name of the output file is given as I<output> to B<sally>.
 
 =item I<"text"> 
 
-The feature vectors of the embedded strings are stored as a plain text
-using a list of dimensions, features and respective values.  Almost
-all comprehensive analysis tools can deal with this type of format.
-The name of the output file is given as I<output> to B<sally>.
+The feature vectors of the embedded strings are stored as plain text. 
+Each feature vector is represented as a list of dimensions, which is written
+to I<output> in the following form
+ 
+    dimension:feature:value,... source 
+
+I<dimension> specifies the index of the dimension, I<feature> a textual
+representation of the feature and I<value> the value at the dimension.  If
+parameter B<explicit_hash> is not enabled in the configuration, the field
+I<feature> is empty.
 
 =item I<"matlab">
 
-The feature vectors of the embedded strings are stored in matlab
+The feature vectors of the embedded strings are stored in Matlab
 format (v5).  The vectors are stored as a 1 x n struct array with the
 fields: data, src, label and feat. The name of the output file is
 given as I<output> to B<sally>. Note that great care is required to
@@ -362,9 +407,11 @@ can be changed by using the command-line option B<--xx
 
   -i,  --input_format <format>   Set input format for strings.
        --chunk_size <num>        Set chunk size for processing.
-       --decode_str <0|1>        Enable decoding of URI encodings.
+       --decode_str <0|1>        Enable URI-decoding of strings.
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
+       --reverse_str <0|1>       Reverse (flip) all strings.
+       --stopword_file <file>    Provide a file with stop words.
   -o,  --output_format <format>  Set output format for vectors.
 
 =head2 Feature options
@@ -376,6 +423,8 @@ can be changed by using the command-line option B<--xx
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
        --vect_sign <0|1>         Enabled signed embedding.
+       --thres_low <float>       Enable minimum threshold for vectors.
+       --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
        --explicit_hash <0|1>     Enable explicit hash representation.
        --tfidf_file <file>       Set file name for TFIDF weighting.
@@ -385,6 +434,8 @@ can be changed by using the command-line option B<--xx
   -c,  --config_file <file>      Set configuration file.
   -v,  --verbose                 Increase verbosity.
   -q,  --quiet                   Be quiet during processing.
+  -C,  --print_config            Print the current configuration.
+  -D,  --print_defaults          Print the default configuration.
   -V,  --version                 Print version and copyright.
   -h,  --help                    Print this help screen.
 
@@ -392,9 +443,9 @@ can be changed by using the command-line option B<--xx
 
 =over 4
 
-=item F</etc/sally.cfg> 
+=item F<PREFIX/share/doc/sally/example.cfg> 
 
-The system wide configuration file of B<sally>. See the configuration
+An example configuration file for B<sally>. See the configuration
 section for further details.
 
 =back
@@ -407,7 +458,9 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+		Christian Wressnegger (christian@mlsec.org);
+		Alexander Bikadorov (abiku@cs.tu-berlin.de)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

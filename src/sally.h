@@ -13,7 +13,6 @@
 #define SALLY_H
 
 #define MAX_PATH_LEN    512
-#define CONFIG_DIR      "__SYSCONFDIR__"
 
 int sally_version(FILE *, char *, char *);
 

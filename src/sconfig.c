@@ -12,11 +12,12 @@
 /** 
  * @defgroup sconfig Configuration functions
  * Functions for configuration of the Sally tool. Additionally default
- * values for each configruation parameter are specified in this module. 
+ * values for each configuration parameter are specified in this module.
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
  */
 
+#include "config.h"
 #include "common.h"
 #include "util.h"
 #include "sconfig.h"
@@ -26,20 +27,23 @@ extern int verbose;
 
 /* Default configuration */
 static config_default_t defaults[] = {
-    {"input", "input_format", CONFIG_TYPE_STRING, {.str = "dir"}},
-    {"input", "chunk_size", CONFIG_TYPE_INT, {.num = 1024}},
+    {"input", "input_format", CONFIG_TYPE_STRING, {.str = "lines"}},
+    {"input", "chunk_size", CONFIG_TYPE_INT, {.num = 256}},
     {"input", "decode_str", CONFIG_TYPE_INT, {.num = 0}},
-    {"input", "fasta_regex", CONFIG_TYPE_STRING,
-     {.str = " (\\+|-)[:digit:]*"}},
-    {"input", "lines_regex", CONFIG_TYPE_STRING, {.str = "[:digit:]+: "}},
-    {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 2}},
+    {"input", "fasta_regex", CONFIG_TYPE_STRING, {.str = " (\\+|-)?[0-9]+"}},
+    {"input", "lines_regex", CONFIG_TYPE_STRING, {.str = "^(\\+|-)?[0-9]+"}},
+    {"input", "reverse_str", CONFIG_TYPE_INT, {.num = 0}},
+    {"input", "stopword_file", CONFIG_TYPE_STRING, {.str = ""}},
+    {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 4}},
     {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
     {"features", "ngram_pos", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "ngram_sort", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "vect_embed", CONFIG_TYPE_STRING, {.str = "cnt"}},
-    {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "l1"}},
+    {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},
     {"features", "vect_sign", CONFIG_TYPE_INT, {.num = 0}},
-    {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 26}},
+    {"features", "thres_low", CONFIG_TYPE_FLOAT, {.flt = 0}},
+    {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},    
+    {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 22}},
     {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
@@ -57,8 +61,8 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
     assert(cs && d >= 0);
 
     int i;
-    for (i = 0; i < d; i++)
-        fprintf(f, "  ");
+    for (i = 0; i < d - 1; i++)
+        fprintf(f, "       ");
 
     char *n = config_setting_name(cs);
 
@@ -71,9 +75,9 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
             config_setting_fprint(f, config_setting_get_elem(cs, i), d + 1);
 
         if (d > 0) {
-            for (i = 0; i < d; i++)
-                fprintf(f, "  ");
-            fprintf(f, "};\n");
+            for (i = 0; i < d - 1; i++)
+                fprintf(f, "        ");
+            fprintf(f, "};\n\n");
         }
         break;
     case CONFIG_TYPE_STRING:
@@ -87,6 +91,7 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
         break;
     default:
         error("Unsupported type for configuration setting '%s'", n);
+        break;
     }
 }
 
@@ -96,7 +101,6 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
  */
 void config_print(config_t *cfg)
 {
-    printf("Sally configuration\n");
     config_setting_fprint(stdout, config_root_setting(cfg), 0);
 }
 
@@ -111,11 +115,10 @@ void config_fprint(FILE *f, config_t *cfg)
 }
 
 /**
- * Checks if the configuration is valid. The function checks if all 
- * required parameters are set and adds default values if necessary.
+ * The functions add default values to unspecified parameters.
  * @param cfg configuration
  */
-void config_check(config_t *cfg)
+static void config_default(config_t *cfg)
 {
     int i, j;
     const char *s;
@@ -173,8 +176,37 @@ void config_check(config_t *cfg)
             config_setting_set_int(vs, defaults[i].val.num);
             break;
         }
-
     }
+}
+
+/**
+ * Checks if the configuration is valid and sane. 
+ * @return 1 if config is valid, 0 otherwise
+ */
+int config_check(config_t *cfg)
+{
+    const char *s1, *s2;
+    double f1, f2;
+
+    /* Add default values where missing */
+    config_default(cfg);    
+
+    /* Sanity checks */
+    config_lookup_string(cfg, "input.stopword_file", &s1);
+    config_lookup_string(cfg, "features.vect_delim", &s2);
+    if (strlen(s1) > 0 && strlen(s2) == 0) {
+        error("Stop words can only be used if delimiters are defined.");
+        return 0;
+    }
+    
+    config_lookup_float(cfg, "features.thres_low", &f1);
+    config_lookup_float(cfg, "features.thres_high", &f2);
+    if (f1 != 0.0 && f2 != 0.0 && f1 > f2) {
+        error("Minimum threshold larger than maximum threshold.");
+        return 0;
+    }
+    
+    return 1;
 }
 
 /** @} */

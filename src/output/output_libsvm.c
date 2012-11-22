@@ -69,6 +69,10 @@ int output_libsvm_write(fvec_t **x, int len)
     int j, i;
 
     for (j = 0; j < len; j++) {
+#ifdef ENABLE_EVALTIME
+        double t1 = time_stamp();
+#endif           
+
         /* Print feature vector */
         fprintf(f, "%g ", x[j]->label);
         for (i = 0; i < x[j]->len; i++)
@@ -80,6 +84,10 @@ int output_libsvm_write(fvec_t **x, int len)
             fprintf(f, "# %s", x[j]->src);
 
         fprintf(f, "\n");
+        
+#ifdef ENABLE_EVALTIME
+        printf("fdim %lu write %f\n", x[j]->len, time_stamp() - t1);
+#endif           
     }
 
     return TRUE;

@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,6 +21,7 @@
 
 /* Global variables */
 int verbose = 1;
+int print_conf = 0;
 config_t cfg;
 
 /* Local variables */
@@ -28,7 +30,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVh"
+#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -40,6 +42,8 @@ static struct option longopts[] = {
     {"fasta_regex", 1, NULL, 1001},
     {"lines_regex", 1, NULL, 1002},
     {"decode_str", 1, NULL, 1005},
+    {"reverse_str", 1, NULL, 1007},
+    {"stopword_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 1, NULL, 'p'},
@@ -47,11 +51,15 @@ static struct option longopts[] = {
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 1, NULL, 1006},
+    {"thres_low", 1, NULL, 1009},    
+    {"thres_high", 1, NULL, 1010},   /* <- last entry */   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
+    {"print_config", 0, NULL, 'C'},
+    {"print_defaults", 0, NULL, 'D'},
     {"quiet", 0, NULL, 'q'},
     {"version", 0, NULL, 'V'},
     {"help", 0, NULL, 'h'},
@@ -71,10 +79,14 @@ int sally_version(FILE *f, char *p, char *m)
 }
 
 /**
- * Main processing function
- * @param in Input file
- * @param out Output file
+ * Print configuration
+ * @param msg Text to add to output
  */
+static void print_config(char *msg)
+{
+    sally_version(stdout, "# ", msg);
+    config_print(&cfg);
+}
 
 /**
  * Print usage of command line tool
@@ -85,9 +97,11 @@ static void print_usage(void)
            "\nI/O options:\n"
            "  -i,  --input_format <format>   Set input format for strings.\n"
            "       --chunk_size <num>        Set chunk size for processing.\n"
-           "       --decode_str <0|1>        Enable decoding of URI encodings.\n"
+           "       --decode_str <0|1>        Enable URI-decoding of strings.\n"
            "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
+           "       --reverse_str <0|1>       Reverse (flip) the input strings.\n"
+           "       --stopword_file <file>    Provide a file with stop words.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
@@ -97,6 +111,8 @@ static void print_usage(void)
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
            "       --vect_sign <0|1>         Enable signed embedding.\n"
+           "       --thres_low <float>       Enable minimum threshold for vectors.\n"
+           "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
            "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
@@ -104,6 +120,8 @@ static void print_usage(void)
            "  -c,  --config_file <file>      Set configuration file.\n"
            "  -v,  --verbose                 Increase verbosity.\n"
            "  -q,  --quiet                   Be quiet during processing.\n"
+           "  -C,  --print_config            Print the current configuration.\n"
+           "  -D,  --print_defaults          Print the default configuration.\n"
            "  -V,  --version                 Print version and copyright.\n"
            "  -h,  --help                    Print this help screen.\n" "\n");
 }
@@ -125,7 +143,7 @@ static void print_version(void)
  */
 static void sally_parse_options(int argc, char **argv)
 {
-    int ch;
+    int ch, user_conf = FALSE;
 
     optind = 0;
 
@@ -133,6 +151,7 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
+            user_conf = TRUE;
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -151,6 +170,18 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1006:
             config_set_int(&cfg, "features.vect_sign", atoi(optarg));
+            break;
+        case 1007:
+            config_set_int(&cfg, "input.reverse_str", atoi(optarg));
+            break;
+        case 1008:
+            config_set_string(&cfg, "input.stopword_file", optarg);
+            break;
+        case 1009:
+            config_set_float(&cfg, "features.thres_low", atof(optarg));
+            break;
+        case 1010:
+            config_set_float(&cfg, "features.thres_high", atof(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
@@ -188,6 +219,13 @@ static void sally_parse_options(int argc, char **argv)
         case 'v':
             verbose++;
             break;
+        case 'D':
+            print_config("Default configuration");
+            exit(EXIT_SUCCESS);
+            break;
+        case 'C':
+            print_conf = 1;
+            break;
         case 'V':
             print_version();
             exit(EXIT_SUCCESS);
@@ -200,20 +238,38 @@ static void sally_parse_options(int argc, char **argv)
         }
     }
 
+#ifdef ENABLE_EVALTIME
+    config_set_int(&cfg, "input.chunk_size", 1);
+    verbose = 0;
+#endif
+
     /* Check configuration */
-    config_check(&cfg);
-
-    argc -= optind;
-    argv += optind;
-
-    /* Check remaining arguments */
-    if (argc != 2) {
-        print_usage();
+    if(!config_check(&cfg)) {
         exit(EXIT_FAILURE);
     }
 
-    input = argv[0];
-    output = argv[1];
+    /* We are through with parsing. Print the config if requested */
+    if (print_conf) {
+        print_config("Current configuration");
+        exit(EXIT_SUCCESS);
+    }
+
+    argc -= optind;
+    argv += optind;
+    
+    /* Check for input and output arguments */
+    if (argc != 2) {
+        print_usage();
+        exit(EXIT_FAILURE);
+    } else {
+        input = argv[0];
+        output = argv[1];
+    }
+    
+    /* Last but not least. Warn about default config */
+    if (!user_conf) {
+        warning("No config file given. Using defaults (see -D)");
+    }
 }
 
 
@@ -224,8 +280,7 @@ static void sally_parse_options(int argc, char **argv)
  */
 static void sally_load_config(int argc, char **argv)
 {
-    char *cfg_file = NULL;
-    char cfg_path[MAX_PATH_LEN];
+    char* cfg_file = NULL;
     int ch;
 
     /* Check for config file in command line */
@@ -235,33 +290,28 @@ static void sally_load_config(int argc, char **argv)
             cfg_file = optarg;
             break;
         case '?':
-        default:
+            print_usage();
+            exit(EXIT_SUCCESS);
+            break;
+        default:                                                                    
             /* empty */
             break;
         }
     }
 
-    /* Check for local config file ".sally" */
-    snprintf(cfg_path, MAX_PATH_LEN, "%s/.sally", getenv("HOME"));
-    if (!cfg_file && !access(cfg_path, F_OK))
-        cfg_file = cfg_path;
-
-    /* Check for global config file "sally.cfg" */
-    snprintf(cfg_path, MAX_PATH_LEN, "%s/sally.cfg", CONFIG_DIR);
-    if (!cfg_file && !access(cfg_path, F_OK))
-        cfg_file = cfg_path;
-
-    if (!cfg_file)
-        fatal("No config file availablle.");
-
     /* Init and load configuration */
     config_init(&cfg);
-    if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
-        fatal("Could not read configuration (%s in line %d)",
-              config_error_text(&cfg), config_error_line(&cfg));
+
+    if (cfg_file != NULL) {
+        if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
+            fatal("Could not read configuration (%s in line %d)",
+                  config_error_text(&cfg), config_error_line(&cfg));
+    }
 
     /* Check configuration */
-    config_check(&cfg);
+    if (!config_check(&cfg)) {
+        exit(EXIT_FAILURE);
+    }
 }
 
 
@@ -278,10 +328,20 @@ static void sally_init()
     if (verbose > 1)
         config_print(&cfg);
 
+    /* Set delimiters */
+    config_lookup_string(&cfg, "features.ngram_delim", &cfg_str);
+    if (strlen(cfg_str) > 0) 
+        fvec_delim_set(cfg_str);
+
     /* Check for TFIDF weighting */
     config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_create(input);
+
+    /* Load stop words */
+    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    if (strlen(cfg_str) > 0)
+        stopwords_load(cfg_str);
 
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
@@ -303,7 +363,7 @@ static void sally_init()
     output_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with output module '%s'.", output, cfg_str);
     if (!output_open(output))
-        fatal("Coult not open output destination");
+        fatal("Could not open output destination");
 }
 
 /**
@@ -335,6 +395,9 @@ static void sally_process()
         /* Generic preprocessing of input */
         input_preproc(strs, read);
 
+#ifdef ENABLE_OPENMP
+#pragma omp parallel for
+#endif
         for (j = 0; j < read; j++) {
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
@@ -371,7 +434,10 @@ static void sally_exit()
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_destroy(input);
 
-    /* Check for feature hash table */
+    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    if (strlen(cfg_str) > 0)
+        stopwords_destroy();
+
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
     if (ehash)
         fhash_destroy();
@@ -395,4 +461,6 @@ int main(int argc, char **argv)
     sally_init();
     sally_process();
     sally_exit();
+
+    return EXIT_SUCCESS;
 }

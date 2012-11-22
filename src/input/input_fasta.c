@@ -28,7 +28,7 @@
 #include <regex.h>
 
 /** Static variable */
-static gzFile *in;
+static gzFile in;
 static regex_t re;
 static char *old_line = NULL;
 

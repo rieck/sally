@@ -1,7 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
- *                         Christian Wressnegger(christian@mlsec.org)
+ * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -10,14 +9,12 @@
  * warranty. See the GNU General Public License for more details. 
  */
 
-#ifndef EMBED_H
-#define EMBED_H
+#ifndef INPUT_STDIN_H
+#define INPUT_STDIN_H
 
-#include "fvec.h"
+/* Stdin module */
+int input_stdin_open(char *);
+int input_stdin_read(string_t *, int);
+void input_stdin_close(void);
 
-void fvec_embed(fvec_t *fv, const char *);
-void idf_create(char *input);
-void idf_destroy();
-int idf_check(fvec_t *f);
-
-#endif /* EMBED */
+#endif /* INPUT_STDIN_H */

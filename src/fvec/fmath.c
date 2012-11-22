@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org);
+ *                    Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -70,7 +71,7 @@ fvec_t *fvec_clone(fvec_t *o)
     fv->dim = (feat_t *) malloc(o->len * sizeof(feat_t));
     fv->val = (float *) malloc(o->len * sizeof(float));
     if (!fv->dim || !fv->val) {
-        error("Could not allocate feature vector");
+        error("Could not allocate feature vector contents");
         fvec_destroy(fv);
         return NULL;
     }
@@ -141,18 +142,49 @@ void fvec_add(fvec_t *fa, fvec_t *fb)
 }
 
 /** 
- * Element-wise multiplication of one feature vector with another (a = a x b)
+ * Element-wise multiplication of a feature vector with another (a = a x b).
+ * The function uses a loop to compute the multiplication.
  * @param fa Feature vector (a)
  * @param fb Feature vector (b)
  */
-void fvec_times(fvec_t *fa, fvec_t *fb)
+static void fvec_times_loop(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0, j = 0;
+
+    /* Loop over features in a and b */
+    while (i < fa->len && j < fb->len) {
+        if (fa->dim[i] > fb->dim[j]) {
+            j++;
+        } else if (fa->dim[i] < fb->dim[j]) {
+            fa->val[i++] = 0.0;
+        } else {
+            fa->val[i++] *= fb->val[j++];
+        }
+    }
+    
+    /* Zero-out remaining values in fa */
+    while(i < fa->len)
+        fa->val[i++] = 0.0;
+        
+    /* The parent function should sparsify fa. */
+}
+
+/** 
+ * Element-wise multiplication of a feature vector with another (a = a x b).
+ * The function uses binary search to compute the multiplication. Note that
+ * the elements can not be swapped for efficiency!
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+static void fvec_times_bsearch(fvec_t *fa, fvec_t *fb)
 {
     unsigned long i = 0, j = 0, p, q, k;
+    int found;
 
     /* Loop over dimensions fa */
     for (i = 0, j = 0; j < fa->len; j++) {
         /* Binary search */
-        p = i, q = fb->len;
+        p = i, q = fb->len, found = FALSE;
         do {
             k = i, i = ((q - p) >> 1) + p;
             if (fb->dim[i] > fa->dim[j]) {
@@ -160,15 +192,43 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
             } else if (fb->dim[i] < fa->dim[j]) {
                 p = i;
             } else {
-                fa->val[j] = fb->val[i] * fa->val[j];
+                fa->val[j] *= fb->val[i];
+                found = TRUE;
                 break;
             }
         } while (i != k);
 
-        /* No match */
-        if (i == k)
-            fa->val[j] = 0;
+        /* No match. Zero-out value in fa */
+        if (!found)
+            fa->val[j] = 0.0;
     }
+    
+    /* The parent function should sparsify fa. */
+}
+
+/** 
+ * Element-wise multiplication of one feature vector with another (a = a x b)
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ */
+void fvec_times(fvec_t *fa, fvec_t *fb)
+{
+    assert(fa && fb);
+    double a = fa->len, b = fb->len;
+
+    if (b <= 0) {
+    	fvec_truncate(fa);
+    	return;
+    }
+
+    /* Choose times functions */
+    if (a + b > ceil(a * log2(b))) {
+        fvec_times_bsearch(fa, fb);
+    } else {
+        fvec_times_loop(fa, fb);
+    }
+        
+    fvec_sparsify(fa);
 }
 
 
@@ -250,7 +310,7 @@ double fvec_dot(fvec_t *fa, fvec_t *fb)
     assert(fa && fb);
     double a, b;
 
-    /* Sort vectors according to size */
+    /* Swap vectors according to size */
     if (fa->len > fb->len) {
         a = (double) fa->len, b = (double) fb->len;
     } else {
@@ -303,6 +363,75 @@ void fvec_invert(fvec_t *f)
 
     for (i = 0; i < f->len; i++)
         f->val[i] = (float) 1.0 / f->val[i];
+}
+
+/** 
+ * Apply thresholds to the values of a vector. Values below or above the 
+ * thresholds are removed. If set to 0, the thresholding is disabled.
+ * @param f Feature vector
+ * @param tl Minimum threshold
+ * @param th Maximum threshold
+ */
+void fvec_thres(fvec_t *f, double tl, double th) 
+{
+    int i;
+    assert(f);
+    
+    for (i = 0; i < f->len; i++) {
+        if (tl != 0.0 && f->val[i] < tl) 
+            f->val[i] = 0.0;
+        if (th != 0.0 && f->val[i] > th)
+            f->val[i] = 0.0;
+    }
+
+    fvec_sparsify(f);
+}
+
+void fvec_sparsify(fvec_t *f)
+{
+    int i, j;
+    assert(f);
+
+    for (i = 0, j = 0; i < f->len; i++) {
+        /* Copy entries. */
+        if (i != j) {
+            f->val[j] = f->val[i];
+            f->dim[j] = f->dim[i];
+        }
+        /* Count only non-zero elements only */
+        if (fabs(f->val[i]) > FVEC_ZERO) 
+            j++;
+    }
+    
+    f->len = j;
+    fvec_realloc(f);
+}
+
+/**
+ * Element-wise comparison of one feature vector with another
+ * @param fa Feature vector (a)
+ * @param fb Feature vector (b)
+ *
+ * @returns 1 if the two vectors are equal, 0 otherwise
+ */
+int fvec_equals(fvec_t *fa, fvec_t *fb)
+{
+    unsigned long i = 0;
+
+    if (fa->len != fb->len) {
+    	return FALSE;
+    }
+
+    if (fa == fb) {
+    	return TRUE;
+    }
+
+    for (i = 0; i < fa->len; i++) {
+        if (fa->dim[i] != fb->dim[i] || fabs(fa->val[i] - fb->val[i]) > 1e-6)
+    		return FALSE;
+    }
+
+    return TRUE;
 }
 
 /** @} */

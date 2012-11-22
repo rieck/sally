@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ *               Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -27,7 +28,7 @@
 #include <regex.h>
 
 /** Static variable */
-static gzFile *in;
+static gzFile in;
 static regex_t re;
 static int line_num = 0;
 
@@ -92,13 +93,16 @@ int input_lines_open(char *name)
         return -1;
     }
 
-    /* Count lines in file (I hope this is buffered) */
-    int c, num_lines = 0;
+    /* Count lines in file (I hope this is buffered)*/
+    int c = -1, prev, num_lines = 0;
     do {
+        prev = c;
         c = gzgetc(in);
         if (c == '\n')
             num_lines++;
-    } while (c != -1);
+    } while(c != -1);
+
+    if (prev >= 0 && prev != '\n') num_lines++;
 
     /* Prepare reading */
     gzrewind(in);
@@ -111,7 +115,7 @@ int input_lines_open(char *name)
  * Reads a block of files into memory.
  * @param strs Array for data
  * @param len Length of block
- * @return number of read files
+ * @return number of lines read into memory
  */
 int input_lines_read(string_t *strs, int len)
 {
@@ -121,25 +125,31 @@ int input_lines_read(string_t *strs, int len)
     char buf[32], *line = NULL;
 
     for (i = 0; i < len; i++) {
+#ifdef ENABLE_EVALTIME 
+        double t1 = time_stamp();   
+#endif    
+    
         line = NULL;
         read = gzgetline(&line, &size, in);
         if (read == -1) {
             free(line);
             break;
         }
+        
+        /* Strip newline characters */
+        strip_newline(line, read);
 
-        if (strlen(line) == 0) {
-            line_num++;
-            continue;
-        }
-
-        strs[i].label = get_label(line);
+        strs[j].label = get_label(line);
         strs[j].str = line;
         strs[j].len = strlen(line);
 
         snprintf(buf, 32, "line%d", line_num++);
         strs[j].src = strdup(buf);
         j++;
+
+#ifdef ENABLE_EVALTIME 
+        printf("strlen %d read %f\n", strs[j-1].len, time_stamp() - t1);
+#endif    
     }
 
     return j;
@@ -155,3 +165,4 @@ void input_lines_close()
 }
 
 /** @} */
+

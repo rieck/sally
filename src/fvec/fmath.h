@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org);
+ *                    Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,5 +23,8 @@ void fvec_times(fvec_t *fa, fvec_t *fb);
 void fvec_mul(fvec_t *f, double s);
 void fvec_log2(fvec_t *f);
 void fvec_invert(fvec_t *f);
+void fvec_thres(fvec_t *f, double tl, double th);
+void fvec_sparsify(fvec_t *f);
+int fvec_equals(fvec_t *fa, fvec_t *fb);
 
 #endif /* FMATH_H */
