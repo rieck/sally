@@ -37,7 +37,7 @@ Dependencies
 
 Corresponding packages
 
-+ Debian and Ubuntu Linux: `libz-dev libconfig8-dev libarchive-dev`  
++ Debian and Ubuntu Linux: `libz-dev libconfig9-dev libarchive-dev`  
 + MacOS X with Homebrew:   `libconfig libarchive (homebrew-dupes)`  
 + MacOS X with MacPorts:   `libconfig-hr libarchive`  
 
