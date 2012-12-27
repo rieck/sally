@@ -62,7 +62,7 @@ PKG_CHECK_MODULES([PKGCONFIG], [libconfig >= 1.4], [],
 
 CFLAGS="$CFLAGS $PKGCONFIG_CFLAGS"
 LIBS="$LIBS $PKGCONFIG_LIBS"
-INCLUDES="$INCLUDES `pkg-config --cflags-only-I libconfig`"
+AM_CPPFLAGS="$AM_CPPFLAGS `pkg-config --cflags-only-I libconfig`"
 AC_CHECK_HEADERS([libconfig.h], HEADER_LIBCONFIG="yes")
 
 # features
@@ -151,7 +151,7 @@ AC_ARG_ENABLE(evaltime,
     ], []
 )
 
-AC_SUBST([INCLUDES])
+AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([LIB_VERSION])
 
 AC_CONFIG_FILES([ 
