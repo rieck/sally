@@ -7,9 +7,6 @@ doc_DATA = example.cfg
 EXTRA_DIST = sally.pod doxygen.cfg sally.pdf sally.txt \
              latex-pre.inc.in latex-post.inc example.cfg
 
-changes:	
-	./git2changes.py
-
 sally.man: sally.pod
 	pod2man -c "User Manual" -s 1 -r "sally $(VERSION)" $< > $@
 
@@ -34,4 +31,4 @@ latex-pre.inc: latex-pre.inc.in
 distclean-local:
 	rm -f sally.man sally.txt sally.pdf latex-pre.inc
 		
-dist-hook: distclean-local sally.man sally.txt sally.pdf changes
+dist-hook: distclean-local sally.man sally.txt sally.pdf 

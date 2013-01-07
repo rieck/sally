@@ -7,7 +7,7 @@ AM_CPPFLAGS             = @AM_CPPFLAGS@ -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/output
 			  
 EXTRA_DIST		= test.in
-			  
+TESTS_ENVIRONMENT       = export TEST_FILE='$(srcdir)/test.in';
 TESTS                   = test_fhash test_fvec test_embed
 noinst_PROGRAMS         = test_fhash test_fvec test_embed
 
