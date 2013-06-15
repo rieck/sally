@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+ * Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org);
  *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
@@ -134,7 +134,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org)\n",
            PACKAGE_VERSION);
 }
 
