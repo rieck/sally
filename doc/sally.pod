@@ -307,10 +307,23 @@ several application may choke from the vast amount of dimensions.
 
 For performance reasons B<sally> maps features to dimensions without
 memorizing the n-grams associating with these features.  For certain
-analysis tasks, however, it may be necessary to retrieve a full
-mapping including the n-grams of each dimension. If this parameter is
-enabled B<sally> keeps track of all n-grams and depending on the
-selected output format stores them with the extracted feature vectors.
+analysis tasks, however, it may be necessary to retrieve a full mapping
+including the n-grams of each dimension.  If this parameter is enabled
+B<sally> keeps track of all n-grams and depending on the selected output
+format stores them with the extracted feature vectors.  The mapping may
+suffer from collisions due to hashing.  You can control the size of the
+hash function using the parameter B<hash_bits>.
+
+=item B<hash_file = "";>
+
+This parameter enables saving the mapping between n-grams and dimensions to
+a gzip-compressed file.  The functionality is similar to B<explicit_hash>,
+except that B<sally> does not store the n-grams within the feature vectors
+but in a separate file.  Note that the tracking of n-grams and dimensions
+induces a considerable run-time and memory overhead.  Also note that the
+table may contain collisions, where simply the latest colliding entry
+overrides previous entries.  You can control the size of the hash function
+using the parameter B<hash_bits>.
 
 =item B<tfidf_file = "tfidf.fv";>
 
