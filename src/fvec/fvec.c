@@ -771,7 +771,6 @@ void fvec_save(fvec_t *fv, char *f)
 /**
  * Decodes a string containing delimiters to a lookup table
  * @param s String containing delimiters
- * @param delim Lookup table of 256 bytes
  */
 void fvec_delim_set(const char *s)
 {

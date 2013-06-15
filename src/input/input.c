@@ -141,7 +141,7 @@ void input_free(string_t *strs, int len)
 
 /**
  * Read in and hash stop words 
- * @param stop word file
+ * @param file stop word file
  */
 void stopwords_load(const char *file)
 {
