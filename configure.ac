@@ -15,7 +15,7 @@ echo
 
 # Init automake & config.h
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h])
 
 # Check for important programs
 AC_PROG_CC
