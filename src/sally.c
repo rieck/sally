@@ -350,7 +350,8 @@ static void sally_init()
 
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
-    if (ehash) {
+    config_lookup_string(&cfg, "features.hash_file", &cfg_str);
+    if (ehash || strlen(cfg_str) > 0) {
         info_msg(1, "Enabling feature hash table.");
         fhash_init();
     }
@@ -379,6 +380,10 @@ static void sally_process()
 {
     long read, i, j;
     int chunk;
+    const char *hash_file;
+
+    /* Check if a hash file is set */
+    config_lookup_string(&cfg, "features.hash_file", &hash_file);
 
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
@@ -416,7 +421,8 @@ static void sally_process()
         input_free(strs, read);
         output_free(fvec, read);
 
-        if (fhash_enabled())
+        /* Reset hash if enabled but no hash file is set */
+        if (fhash_enabled() && !strlen(hash_file) > 0)
             fhash_reset();
 
         prog_bar(0, entries, i + read);
@@ -429,7 +435,7 @@ static void sally_process()
 static void sally_exit()
 {
     int ehash;
-    const char *cfg_str;
+    const char *cfg_str, *hash_file;
 
     info_msg(1, "Flushing. Closing input and output.");
     input_close();
@@ -443,8 +449,18 @@ static void sally_exit()
     if (strlen(cfg_str) > 0)
         stopwords_destroy();
 
+    config_lookup_string(&cfg, "features.hash_file", &hash_file);
+    if (strlen(hash_file) > 0) {
+        info_msg(1, "Saving explicit hash table to '%s'.", hash_file);    
+        gzFile z = gzopen(hash_file, "w9");
+        if (!z)
+            error("Could not open hash file '%s'", hash_file);
+        fhash_write(z);
+        gzclose(z);
+    }
+    
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
-    if (ehash)
+    if (ehash || strlen(hash_file) > 0)
         fhash_destroy();
 
     /* Destroy configuration */

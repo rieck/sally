@@ -209,13 +209,6 @@ int config_check(config_t *cfg)
         return 0;
     }
     
-    config_lookup_string(cfg, "features.hash_file", &s1);
-    config_lookup_int(cfg, "features.explicit_hash", &i1);
-    if (s1 && strlen(s1) > 0 && !i1) {
-        warning("An explicit hash is required for a hash file. Setting explicit_hash to 1.");
-        config_set_int(cfg, "features.explicit_hash", (unsigned long) 1);
-    }
-    
     return 1;
 }
 
