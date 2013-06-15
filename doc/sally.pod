@@ -427,7 +427,8 @@ can be changed by using the command-line option B<--xx
        --thres_low <float>       Enable minimum threshold for vectors.
        --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
-       --explicit_hash <0|1>     Enable explicit hash representation.
+       --explicit_hash <0|1>     Enable explicit hash table.
+       --hash_file <file>	 Set file name for explicit hash table.
        --tfidf_file <file>       Set file name for TFIDF weighting.
 
 =head2 Generic options
@@ -459,7 +460,7 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org);
 		Christian Wressnegger (christian@mlsec.org);
 		Alexander Bikadorov (abiku@cs.tu-berlin.de)
 

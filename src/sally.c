@@ -52,9 +52,10 @@ static struct option longopts[] = {
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 1, NULL, 1006},
     {"thres_low", 1, NULL, 1009},    
-    {"thres_high", 1, NULL, 1010},   /* <- last entry */   
+    {"thres_high", 1, NULL, 1010},   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
+    {"hash_file", 1, NULL, 1011},   /* <- last entry */   
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -114,7 +115,8 @@ static void print_usage(void)
            "       --thres_low <float>       Enable minimum threshold for vectors.\n"
            "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-           "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
+           "       --explicit_hash <0|1>     Enable explicit hash table.\n"
+           "       --hash_file <file>        Set file name for explicit hash table.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
            "\nGeneric options:\n"
            "  -c,  --config_file <file>      Set configuration file.\n"
@@ -182,6 +184,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1010:
             config_set_float(&cfg, "features.thres_high", atof(optarg));
+            break;
+        case 1011:
+            config_set_string(&cfg, "features.hash_file", optarg);
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
