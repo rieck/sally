@@ -208,6 +208,13 @@ int config_check(config_t *cfg)
         error("Minimum threshold larger than maximum threshold.");
         return 0;
     }
+
+    config_lookup_string(cfg, "features.hash_file", &s1);
+    config_lookup_int(cfg, "features.explicit_hash", &i1);
+    if (i1 && strlen(s1) > 0) {
+        error("'explicit_hash' and 'hash_file' must not be used togther");
+        return 0;
+    }
     
     return 1;
 }
