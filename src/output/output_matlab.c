@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010,2013 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -308,10 +308,15 @@ static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
 
         fentry_t *fe = fhash_get(fv->dim[i]);
         for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
-            if (isprint(fe->data[j]) && !strchr("%", fe->data[k])) {
-                buf[k] = fe->data[j];
-                k += 1;
+            if (fe->data[j] == '%') {
+                /* Matlab requires that "%" is separately encoded as "%%" */ 
+                buf[k++] = '%';
+                buf[k++] = '%';
+            } else if (isprint(fe->data[j])) {
+                /* Printable characters */
+                buf[k++] = fe->data[j];
             } else {
+                /* URI encoding of non-printable characters */
                 snprintf(buf + k, 4, "%%%.2x", (unsigned char) fe->data[j]);
                 k += 3;
             }

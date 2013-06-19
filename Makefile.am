@@ -8,4 +8,10 @@ EXTRA_DIST = README.md COPYING CHANGES
 
 clean-local:
 	rm -f *~
-	        
+
+CHANGES:
+	$(srcdir)/git2changes.py	        
+
+distclean-local:
+	rm -f CHANGES
+	

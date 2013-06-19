@@ -1,6 +1,7 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
  * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+ *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -53,9 +54,10 @@ static struct option longopts[] = {
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 1, NULL, 1006},
     {"thres_low", 1, NULL, 1009},    
-    {"thres_high", 1, NULL, 1010},   /* <- last entry */   
+    {"thres_high", 1, NULL, 1010},   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
+    {"hash_file", 1, NULL, 1011},   /* <- last entry */   
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -116,7 +118,8 @@ static void print_usage(void)
            "       --thres_low <float>       Enable minimum threshold for vectors.\n"
            "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-           "       --explicit_hash <0|1>     Enable explicit hash representation.\n"
+           "       --explicit_hash <0|1>     Enable explicit hash table.\n"
+           "       --hash_file <file>        Set file name for explicit hash table.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
            "\nGeneric options:\n"
            "  -c,  --config_file <file>      Set configuration file.\n"
@@ -137,7 +140,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org)\n",
            PACKAGE_VERSION);
 }
 
@@ -188,6 +191,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1010:
             config_set_float(&cfg, "features.thres_high", atof(optarg));
+            break;
+        case 1011:
+            config_set_string(&cfg, "features.hash_file", optarg);
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
@@ -361,7 +367,8 @@ static void sally_init()
 
     /* Check for feature hash table */
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
-    if (ehash) {
+    config_lookup_string(&cfg, "features.hash_file", &cfg_str);
+    if (ehash || strlen(cfg_str) > 0) {
         info_msg(1, "Enabling feature hash table.");
         fhash_init();
     }
@@ -392,6 +399,7 @@ static void sally_process()
 {
     long read, i, j;
     int chunk;
+    const char *hash_file;
 
 	/* Load weight vector */
 	fvec_t* w = NULL;
@@ -410,6 +418,9 @@ static void sally_process()
         w = fvec_read_liblinear(f);
         fclose(f);
     }
+
+    /* Check if a hash file is set */
+    config_lookup_string(&cfg, "features.hash_file", &hash_file);
 
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
@@ -467,7 +478,8 @@ static void sally_process()
         input_free(strs, read);
         output_free(fvec, read);
 
-        if (fhash_enabled())
+        /* Reset hash if enabled but no hash file is set */
+        if (fhash_enabled() && !strlen(hash_file) > 0)
             fhash_reset();
 
         prog_bar(0, entries, i + read);
@@ -486,7 +498,7 @@ static void sally_process()
 static void sally_exit()
 {
     int ehash;
-    const char *cfg_str;
+    const char *cfg_str, *hash_file;
 
     info_msg(1, "Flushing. Closing input and output.");
     input_close();
@@ -500,8 +512,18 @@ static void sally_exit()
     if (strlen(cfg_str) > 0)
         stopwords_destroy();
 
+    config_lookup_string(&cfg, "features.hash_file", &hash_file);
+    if (strlen(hash_file) > 0) {
+        info_msg(1, "Saving explicit hash table to '%s'.", hash_file);    
+        gzFile z = gzopen(hash_file, "w9");
+        if (!z)
+            error("Could not open hash file '%s'", hash_file);
+        fhash_write(z);
+        gzclose(z);
+    }
+    
     config_lookup_int(&cfg, "features.explicit_hash", &ehash);
-    if (ehash)
+    if (ehash || strlen(hash_file) > 0)
         fhash_destroy();
 
     /* Destroy configuration */

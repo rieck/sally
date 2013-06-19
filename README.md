@@ -37,9 +37,9 @@ Dependencies
 
 Corresponding packages
 
-+ Debian and Ubuntu Linux: `libz-dev libconfig8-dev libarchive-dev`  
++ Debian and Ubuntu Linux: `libz-dev libconfig9-dev libarchive-dev`  
 + MacOS X with Homebrew:   `libconfig libarchive (homebrew-dupes)`  
-+ MacOS X with MacPorts:   `libconfig-ht libarchive`  
++ MacOS X with MacPorts:   `libconfig-hr libarchive`  
 
 The source code of the libraries is available here:
 
@@ -89,6 +89,6 @@ different dimensions in the vector space.  By default the very
 efficient Murmur hash is used for this task.  In certain critical
 cases it may be useful to use a cryptographic hash as MD5.
 
-Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org);
 			Christian Wressnegger (christian@mlsec.org);
 			Alexander Bikadorov (abiku@cs.tu-berlin.de)

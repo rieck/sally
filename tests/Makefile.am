@@ -1,13 +1,13 @@
 # Sally - A Tool for Embedding Strings in Vector Spaces
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
-INCLUDES                = @INCLUDES@ -I$(top_srcdir)/src \
+AM_CPPFLAGS             = @AM_CPPFLAGS@ -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/fvec \
 			  -I$(top_srcdir)/src/input \
 			  -I$(top_srcdir)/src/output
 			  
 EXTRA_DIST		= test.in
-			  
+TESTS_ENVIRONMENT       = export TEST_FILE='$(srcdir)/test.in';
 TESTS                   = test_fhash test_fvec test_embed
 noinst_PROGRAMS         = test_fhash test_fvec test_embed
 

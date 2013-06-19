@@ -1,7 +1,7 @@
 # Sally - A Tool for Embedding Strings in Vector Spaces
 # Copyright (C) 2010-2011 Konrad Rieck (konrad@mlsec.org)
 
-INCLUDES                = -I$(top_srcdir)/src \
+AM_CPPFLAGS             = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/fvec
 			  
 EXTRA_DIST		= README

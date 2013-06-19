@@ -7,7 +7,7 @@ import string, re, os
 # Execute git log with the desired command line options.
 fin = os.popen('git log --summary --stat --no-merges --date=short', 'r')
 # Create a ChangeLog file in the current directory.
-fout = open('../CHANGES', 'w')
+fout = open('CHANGES', 'w')
 
 # Set up the loop variables in order to locate the blocks we want
 authorFound = False
@@ -91,23 +91,23 @@ for line in fin:
 
         # Assemble the actual commit message line(s) and limit the line length
         # to 80 characters.
-        commitLine = "* " + files + ": " + message
+        commitLine = "- " + message 
         i = 0
         commit = ""
         while i < len(commitLine):
             if len(commitLine) < i + 78:
-                commit = commit + "\n  " + commitLine[i:len(commitLine)]
+                commit = commit + "\n    " + commitLine[i:len(commitLine)]
                 break
             index = commitLine.rfind(' ', i, i+78)
             if index > i:
-                commit = commit + "\n  " + commitLine[i:index]
+                commit = commit + "\n    " + commitLine[i:index]
                 i = index+1
             else:
-                commit = commit + "\n  " + commitLine[i:78]
+                commit = commit + "\n    " + commitLine[i:78]
                 i = i+79
 
         # Write out the commit line
-        fout.write(commit + "\n")
+        fout.write(commit + '\n')
 
         #Now reset all the variables ready for a new commit block.
         authorFound = False

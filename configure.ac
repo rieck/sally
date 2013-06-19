@@ -1,7 +1,7 @@
 # Sally - A Tool for Embedding Strings in Vector Spaces
-# Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+# Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org)
 
-AC_INIT([sally], [0.8.0], [konrad@mlsec.org])
+AC_INIT([sally], [0.8.2], [konrad@mlsec.org])
 AC_PREFIX_DEFAULT("/usr/local")
 
 # Library version current:revision:age
@@ -10,12 +10,12 @@ LIB_VERSION=1:1:1
 
 echo
 echo "  .Oo Sally - A Tool for Embedding Strings in Vector Spaces"
-echo "      Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org)"
+echo "      Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org)"
 echo
 
 # Init automake & config.h
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h])
 
 # Check for important programs
 AC_PROG_CC
@@ -55,14 +55,14 @@ fi
 # libconfig
 PKG_CHECK_MODULES([PKGCONFIG], [libconfig >= 1.4], [], 
     AC_MSG_ERROR([The library libconfig is required for compilation.
-    Debian/Ubuntu package: libconfig8-dev
+    Debian/Ubuntu package: libconfig9-dev
     Source code: http://www.hyperrealm.com/libconfig/
     ])
 )
 
 CFLAGS="$CFLAGS $PKGCONFIG_CFLAGS"
 LIBS="$LIBS $PKGCONFIG_LIBS"
-INCLUDES="$INCLUDES `pkg-config --cflags-only-I libconfig`"
+AM_CPPFLAGS="$AM_CPPFLAGS `pkg-config --cflags-only-I libconfig`"
 AC_CHECK_HEADERS([libconfig.h], HEADER_LIBCONFIG="yes")
 
 # features
@@ -151,7 +151,7 @@ AC_ARG_ENABLE(evaltime,
     ], []
 )
 
-AC_SUBST([INCLUDES])
+AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([LIB_VERSION])
 
 AC_CONFIG_FILES([ 

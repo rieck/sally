@@ -234,12 +234,13 @@ delimiter characters (B<ngram_delim>) and choosing an n-gram length
 
 =item B<ngram_pos = 0;>
 
-The parameter B<ngram_pos> can be used to enable positional n-grams.  In
-contrast to regular n-grams, these subsequences of length n are 
-associated with a position in the originating string.  Positional n-grams
-thus only match if they appear at the exact same location in a string.  They
-are often used in bioinformatics for analysis of DNA sequences (see the work 
-of Raetsch and Sonnenburg).
+The parameter B<ngram_pos> can be used to enable positional n-grams. In
+contrast to regular n-grams, these subsequences of length n are associated
+with a position in the originating string.  Positional n-grams thus only
+match if they appear at the same location in a string.  If the parameter is
+set to 1, regular positional n-grams are extracted.  If the parameter is set
+to k, multiple positional n-grams are extracted with a shift of up to k-1
+positions.
 
 =item B<ngram_sort = 0;>
 
@@ -305,11 +306,24 @@ several application may choke from the vast amount of dimensions.
 =item B<explicit_hash = 0;>
 
 For performance reasons B<sally> maps features to dimensions without
-memorizing the n-grams associating with these features.  For certain
-analysis tasks, however, it may be necessary to retrieve a full
-mapping including the n-grams of each dimension. If this parameter is
-enabled B<sally> keeps track of all n-grams and depending on the
-selected output format stores them with the extracted feature vectors.
+memorizing the features associated with these dimensions.  For certain
+analysis tasks, however, it may be necessary to retrieve a full mapping
+including the features of each dimension.  If this parameter is enabled
+B<sally> keeps track of all features and depending on the selected output
+format stores them with the extracted feature vectors.  The mapping may
+suffer from collisions due to hashing.  You can control the size of the
+hash table using the parameter B<hash_bits>.
+
+=item B<hash_file = "";>
+
+This parameter enables saving the mapping between features and dimensions to
+a gzip-compressed file.  The functionality is similar to B<explicit_hash>,
+except that B<sally> does not store the features with the feature vectors
+but separately in a file.  Note that the tracking of features and dimensions
+induces a considerable performance overhead.  Also note that mapping may
+contain collisions, where simply the latest colliding entry overrides
+previous entries.  You can control the size of the hash table using the
+parameter B<hash_bits>.
 
 =item B<tfidf_file = "tfidf.fv";>
 
@@ -426,7 +440,8 @@ can be changed by using the command-line option B<--xx
        --thres_low <float>       Enable minimum threshold for vectors.
        --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
-       --explicit_hash <0|1>     Enable explicit hash representation.
+       --explicit_hash <0|1>     Enable explicit hash table.
+       --hash_file <file>	 Set file name for explicit hash table.
        --tfidf_file <file>       Set file name for TFIDF weighting.
 
 =head2 Generic options
@@ -462,7 +477,7 @@ http://www.mlsec.org/sally/examples.html.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2010-2012 Konrad Rieck (konrad@mlsec.org);
+Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org);
 		Christian Wressnegger (christian@mlsec.org);
 		Alexander Bikadorov (abiku@cs.tu-berlin.de)
 

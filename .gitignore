@@ -32,4 +32,6 @@ doc/sally.txt
 nbproject/
 sally.komodoproject
 src/sally
+test-driver
 tests/test_*
+CHANGES

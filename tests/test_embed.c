@@ -19,7 +19,6 @@
 #include "embed.h"
 
 /* Test file */
-#define TEST_FILE               "test.in"
 #define TEST_TFIDF              "test.fv"
 
 /* Global variables */
@@ -38,11 +37,12 @@ int test_embed_tfidf()
     config_set_string(&cfg, "features.tfidf_file", TEST_TFIDF);
 
     unlink(TEST_TFIDF);
-    idf_create(TEST_FILE);
+    char *test_file = getenv("TEST_FILE");
+    idf_create(test_file);
     test_printf("Testing TFIDF embedding");
 
     input_config("lines");
-    n = input_open(TEST_FILE);
+    n = input_open(test_file);
     input_read(strs, n);
 
     /* Compute IDF manually */
@@ -99,7 +99,8 @@ int test_embed_bin()
     string_t strs[10];
 
     input_config("lines");
-    n = input_open(TEST_FILE);
+    char *test_file = getenv("TEST_FILE");
+    n = input_open(test_file);
     input_read(strs, n);
 
     test_printf("Testing binary embedding");
@@ -130,7 +131,8 @@ int test_norm_l2()
     string_t strs[10];
 
     input_config("lines");
-    n = input_open(TEST_FILE);
+    char *test_file = getenv("TEST_FILE");
+    n = input_open(test_file);
     input_read(strs, n);
 
     test_printf("Testing L2 normalization");
@@ -159,7 +161,8 @@ int test_norm_l1()
     string_t strs[10];
 
     input_config("lines");
-    n = input_open(TEST_FILE);
+    char *test_file = getenv("TEST_FILE");
+    n = input_open(test_file);
     input_read(strs, n);
 
     test_printf("Testing L1 normalization");

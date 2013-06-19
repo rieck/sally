@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2012 Konrad Rieck (konrad@mlsec.org)
+ * Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,6 +21,7 @@
 #include "common.h"
 #include "util.h"
 #include "sconfig.h"
+#include "sally.h"
 
 /* External variables */
 extern int verbose;
@@ -45,6 +46,7 @@ static config_default_t defaults[] = {
     {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},    
     {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 22}},
     {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "hash_file", CONFIG_TYPE_STRING, {.str = ""}},    
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
     { "eval", "weights", CONFIG_TYPE_STRING, { .str = "" } },
@@ -188,6 +190,7 @@ int config_check(config_t *cfg)
 {
     const char *s1, *s2;
     double f1, f2;
+    int i1;
 
     /* Add default values where missing */
     config_default(cfg);    
@@ -204,6 +207,13 @@ int config_check(config_t *cfg)
     config_lookup_float(cfg, "features.thres_high", &f2);
     if (f1 != 0.0 && f2 != 0.0 && f1 > f2) {
         error("Minimum threshold larger than maximum threshold.");
+        return 0;
+    }
+
+    config_lookup_string(cfg, "features.hash_file", &s1);
+    config_lookup_int(cfg, "features.explicit_hash", &i1);
+    if (i1 && strlen(s1) > 0) {
+        error("'explicit_hash' and 'hash_file' must not be used togther");
         return 0;
     }
     

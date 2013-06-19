@@ -2,7 +2,7 @@
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 SUBDIRS 		= input output fvec .
-INCLUDES                = -I$(top_srcdir)/src/input \
+AM_CPPFLAGS             = -I$(top_srcdir)/src/input \
 			  -I$(top_srcdir)/src/output \
 			  -I$(top_srcdir)/src/fvec
 
