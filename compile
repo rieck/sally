@@ -20,6 +20,8 @@ case $arg in
    scarecrow*|sec01*)
        echo "Configuration: Laptop (Goettingen)"
        CC="gcc" \
+       LDFLAGS="-L/usr/local/opt/libarchive/lib" \
+       CPPFLAGS="-I/usr/local/opt/libarchive/include" \
        CFLAGS="-g -pedantic -pipe -O2" \
        ./configure --enable-libarchive --prefix=/opt/rieck
        ;;
