@@ -1,3 +1,4 @@
+![Sally](sally.png) 
 
 Sally - A Tool for Embedding Strings in Vector Spaces
 ==
