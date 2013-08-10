@@ -177,6 +177,5 @@ echo
 echo " .Oo Features:"
 echo "     Support for loading archives (--enable-libarchive):    $ENABLE_LIBARCHIVE"
 echo "     MD5 as alternative hash (--enable-md5hash):            $ENABLE_MD5HASH"
-echo " .Oo Experimental features:"
 echo "     Support for multi-processing (--enable-openmp):        $ENABLE_OPENMP"
 echo
