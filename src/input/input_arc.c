@@ -48,7 +48,7 @@ int input_arc_open(char *name)
     struct archive_entry *entry;
 
     a = archive_read_new();
-    archive_read_support_compression_all(a);
+    archive_read_support_filter_all(a);
     archive_read_support_format_all(a);
 
     FILE *f = fopen(name, "r");
@@ -72,11 +72,11 @@ int input_arc_open(char *name)
         }
         archive_read_data_skip(a);
     }
-    archive_read_finish(a);
+    archive_read_close(a);
 
     /* Open file again */
     a = archive_read_new();
-    archive_read_support_compression_all(a);
+    archive_read_support_filter_all(a);
     archive_read_support_format_all(a);
 
     fseek(f, 0, SEEK_SET);
@@ -128,7 +128,7 @@ int input_arc_read(string_t * strs, int len)
  */
 void input_arc_close()
 {
-    archive_read_finish(a);
+    archive_read_close(a);
 }
 
 
