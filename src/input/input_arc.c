@@ -51,11 +51,10 @@ int input_arc_open(char *name)
     archive_read_support_compression_all(a);
     archive_read_support_format_all(a);
 
-    FILE* f = fopen(name, "r");
-    if (f == NULL)
-    {
-    	error("Failed to open '%s", name);
-    	return -1;
+    FILE *f = fopen(name, "r");
+    if (f == NULL) {
+        error("Failed to open '%s", name);
+        return -1;
     }
 
     int r = archive_read_open_FILE(a, f);
@@ -68,9 +67,8 @@ int input_arc_open(char *name)
     /* Count regular files in archive */
     int num_files = 0;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
-        if (archive_entry_filetype(entry) == AE_IFREG)
-        {
-        	num_files++;
+        if (archive_entry_filetype(entry) == AE_IFREG) {
+            num_files++;
         }
         archive_read_data_skip(a);
     }
@@ -92,7 +90,7 @@ int input_arc_open(char *name)
  * @param len Length of block
  * @return number of read files
  */
-int input_arc_read(string_t *strs, int len)
+int input_arc_read(string_t * strs, int len)
 {
     assert(strs && len > 0);
     struct archive_entry *entry;
@@ -105,15 +103,18 @@ int input_arc_read(string_t *strs, int len)
         if (r != ARCHIVE_OK)
             break;
 
-        const struct stat *s = archive_entry_stat(entry);
-        if (!S_ISREG(s->st_mode)) {
+        if (archive_entry_filetype(entry) != AE_IFREG) {
             archive_read_data_skip(a);
         } else {
+            if (!archive_entry_size_is_set(entry)) {
+                warning("Archive entry has no size set.");
+            }
+        
             /* Add entry */
-            strs[j].str = malloc(s->st_size * sizeof(char));
-            archive_read_data(a, strs[j].str, s->st_size);
+            strs[j].str = malloc(archive_entry_size(entry) * sizeof(char));
+            archive_read_data(a, strs[j].str, archive_entry_size(entry));
             strs[j].src = strdup(archive_entry_pathname(entry));
-            strs[j].len = s->st_size;
+            strs[j].len = archive_entry_size(entry);
             strs[j].label = get_label(strs[j].src);
             j++;
         }
