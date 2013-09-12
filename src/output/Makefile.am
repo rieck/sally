@@ -4,7 +4,7 @@
 AM_CPPFLAGS             = -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/fvec
 			  
-EXTRA_DIST		= README
+EXTRA_DIST		= README.md
 
 noinst_LTLIBRARIES	= liboutput.la
 

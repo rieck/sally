@@ -2,7 +2,7 @@
 # Copyright (C) 2010 Konrad Rieck (konrad@mlsec.org)
 
 AM_CPPFLAGS             = -I$(top_srcdir)/src 
-EXTRA_DIST		= README
+EXTRA_DIST		= README.md
 
 noinst_LTLIBRARIES	= libinput.la
 

@@ -1,0 +1,50 @@
+Development of Output Modules
+==
+
+Three steps
+--
+
+Sally can be easily extended to support different output formats for
+vectors.  The development of a new output module basically involves three
+steps:
+  
+1. Create the source files `output_xxx.c` and `output_xxx.h` for the
+   new output module xxx.  Add these files to `Makefile.am` to
+   include them in the compilation process of Sally.
+  
+2. Implement three functions in `output_xxx.c` and add respective
+   declarations of these functions to `output_xxx.h`.
+           
+   `int output_xxx_open(char *name);`
+     
+   This function opens the output destination for writing vectors.
+   For example, if `xxx` refers to matlab support, this functions
+   corresponds to opening and initializing a file in matlab
+   format. The function returns 1 on success and on 0 on failure.
+     
+   `int output_xxx_write(fvec_t **x, int len)`
+
+   The function writes a block of vectors. The parameter `x` holds
+   the vectors (see fvec.h) and `len` specifies their number.  The
+   function returns the number of loaded strings; 0 indicates the
+   end of the output source.
+       
+   `void output_xxx_close();`
+     
+   This function closes the output destination for the format xxx.
+   Memory allocated by output_xxx_open() should be freed here. Open
+   files and similar objects should be closed.
+     
+3. Integrate the new interface into Sally by extending the code in
+   `output.c`. First, add `output_xxx.h` to the list of included
+   headers and, second, extend the function output_config() to
+   initialize the new output format if requested.
+ 
+
+Support Sally
+--
+
+That's it. Please contribute to the development of Sally. Send your
+new modules to konrad@mlsec.org, so that they can be included in the
+next release.
+  

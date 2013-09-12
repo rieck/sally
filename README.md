@@ -1,3 +1,4 @@
+![Sally](sally.png) 
 
 Sally - A Tool for Embedding Strings in Vector Spaces
 ==
@@ -38,7 +39,7 @@ Dependencies
 Corresponding packages
 
 + Debian and Ubuntu Linux: `libz-dev libconfig9-dev libarchive-dev`  
-+ MacOS X with Homebrew:   `libconfig libarchive (homebrew-dupes)`  
++ MacOS X with Homebrew:   `libconfig libarchive`
 + MacOS X with MacPorts:   `libconfig-hr libarchive`  
 
 The source code of the libraries is available here:
