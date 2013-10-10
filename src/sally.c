@@ -107,7 +107,7 @@ static void print_usage(void)
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
-           "  -p,  --ngram_pos <0|1>         Enable positional n-grams.\n"
+           "  -p,  --ngram_pos <num>         Enable and set positional n-grams.\n"
            "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
