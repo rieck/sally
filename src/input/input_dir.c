@@ -72,7 +72,7 @@ int input_dir_open(char *p)
 int input_dir_read(string_t *strs, int len)
 {
     assert(strs && len > 0);
-    int i, j = 0, l;
+    int i, j = 0, l = 0;
 
     /* Determine maximum path length and allocate buffer */
     int maxlen = fpathconf(dirfd(dir), _PC_NAME_MAX);

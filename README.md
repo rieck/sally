@@ -32,21 +32,52 @@ Consult the manual page of Sally for more information.
 Dependencies
 --
 
-    >= zlib-1.2.1
-    >= libconfig-1.4
-    >= libarchive-2.70
++ zlib >= 1.2.1       <http://www.zlib.net/>
++ libconfig >= 1.4    <http://www.hyperrealm.com/libconfig/>
++ libarchive >= 2.70  <http://libarchive.github.com/>
 
-Corresponding packages
+### Debian & Ubuntu Linux
 
-+ Debian and Ubuntu Linux: `libz-dev libconfig9-dev libarchive-dev`  
-+ MacOS X with Homebrew:   `libconfig libarchive`
-+ MacOS X with MacPorts:   `libconfig-hr libarchive`  
+The following packages need to be installed for compiling Sally on Debian
+and Ubuntu Linux
 
-The source code of the libraries is available here:
+   gcc 
+   libz-dev
+   libconfig9-dev
+   libarchive-dev 
 
-+ zlib        <http://www.zlib.net/>
-+ libconfig   <http://www.hyperrealm.com/libconfig/>
-+ libarchive  <http://libarchive.github.com/>
+For bootstrapping Sally from the GIT repository or manipulating the
+automake/autoconf configuration, the following additional packages are
+necessary.
+
+   automake 
+   autoconf 
+   libtool
+
+### Mac OS X 
+
+For compiling Sally on Mac OS X a working installation of Xcode is required
+including `gcc`.  Additionally, the following packages need to be installed
+via Homebrew
+
+   libconfig   
+   libarchive (from homebrew-alt) 
+
+### OpenBSD
+
+For compiling Sally on OpenBSD the following packages are required. Note
+that you need to use `gmake` instead of `make` for building Sally.
+
+   gmake
+   libconfig
+   libarchive
+
+For bootstrapping Sally from the GIT repository, the following packages
+need be additionally installed
+
+    autoconf
+    automake
+    libtool
 
 Compilation & Installation
 --

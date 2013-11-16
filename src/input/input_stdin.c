@@ -62,7 +62,8 @@ int input_stdin_read(string_t *strs, int lt)
             free(old);
             return 0;
         }
-        strcat(x, buf);
+        
+        strncat(x, buf, 1023);
     }
     
     if(ferror(stdin)) {

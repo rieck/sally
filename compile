@@ -25,6 +25,14 @@ case $arg in
        CFLAGS="-g -pedantic -pipe -O2" \
        ./configure --enable-libarchive --prefix=/opt/rieck
        ;;
+   kindl*)
+       echo "Configuration: Kindl (OpenBSD)"
+       CC="gcc" \
+       LDFLAGS="-L/usr/local/lib" \
+       CPPFLAGS="-I/usr/local/include" \
+       CFLAGS="-g -pedantic -pipe -O2" \
+       ./configure --enable-libarchive --prefix=/opt/rieck
+       ;;
    schulle*)
        echo "Configuration: Schulle (ESX Cluster)"
        PKG_CONFIG_PATH="/usr/local/lib/pkgconfig" \

@@ -389,8 +389,8 @@ static void sally_process()
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */
-    fvec_t **fvec = alloca(sizeof(fvec_t *) * chunk);
-    string_t *strs = alloca(sizeof(string_t) * chunk);
+    fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
+    string_t *strs = malloc(sizeof(string_t) * chunk);
 
     if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
@@ -427,6 +427,9 @@ static void sally_process()
 
         prog_bar(0, entries, i + read);
     }
+    
+    free(fvec);
+    free(strs);
 }
 
 /**
