@@ -36,7 +36,7 @@ Dependencies
 +   libconfig >= 1.4, <http://www.hyperrealm.com/libconfig/>
 +   libarchive >= 2.70,  <http://libarchive.github.com/>
 
-### Debian & Ubuntu Linux
+#### Debian & Ubuntu Linux
 
 The following packages need to be installed for compiling Sally on Debian
 and Ubuntu Linux
@@ -54,7 +54,7 @@ necessary.
     autoconf 
     libtool
 
-### Mac OS X 
+#### Mac OS X 
 
 For compiling Sally on Mac OS X a working installation of Xcode is required
 including `gcc`.  Additionally, the following packages need to be installed
@@ -63,7 +63,7 @@ via Homebrew
     libconfig   
     libarchive (from homebrew-alt) 
 
-### OpenBSD
+#### OpenBSD
 
 For compiling Sally on OpenBSD the following packages are required. Note
 that you need to use `gmake` instead of `make` for building Sally.
