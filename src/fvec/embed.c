@@ -106,6 +106,14 @@ void idf_create(char *input)
     for (i = 0, read = 0; i < entries; i += read) {
         read = input_read(strs, chunk);
         if (read <= 0)
+            // This might cause an infinite loop in case reading the
+            // input data fails for some reason, e.g. a mismatch in the
+            // expected number of inputs available (variable "entries")
+            // and the number of inputs actually available. This can be
+            // triggered by a corrupt archive for instance.
+            // TODO: Break here rather than continuing processing at
+            // this point. Verify whether this works for all the input
+            // modules Sally uses.
             continue;
 
         for (j = 0; j < read; j++) {

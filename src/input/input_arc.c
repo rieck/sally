@@ -97,14 +97,14 @@ int input_arc_read(string_t * strs, int len)
     int j = 0;
 
     /* Load block of files (no OpenMP here) */
-    while (archive_read_next_header(a, &entry) == ARCHIVE_OK && j < len) {    
+    while (j < len && archive_read_next_header(a, &entry) == ARCHIVE_OK) {
         if (archive_entry_filetype(entry) != AE_IFREG) {
             archive_read_data_skip(a);
         } else {
             if (!archive_entry_size_is_set(entry)) {
                 warning("Archive entry has no size set.");
             }
-        
+
             /* Add entry */
             strs[j].str = malloc(archive_entry_size(entry) * sizeof(char));
             archive_read_data(a, strs[j].str, archive_entry_size(entry));
