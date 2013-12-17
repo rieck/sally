@@ -110,7 +110,7 @@ static void print_usage(void)
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
-           "  -p,  --ngram_pos <0|1>         Enable positional n-grams.\n"
+           "  -p,  --ngram_pos <num>         Enable and set positional n-grams.\n"
            "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
@@ -426,9 +426,9 @@ static void sally_process()
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */
-    fvec_t **fvec = alloca(sizeof(fvec_t *) * chunk);
-    string_t *strs = alloca(sizeof(string_t) * chunk);
-    double* const scores = (eval_mode ? alloca(sizeof (double) * chunk) : NULL);
+    fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
+    string_t *strs = malloc(sizeof(string_t) * chunk);
+    double* const scores = (eval_mode ? malloc(sizeof (double) * chunk) : NULL);
 
     if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
@@ -490,6 +490,9 @@ static void sally_process()
 		info_msg(1, "Net calculation time: %.4f seconds", totalTime);
 		fvec_destroy(w);
     }
+
+    free(fvec);
+    free(strs);
 }
 
 /**
