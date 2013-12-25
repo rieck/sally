@@ -1,7 +1,7 @@
 # Sally - A Tool for Embedding Strings in Vector Spaces
 # Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org)
 
-AC_INIT([sally], [0.8.2], [konrad@mlsec.org])
+AC_INIT([sally], [0.8.3], [konrad@mlsec.org])
 AC_PREFIX_DEFAULT("/usr/local")
 
 # Library version current:revision:age
