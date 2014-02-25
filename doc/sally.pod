@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-B<sally> -- a tool for embedding strings in vector spaces
+B<sally> - a tool for embedding strings in vector spaces
 
 =head1 SYNOPSIS
 
