@@ -82,11 +82,14 @@ void reduce_simhash(fvec_t *fv, int num)
 /**
  * Reduce the feature vector to a "minimum hash". The string features
  * associated with each dimension are hashed and sorted.  In a slight
- * variant of the idea by Broder (1997), the final hash is constructed from
- * the last bit of the k lowest hash values resulting in a k-bit hash value. 
- * Hence, we are not looking at the k minimum hash values of k hash
- * functions as in the original formulation, but rather k bits from the
- * lowest k hashes of one hash function. 
+ * variant of the original idea by Broder (1997), the final hash is
+ * constructed from the last bit of the k lowest hash values.  Hence, we are
+ * not looking at the minimum hash values of k hash functions as in the
+ * original formulation, but rather at k bits from the lowest k hash values
+ * of one hash function. 
+ *
+ * Why? Well, in this way, we are constructing a hash value, whereas the 
+ * original formulation returns a set of hash values.
  *
  * @param fv Feature vector
  * @param num Number of bits
