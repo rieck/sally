@@ -14,8 +14,7 @@
 
 #include "fvec.h"
 
-
-void fvec_simhash(fvec_t *fv, int num);
-void fvec_minhash(fvec_t *fv, int num);
+void reduce_simhash(fvec_t *fv, int num);
+void reduce_minhash(fvec_t *fv, int num);
 
 #endif /* REDUCE_H */

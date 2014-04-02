@@ -17,6 +17,7 @@
 #include "output.h"
 #include "fvec.h"
 #include "util.h"
+#include "reduce.h"
 #include "sconfig.h"
 
 /* Global variables */
@@ -379,14 +380,19 @@ static void sally_init()
 static void sally_process()
 {
     long read, i, j;
-    int chunk;
+    int chunk, num_dim;
     const char *hash_file;
+    const char *dim_reduce;
 
     /* Check if a hash file is set */
     config_lookup_string(&cfg, "features.hash_file", &hash_file);
 
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
+
+    /* Get dimension reduction method */
+    config_lookup_string(&cfg, "reduce.method", &dim_reduce);
+    config_lookup_int(&cfg, "reduce.num_dim", &num_dim);
 
     /* Allocate space */
     fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
@@ -412,6 +418,17 @@ static void sally_process()
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
             fvec_set_source(fvec[j], strs[j].src);
+            
+            if (!strcasecmp(dim_reduce, "none")) {
+                /* Do nothing ;) */
+            } else if (!strcasecmp(dim_reduce, "simhash")) {
+                reduce_simhash(fvec[j], num_dim);
+            } else if (!strcasecmp(dim_reduce, "minhash")) {
+                reduce_minhash(fvec[j], num_dim);
+            } else {
+                warning("Unknown dimension reduction method. Skipping");
+            }
+            
         }
 
         if (!output_write(fvec, read))

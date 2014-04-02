@@ -29,7 +29,7 @@
  * @param fv Feature vector
  * @param num Number of bits
  */
-void fvec_simhash(fvec_t *fv, int num)
+void reduce_simhash(fvec_t *fv, int num)
 {
     assert(fv && num > 0);
     feat_t *dim;
@@ -82,12 +82,12 @@ void fvec_simhash(fvec_t *fv, int num)
  * @param fv Feature vector
  * @param num Number of bits
  */
-void fvec_minhash(fvec_t *fv, int num)
+void reduce_minhash(fvec_t *fv, int num)
 {
     assert(fv && num > 0);
     feat_t *dim;
     float *val;
-    int i, j;
+    int j;
 
     if (num > fv->len)
         num = fv->len;
@@ -103,7 +103,7 @@ void fvec_minhash(fvec_t *fv, int num)
     }
   
     /* Compute hash from smallest feature dims */
-    for (j = 0; j < num; i++) {
+    for (j = 0; j < num; j++) {
         dim[j] = j;
         val[j] = fv->dim[j] & 1;
     }
