@@ -56,7 +56,9 @@ static struct option longopts[] = {
     {"thres_high", 1, NULL, 1010},   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
-    {"hash_file", 1, NULL, 1011},   /* <- last entry */   
+    {"hash_file", 1, NULL, 1011},   
+    {"dim_reduce", 1, NULL, 1012}, /* <- last entry */   
+    {"dim_num", 1, NULL, 1013},
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -188,6 +190,12 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1011:
             config_set_string(&cfg, "features.hash_file", optarg);
+            break;
+        case 1012:
+            config_set_string(&cfg, "filter.dim_reduce", optarg);
+            break;
+        case 1013:
+            config_set_int(&cfg, "filter.dim_num", atoi(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
@@ -380,7 +388,7 @@ static void sally_init()
 static void sally_process()
 {
     long read, i, j;
-    int chunk, num_dim;
+    int chunk, dim_num;
     const char *hash_file;
     const char *dim_reduce;
 
@@ -391,8 +399,8 @@ static void sally_process()
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
 
     /* Get dimension reduction method */
-    config_lookup_string(&cfg, "reduce.method", &dim_reduce);
-    config_lookup_int(&cfg, "reduce.num_dim", &num_dim);
+    config_lookup_string(&cfg, "filter.dim_reduce", &dim_reduce);
+    config_lookup_int(&cfg, "filter.dim_num", &dim_num);
 
     /* Allocate space */
     fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
@@ -422,11 +430,11 @@ static void sally_process()
             if (!strcasecmp(dim_reduce, "none")) {
                 /* Do nothing ;) */
             } else if (!strcasecmp(dim_reduce, "simhash")) {
-                reduce_simhash(fvec[j], num_dim);
+                reduce_simhash(fvec[j], dim_num);
             } else if (!strcasecmp(dim_reduce, "minhash")) {
-                reduce_minhash(fvec[j], num_dim);
+                reduce_minhash(fvec[j], dim_num);
             } else {
-                warning("Unknown dimension reduction method. Skipping");
+                warning("Unknown dimension reduction method. Skipping.");
             }
             
         }

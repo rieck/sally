@@ -342,24 +342,24 @@ sets.
 
 =back
 
-=head2 Dimension reduction
+=head2 Filtering and dimension reduction
 
-B<sally> supports some simple methods for unsupervised dimension reduction.
-These can be applied to reduce the number of dimensions in the feature
-vectors.  Due to their simplicitiy, however, these methods only capture a
-small amount of information from the original feature vectors and should be
-used with caution.
-
-=over 4
-
-=item B<reduce = {>
+B<sally> supports some simple methods for unsupervised filtering and
+dimension reduction.  These can be applied to reduce the number of
+dimensions in the feature vectors.  Due to their simplicitiy, however, these
+methods only capture a small amount of information from the original feature
+vectors and should be used with caution.
 
 =over 4
 
-=item B<method = "none";>
+=item B<filter = {>
 
-Following is a list of methods for unsupervised dimension reduction
-supported by B<sally>:
+=over 4
+
+=item B<dim_reduce = "none";>
+
+Following is a list of methods for unsupervised filtering and dimension
+reduction supported by B<sally>:
 
 =over 14
 
@@ -369,7 +369,7 @@ No dimension reduction is performed.
 
 =item I<"simhash">
 
-Each feature vector is reduced to a similarity hash with B<num_dim> bits. 
+Each feature vector is reduced to a similarity hash with B<dim_num> bits. 
 The string features associated with each dimension are hashed and aggregated
 to a single hash value as proposed by Charikar (STOC 2002).  For
 convenience, the computed hash value is again represented as a feature
@@ -378,17 +378,19 @@ the feature configuration section.
 
 =item I<"minhash">
 
-Each feature vector is reduced to a "minimum hash" with B<num_dim> bits. The
+Each feature vector is reduced to a "minimum hash" with B<dim_num> bits. The
 string features associated with each dimension are hashed and sorted.  In a
 slight variant of the idea by Broder (1997), the hash is constructed from
 the last bit of the k lowest hash values.  Hence, we are not looking at the
 minimum hash values of k hash functions, but rather at the last bits from
 the lowest k hash values of one hash function.  For convenience, the
-computed hash value is again represented as a feature vector.
+computed hash value is represented as a feature vector.  Note that the
+maximum number of non-zero bits is limited by the number of features in each
+string.
 
 =back
 
-=item B<num_dim = 32;>
+=item B<dim_num = 32;>
 
 This parameter defines the number of dimensions/bits to generate using
 unsupervised dimension reduction.

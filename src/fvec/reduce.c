@@ -117,7 +117,7 @@ void reduce_minhash(fvec_t *fv, int num)
         if (j < fv->len)
             val[j] = fv->dim[j] & 1;
         else
-            val[j] = fv->dim[j] & 0;
+            val[j] = 0;
     }
     
     /* Exchange data */
