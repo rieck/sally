@@ -342,6 +342,37 @@ sets.
 
 =back
 
+=head2 Dimension reduction
+
+B<sally> supports some simple methods for dimension reduction. These can be
+applied to reduce the number of dimensions in the feature vectors.  Due to
+their simplicitiy, however, these methods only capture small amount of
+information from the original feature vectors.
+
+=over 4
+
+=item B<reduce = {>
+
+=over 4
+
+=item B<method = "none";>
+
+This parameter specifies the method used for dimension reduction. Supported
+methods are: I<"none"> for no dimension reduction, I<"simhash"> for
+computation of similarity hashs and I<"minhash"> for computation of 
+minimum hashs.
+
+=item B<num_dim = 32;>
+
+This parameter defines the number of dimensions to generate/filter using 
+dimension reduction.
+
+=back
+
+=item B<};>
+
+=back
+
 =head2 Output formats
 
 Once the input strings have been embedded in a vector space, B<sally>

@@ -48,6 +48,8 @@ static config_default_t defaults[] = {
     {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "hash_file", CONFIG_TYPE_STRING, {.str = ""}},    
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
+    {"reduce", "method", CONFIG_TYPE_STRING, {.str = "none" }},
+    {"reduce", "num_dim", CONFIG_TYPE_INT, {.num = 32}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
     {NULL}
 };
