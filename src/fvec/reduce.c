@@ -101,9 +101,6 @@ void reduce_minhash(fvec_t *fv, int num)
     float *val;
     int j;
 
-    if (num > fv->len)
-        num = fv->len;
-
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
     
@@ -117,7 +114,10 @@ void reduce_minhash(fvec_t *fv, int num)
     /* Compute hash from smallest feature dims */
     for (j = 0; j < num; j++) {
         dim[j] = j;
-        val[j] = fv->dim[j] & 1;
+        if (j < fv->len)
+            val[j] = fv->dim[j] & 1;
+        else
+            val[j] = fv->dim[j] & 0;
     }
     
     /* Exchange data */
