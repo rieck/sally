@@ -24,8 +24,11 @@
 #include "util.h"
 
 /**
- * Compute simhash from feature vector. The dimensions of the resulting 
- * vector correspond to the bits of the simhash.
+ * Reduce the feature vector to a similarity hash. The string features
+ * associated with each dimension are hashed and aggregated to a single hash
+ * value as proposed by Charikar (STOC 2002).  For convenience, the computed
+ * hash value is again represented as a feature vector.
+ * 
  * @param fv Feature vector
  * @param num Number of bits
  */
@@ -77,8 +80,14 @@ void reduce_simhash(fvec_t *fv, int num)
 
 
 /**
- * Compute minhash from feature vector. The dimensions of the resulting 
- * vector correspond to the bits of the minhash.
+ * Reduce the feature vector to a "minimum hash". The string features
+ * associated with each dimension are hashed and sorted.  In a slight
+ * variant of the idea by Broder (1997), the final hash is constructed from
+ * the last bit of the k lowest hash values resulting in a k-bit hash value. 
+ * Hence, we are not looking at the k minimum hash values of k hash
+ * functions as in the original formulation, but rather k bits from the
+ * lowest k hashes of one hash function. 
+ *
  * @param fv Feature vector
  * @param num Number of bits
  */
@@ -116,6 +125,5 @@ void reduce_minhash(fvec_t *fv, int num)
     fv->val = val;
     fv->len = num;
 }
-
 
 /** @} */
