@@ -372,8 +372,9 @@ No dimension reduction is performed.
 Each feature vector is reduced to a similarity hash.  The string features
 associated with each dimension are hashed and aggregated to a single hash
 value as proposed by Charikar (STOC 2002).  For convenience, the computed
-hash value is again represented as a feature vector, where the returned
-dimensions are either 0 or 1.
+hash value is again represented as a feature vector.  Note that the number
+of maximum hash bits is defined by B<hash_bits> in the feature configuration
+section.
 
 =item I<"minhash">
 
@@ -383,8 +384,7 @@ of the original idea by Broder (1997), the final hash is constructed from
 the last bit of the k lowest hash values.  Hence, we are not looking at the
 minimum hash values of k hash functions, but rather at the last bits from
 the lowest k hash values of one hash function.  For convenience, the
-computed hash value is again represented as a feature vector, where the
-returned dimensions are either 0 or 1.
+computed hash value is again represented as a feature vector.
 
 =back
 
