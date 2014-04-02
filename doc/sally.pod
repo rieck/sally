@@ -346,8 +346,9 @@ sets.
 
 B<sally> supports some simple methods for dimension reduction. These can be
 applied to reduce the number of dimensions in the feature vectors.  Due to
-their simplicitiy, however, these methods only capture small amount of
-information from the original feature vectors.
+their simplicitiy, however, these methods only capture a small amount of
+information from the original feature vectors and should be used with
+caution.
 
 =over 4
 
@@ -357,10 +358,35 @@ information from the original feature vectors.
 
 =item B<method = "none";>
 
-This parameter specifies the method used for dimension reduction. Supported
-methods are: I<"none"> for no dimension reduction, I<"simhash"> for
-computation of similarity hashs and I<"minhash"> for computation of 
-minimum hashs.
+Following is a list of methods for dimension reduction supported by
+B<sally>:
+
+=over 14
+
+=item I<"none">
+
+No dimension reduction is performed.
+
+=item I<"simhash">
+
+Each feature vector is reduced to a similarity hash.  The string features
+associated with each dimension are hashed and aggregated to a single hash
+value as proposed by Charikar (STOC 2002).  For convenience, the computed
+hash value is again represented as a feature vector, where the returned
+dimensions are either 0 or 1.
+
+=item I<"minhash">
+
+Each feature vector is reduced to a "minimum hash" The string features
+associated with each dimension are hashed and sorted.  In a slight variant
+of the original idea by Broder (1997), the final hash is constructed from
+the last bit of the k lowest hash values.  Hence, we are not looking at the
+minimum hash values of k hash functions, but rather at the last bits from
+the lowest k hash values of one hash function.  For convenience, the
+computed hash value is again represented as a feature vector, where the
+returned dimensions are either 0 or 1.
+
+=back
 
 =item B<num_dim = 32;>
 
