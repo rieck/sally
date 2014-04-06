@@ -12,7 +12,7 @@
 /** 
  * @defgroup reduce Dimension reduction
  *
- * Simple implementations of dimension reduction and related techniques.
+ * Implementations of unsupervised filtering and dimension reduction methods.
  *
  * @author Konrad Rieck (konrad@mlsec.org)
  * @{
