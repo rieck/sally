@@ -232,7 +232,7 @@ delimiter characters (B<ngram_delim>) and choosing an n-gram length
 
 =back
 
-=item B<ngram_pos = 0;>
+=item B<ngram_pos = false;>
 
 =item B<pos_shift = 0;>
 
@@ -242,7 +242,7 @@ with a position in the originating string.  Positional n-grams thus only
 match if they appear at the same location in a string.  The additional
 parameter B<pos_shift> can be used to add a shift to the n-grams.  If the
 parameter is set to I<k>, multiple positional n-grams are extracted with a
-shift from -I<k> to I<k>.
+shift from I<-k> to I<+k>.
 
 =item B<ngram_sort = false;>
 
@@ -434,7 +434,8 @@ can be changed by using the command-line option B<--xx
 
   -n,  --ngram_len <num>         Set length of n-grams.
   -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.
-  -p,  --ngram_pos <num>         Enable and set positional n-grams.
+  -p,  --ngram_pos               Enable positional n-grams.
+       --pos_shift <num>         Set shift of positional n-grams.
   -s,  --ngram_sort              Enable sorted n-grams (n-perms).
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
