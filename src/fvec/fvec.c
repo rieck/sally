@@ -380,9 +380,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
 
             /* Positional n-grams code */
             if (pos) {
-                long p = ci + shift;
-                memcpy(fstr + flen, &p, sizeof(long));
-                flen += sizeof(long);
+                int32_t p = ci + shift;
+                memcpy(fstr + flen, &p, sizeof(int32_t));
+                flen += sizeof(int32_t);
             }
 
             feat_t h = hash_str(fstr, flen);
@@ -462,9 +462,9 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
 
         /* Positional n-grams code */
         if (pos) {
-            long p = ci + shift;
-            memcpy(fstr + flen, &p, sizeof(long));
-            flen += sizeof(long);
+            int32_t p = ci + shift;
+            memcpy(fstr + flen, &p, sizeof(int32_t));
+            flen += sizeof(int32_t);
         }
 
         feat_t h = hash_str(fstr, flen);
