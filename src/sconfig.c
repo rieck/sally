@@ -181,6 +181,15 @@ static void config_default(config_t *cfg)
             if (config_setting_lookup_bool(cs, defaults[i].name, &j))
                 continue;
 
+            /* Check for mis-interpreted integer */
+            if (config_setting_lookup_int(cs, defaults[i].name, &j)) {
+                config_setting_remove(cs, defaults[i].name);
+                vs = config_setting_add(cs, defaults[i].name,
+                                        CONFIG_TYPE_BOOL);
+                config_setting_set_bool(vs, j == 0 ? CONFIG_FALSE : CONFIG_TRUE);
+                continue;
+            }
+
             /* Add default value */
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_BOOL);
             config_setting_set_bool(vs, defaults[i].val.num);
