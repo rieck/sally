@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org);
+ * Copyright (C) 2010-2014 Konrad Rieck (konrad@mlsec.org);
  *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
@@ -47,6 +47,7 @@ static struct option longopts[] = {
     {"ngram_len", 1, NULL, 'n'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 1, NULL, 'p'},
+    {"pos_shift", 1, NULL, 1012}, /* <- last entry */
     {"ngram_sort", 1, NULL, 's'},
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
@@ -55,7 +56,7 @@ static struct option longopts[] = {
     {"thres_high", 1, NULL, 1010},   
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 1, NULL, 1003},
-    {"hash_file", 1, NULL, 1011},   /* <- last entry */   
+    {"hash_file", 1, NULL, 1011},   
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -107,7 +108,8 @@ static void print_usage(void)
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
-           "  -p,  --ngram_pos <num>         Enable and set positional n-grams.\n"
+           "  -p,  --ngram_pos <num>         Enable positional n-grams.\n"
+           "       --pos_shift <num>         Set shift of positional n-grams.\n"
            "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
@@ -134,7 +136,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2014 Konrad Rieck (konrad@mlsec.org)\n",
            PACKAGE_VERSION);
 }
 
@@ -187,6 +189,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 1011:
             config_set_string(&cfg, "features.hash_file", optarg);
+            break;
+        case 1012:
+            config_set_int(&cfg, "features.pos_shift", atoi(optarg));
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));

@@ -43,8 +43,8 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l, int p);
-static void extract_ngrams(fvec_t *, char *x, int l, int p);
+static void extract_wgrams(fvec_t *, char *x, int l, int p, int s);
+static void extract_ngrams(fvec_t *, char *x, int l, int p, int s);
 static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
@@ -79,7 +79,7 @@ fvec_t *fvec_extract(char *x, int l)
 fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
 {
     fvec_t *fv;
-    int pos;
+    int pos, shift;
     const char *dlm_str, *cfg_str;
     double flt1, flt2;
     assert(x && l >= 0);
@@ -94,14 +94,20 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
     config_lookup_int(&cfg, "features.ngram_pos", (int *) &pos);
+    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);    
 
     /* Check for empty sequence */
     if (l == 0)
         return fv;
 
+    /* Sanitize shift value */
+    if (!pos)
+        shift = 0;
+
     /* Allocate arrays */
-    fv->dim = (feat_t *) malloc(l * sizeof(feat_t) * (pos ? pos : 1));
-    fv->val = (float *) malloc(l * sizeof(float) * (pos ? pos : 1));
+    int space = 2 * shift + 1;
+    fv->dim = (feat_t *) malloc(l * sizeof(feat_t) * space);
+    fv->val = (float *) malloc(l * sizeof(float) * space);
 
     if (!fv->dim || !fv->val) {
         error("Could not allocate feature vector contents");
@@ -116,25 +122,15 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
     double t1 = time_stamp();
 #endif
 
-    /* N-grams of bytes */
-    if (!dlm_str || strlen(dlm_str) == 0) {
-        /* Feature extraction */
-        if (pos) {
-            for (int p = 1; p <= pos; p++) 
-                extract_ngrams(fv, x, l, p);
+    /* Loop over position shifts (0 if pos is disabled) */
+    for (int s = -shift; s <= shift; s++) {
+        if (!dlm_str || strlen(dlm_str) == 0) {    
+            extract_ngrams(fv, x, l, pos, s);
         } else {
-                extract_ngrams(fv, x, l, 0);
-        }
-    } else {
-        /* Feature extraction */
-        if (pos) {
-            for (int p = 1; p <= pos; p++) 
-                extract_wgrams(fv, x, l, p);
-        } else {
-            extract_wgrams(fv, x, l, 0);
+            extract_wgrams(fv, x, l, pos, s);
         }
     }
-    
+
     /* Sort extracted features */
     qsort(fv->dim, fv->len, sizeof(feat_t), cmp_feat);
 
@@ -318,9 +314,10 @@ static char *sort_words(char *str, int len, char delim)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param pos Positional n-grams (with shift)
+ * @param pos Positional n-grams
+ * @param shift Shift value
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
+static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
 {
     assert(fv && x && l > 0);
     int nlen, sort, bits, sign, flen;
@@ -383,9 +380,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
             /* Positional n-grams code */
             if (pos) {
-                unsigned long p = ci + pos;
-                memcpy(fstr + flen, &p, sizeof(unsigned long));
-                flen += sizeof(unsigned long);
+                long p = ci + shift;
+                memcpy(fstr + flen, &p, sizeof(long));
+                flen += sizeof(long);
             }
 
             feat_t h = hash_str(fstr, flen);
@@ -425,9 +422,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
- * @param pos Positional n-grams (with shift)
+ * @param pos Positional n-grams 
+ * @param shift Shift value
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
+static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
 {
     assert(fv && x);
 
@@ -464,9 +462,9 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 
         /* Positional n-grams code */
         if (pos) {
-            unsigned long p = ci + pos;
-            memcpy(fstr + flen, &p, sizeof(unsigned long));
-            flen += sizeof(unsigned long);
+            long p = ci + shift;
+            memcpy(fstr + flen, &p, sizeof(long));
+            flen += sizeof(long);
         }
 
         feat_t h = hash_str(fstr, flen);
