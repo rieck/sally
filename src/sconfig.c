@@ -30,23 +30,23 @@ extern int verbose;
 static config_default_t defaults[] = {
     {"input", "input_format", CONFIG_TYPE_STRING, {.str = "lines"}},
     {"input", "chunk_size", CONFIG_TYPE_INT, {.num = 256}},
-    {"input", "decode_str", CONFIG_TYPE_INT, {.num = 0}},
+    {"input", "decode_str", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"input", "fasta_regex", CONFIG_TYPE_STRING, {.str = " (\\+|-)?[0-9]+"}},
     {"input", "lines_regex", CONFIG_TYPE_STRING, {.str = "^(\\+|-)?[0-9]+"}},
-    {"input", "reverse_str", CONFIG_TYPE_INT, {.num = 0}},
+    {"input", "reverse_str", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"input", "stopword_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 4}},
     {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
-    {"features", "ngram_pos", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
-    {"features", "ngram_sort", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "ngram_sort", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "vect_embed", CONFIG_TYPE_STRING, {.str = "cnt"}},
     {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},
-    {"features", "vect_sign", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "vect_sign", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "thres_low", CONFIG_TYPE_FLOAT, {.flt = 0}},
     {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},    
     {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 22}},
-    {"features", "explicit_hash", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "explicit_hash", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "hash_file", CONFIG_TYPE_STRING, {.str = ""}},    
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
@@ -141,6 +141,7 @@ static void config_default(config_t *cfg)
                 continue;
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_STRING);
             config_setting_set_string(vs, defaults[i].val.str);
             break;
@@ -158,6 +159,7 @@ static void config_default(config_t *cfg)
             }
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_FLOAT);
             config_setting_set_float(vs, defaults[i].val.flt);
             break;
@@ -175,8 +177,27 @@ static void config_default(config_t *cfg)
             }
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_INT);
             config_setting_set_int(vs, defaults[i].val.num);
+            break;
+        case CONFIG_TYPE_BOOL:
+            if (config_setting_lookup_bool(cs, defaults[i].name, &j))
+                continue;
+
+            /* Check for mis-interpreted integer */
+            if (config_setting_lookup_int(cs, defaults[i].name, &j)) {
+                config_setting_remove(cs, defaults[i].name);
+                vs = config_setting_add(cs, defaults[i].name,
+                                        CONFIG_TYPE_BOOL);
+                config_setting_set_bool(vs, j == 0 ? CONFIG_FALSE : CONFIG_TRUE);
+                continue;
+            }
+
+            /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
+            vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_BOOL);
+            config_setting_set_bool(vs, defaults[i].val.num);
             break;
         }
     }
@@ -211,7 +232,7 @@ int config_check(config_t *cfg)
     }
 
     config_lookup_string(cfg, "features.hash_file", &s1);
-    config_lookup_int(cfg, "features.explicit_hash", &i1);
+    config_lookup_bool(cfg, "features.explicit_hash", &i1);
     if (i1 && strlen(s1) > 0) {
         error("'explicit_hash' and 'hash_file' must not be used togther");
         return 0;
