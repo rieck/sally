@@ -140,6 +140,7 @@ static void config_default(config_t *cfg)
                 continue;
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_STRING);
             config_setting_set_string(vs, defaults[i].val.str);
             break;
@@ -157,6 +158,7 @@ static void config_default(config_t *cfg)
             }
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_FLOAT);
             config_setting_set_float(vs, defaults[i].val.flt);
             break;
@@ -174,6 +176,7 @@ static void config_default(config_t *cfg)
             }
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_INT);
             config_setting_set_int(vs, defaults[i].val.num);
             break;
@@ -191,6 +194,7 @@ static void config_default(config_t *cfg)
             }
 
             /* Add default value */
+            config_setting_remove(cs, defaults[i].name);
             vs = config_setting_add(cs, defaults[i].name, CONFIG_TYPE_BOOL);
             config_setting_set_bool(vs, defaults[i].val.num);
             break;
