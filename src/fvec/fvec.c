@@ -332,9 +332,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos)
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
+    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
@@ -438,9 +438,9 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos)
 
     /* Get configuration */
     config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_int(&cfg, "features.ngram_sort", (int *) &sort);
+    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_int(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;

@@ -234,8 +234,8 @@ void input_preproc(string_t *strs, int len)
     assert(strs);
     int decode, reverse, c, i, j, k;
 
-    config_lookup_int(&cfg, "input.decode_str", &decode);
-    config_lookup_int(&cfg, "input.reverse_str", &reverse);
+    config_lookup_bool(&cfg, "input.decode_str", &decode);
+    config_lookup_bool(&cfg, "input.reverse_str", &reverse);
     
     for (j = 0; j < len; j++) {
         if (decode) {
