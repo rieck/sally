@@ -307,7 +307,7 @@ uint64_t hash_str(char *s, int l)
 int strip_newline(char *str, int len)
 {
     int k;
-    static char strip[256] = {0};
+    static char strip[256] = { 0 };
     strip[(int) '\n'] = 1;
     strip[(int) '\r'] = 1;
 
@@ -318,9 +318,27 @@ int strip_newline(char *str, int len)
             break;
         }
     }
-    
+
     str[k + 1] = 0x00;
     return k + 1;
+}
+
+/**
+ * Rehash using a PRNG.
+ * @param f Original hash value
+ * @param n Number of rehashing steps
+ * @return New hash value
+ */
+uint64_t rehash(uint64_t f, int n)
+{
+    uint64_t r = 0;
+    unsigned short seed[3] = { 0xdead, 0xc0de, 0xbabe };
+    int i;
+
+    for (i = 0; i < n; i++)
+        r = (nrand48(seed) << 32) + nrand48(seed);
+
+    return f ^ r;
 }
 
 /** @} */
