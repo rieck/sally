@@ -31,7 +31,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:psE:N:b:vqVhCD"
+#define OPTSTRING       "c:i:o:n:m:r:d:psE:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -48,7 +48,7 @@ static struct option longopts[] = {
     {"ngram_len", 1, NULL, 'n'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 0, NULL, 'p'},
-    {"pos_shift", 1, NULL, 1012},
+    {"pos_shift", 1, NULL, 1012}, /* <- last entry */
     {"ngram_sort", 0, NULL, 's'},
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
@@ -58,8 +58,8 @@ static struct option longopts[] = {
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 0, NULL, 1003},
     {"hash_file", 1, NULL, 1011},   
-    {"dim_reduce", 1, NULL, 1013},
-    {"dim_num", 1, NULL, 1014}, /* <- last entry */
+    {"dim_reduce", 1, NULL, 'r'},
+    {"dim_num", 1, NULL, 'm'}, 
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -123,6 +123,9 @@ static void print_usage(void)
            "       --explicit_hash           Enable explicit hash table.\n"
            "       --hash_file <file>        Set file name for explicit hash table.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
+           "\nFilter options:\n"
+           "  -r,  --dim_reduce <method>     Set method for dimension reduction.\n"
+           "  -m,  --dim_num <num>           Set number of dimensions to keep.\n"
            "\nGeneric options:\n"
            "  -c,  --config_file <file>      Set configuration file.\n"
            "  -v,  --verbose                 Increase verbosity.\n"
@@ -196,10 +199,10 @@ static void sally_parse_options(int argc, char **argv)
         case 1012:
             config_set_int(&cfg, "features.pos_shift", atoi(optarg));
             break;
-        case 1013:
+        case 'r':
             config_set_string(&cfg, "filter.dim_reduce", optarg);
             break;
-        case 1014:
+        case 'm':
             config_set_int(&cfg, "filter.dim_num", atoi(optarg));
             break;
         case 'n':
@@ -393,19 +396,14 @@ static void sally_init()
 static void sally_process()
 {
     long read, i, j;
-    int chunk, dim_num;
+    int chunk;
     const char *hash_file;
-    const char *dim_reduce;
 
     /* Check if a hash file is set */
     config_lookup_string(&cfg, "features.hash_file", &hash_file);
 
     /* Get chunk size */
     config_lookup_int(&cfg, "input.chunk_size", &chunk);
-
-    /* Get dimension reduction method */
-    config_lookup_string(&cfg, "filter.dim_reduce", &dim_reduce);
-    config_lookup_int(&cfg, "filter.dim_num", &dim_num);
 
     /* Allocate space */
     fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
@@ -428,20 +426,13 @@ static void sally_process()
 #pragma omp parallel for
 #endif
         for (j = 0; j < read; j++) {
+            /* Feature extraction */
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
             fvec_set_source(fvec[j], strs[j].src);
             
-            if (!strcasecmp(dim_reduce, "none")) {
-                /* Do nothing ;) */
-            } else if (!strcasecmp(dim_reduce, "simhash")) {
-                reduce_simhash(fvec[j], dim_num);
-            } else if (!strcasecmp(dim_reduce, "minhash")) {
-                reduce_minhash(fvec[j], dim_num);
-            } else {
-                warning("Unknown dimension reduction method. Skipping.");
-            }
-            
+            /* Dimension reduction */
+            dim_reduce(fvec[j]);
         }
 
         if (!output_write(fvec, read))

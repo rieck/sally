@@ -381,14 +381,11 @@ the feature configuration section.
 =item I<"minhash">
 
 Each feature vector is reduced to a "minimum hash" with B<dim_num> bits. The
-string features associated with each dimension are hashed and sorted.  In a
-slight variant of the idea by Broder (1997), the hash is constructed from
-the last bit of the k lowest hash values.  Hence, we are not looking at the
-minimum hash values of k hash functions, but rather at the last bits from
-the lowest k hash values of one hash function.  For convenience, the
-computed hash value is represented as a feature vector.  Note that the
-maximum number of non-zero bits is limited by the number of features in each
-string.
+string features associated with each dimension are hash and sorted multiple
+times as proposed by Broder (1997).  In each round the smallest hash value
+is appended to the minimum hash.  The number of hash bits in each round is
+defined by B<hash_bits> in the feature configuration section and the number
+of rounds is simply determined by ceil(B<dim_num> / B<hash_bits>).
 
 =back
 

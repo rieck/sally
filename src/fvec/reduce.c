@@ -22,6 +22,35 @@
 #include "common.h"
 #include "fvec.h"
 #include "util.h"
+#include "reduce.h"
+
+/* External variables */
+extern config_t cfg;
+
+
+/**
+ * Dimension reduction wrapper.
+ * @param fv Feature vector
+ */
+void dim_reduce(fvec_t *fv)
+{
+    const char *method;
+    int dim_num;
+
+    /* Get dimension reduction method */
+    config_lookup_string(&cfg, "filter.dim_reduce", &method);
+    config_lookup_int(&cfg, "filter.dim_num", &dim_num);
+
+    if (!strcasecmp(method, "none")) {
+        /* Do nothing ;) */
+    } else if (!strcasecmp(method, "simhash")) {
+        reduce_simhash(fv, dim_num);
+    } else if (!strcasecmp(method, "minhash")) {
+        reduce_minhash(fv, dim_num);
+    } else {
+        warning("Unknown dimension reduction method. Skipping.");
+    }
+}
 
 /**
  * Reduce the feature vector to a similarity hash. The string features
@@ -44,14 +73,14 @@ void reduce_simhash(fvec_t *fv, int num)
 
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
-    
+
     if (!dim || !val) {
         error("Could not allocate feature vector contents");
         free(dim);
         free(val);
         return;
     }
-  
+
     /* Compute aggregated feature hashes */
     for (i = 0; i < fv->len; i++) {
         feat_t hash = fv->dim[i];
@@ -59,20 +88,20 @@ void reduce_simhash(fvec_t *fv, int num)
             dim[j] = j;
             if (hash & 1)
                 val[j] += fv->val[i];
-            else 
+            else
                 val[j] -= fv->val[i];
             hash = hash >> 1;
         }
-    }    
-    
+    }
+
     /* Binarize feature hash */
     for (j = 0; j < num; j++)
         val[j] = val[j] > 0 ? 1 : 0;
-        
+
     /* Exchange data */
     free(fv->dim);
     free(fv->val);
-    
+
     fv->dim = dim;
     fv->val = val;
     fv->len = num;
@@ -80,16 +109,10 @@ void reduce_simhash(fvec_t *fv, int num)
 
 
 /**
- * Reduce the feature vector to a "minimum hash". The string features
- * associated with each dimension are hashed and sorted.  In a slight
- * variant of the original idea by Broder (1997), the final hash is
- * constructed from the last bit of the k lowest hash values.  Hence, we are
- * not looking at the minimum hash values of k hash functions as in the
- * original formulation, but rather at k bits from the lowest k hash values
- * of one hash function. 
- *
- * Why? Well, in this way, we are constructing a hash value, whereas the 
- * original formulation returns a set of hash values.
+ * Reduce the feature vector to a minimum hash. The string features
+ * associated with each dimension are hashed and sorted multiple times as
+ * proposed by Broder (1997).  In each round the smallest hash value is
+ * appended to the minimum hash.  
  *
  * @param fv Feature vector
  * @param num Number of bits
@@ -97,33 +120,47 @@ void reduce_simhash(fvec_t *fv, int num)
 void reduce_minhash(fvec_t *fv, int num)
 {
     assert(fv && num > 0);
-    feat_t *dim;
+    feat_t *dim, min_hash = 0;
     float *val;
-    int j;
+    int i, j, k, hash_bits;
+
+    config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
 
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
-    
+
     if (!dim || !val) {
         error("Could not allocate feature vector contents");
         free(dim);
         free(val);
         return;
     }
-  
-    /* Compute hash from smallest feature dims */
-    for (j = 0; j < num; j++) {
-        dim[j] = j;
-        if (j < fv->len)
-            val[j] = fv->dim[j] & 1;
-        else
-            val[j] = 0;
+
+    /* Fill hash bits */
+    for (i = 0, j = 0; i < num; i++, j++) {
+
+        /* Determine minimum hash value */
+        if (i % hash_bits == 0) {
+            min_hash = UINT64_MAX;
+            for (k = 0; k < fv->len; k++) {
+                /* Re-hash feature depending on round */
+                feat_t h = rehash(fv->dim[k], i / hash_bits);
+                h = h & ((1 << hash_bits) - 1);
+
+                if (h < min_hash)
+                    min_hash = h;
+            }
+            j = 0;
+        }
+
+        dim[i] = i;
+        val[i] = (min_hash << j) & 1;
     }
-    
+
     /* Exchange data */
     free(fv->dim);
     free(fv->val);
-    
+
     fv->dim = dim;
     fv->val = val;
     fv->len = num;
