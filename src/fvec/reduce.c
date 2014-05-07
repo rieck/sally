@@ -50,6 +50,9 @@ void dim_reduce(fvec_t *fv)
     } else {
         warning("Unknown dimension reduction method. Skipping.");
     }
+
+    /* Sparsify vector to reduce space */
+    fvec_sparsify(fv);
 }
 
 /**
