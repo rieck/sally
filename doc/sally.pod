@@ -133,7 +133,7 @@ strings in one of these chunks. Depending on the lengths of the
 strings, this parameter can be adjusted to balance loading and
 processing of data.
 
-=item B<decode_str = 0;>
+=item B<decode_str = false;>
 
 If this parameter is set to 1, B<sally> automatically decodes strings that
 contain URI-encoded characters.  That is, substrings of the form %XX are
@@ -156,7 +156,7 @@ If the strings are available as text lines, the parameter can be used
 to extract a numerical label from the start of the strings. The
 parameter is a regular expression matching labels, such as +1 and -1.
 
-=item B<reverse_str = 0;>
+=item B<reverse_str = false;>
 
 If this parameter is set to 1, the bytes of all input strings will
 be reversed. Such reversing might help in situations where the 
@@ -232,17 +232,19 @@ delimiter characters (B<ngram_delim>) and choosing an n-gram length
 
 =back
 
-=item B<ngram_pos = 0;>
+=item B<ngram_pos = false;>
+
+=item B<pos_shift = 0;>
 
 The parameter B<ngram_pos> can be used to enable positional n-grams. In
-contrast to regular n-grams, these subsequences of length n are associated
+contrast to regular n-grams, these substrings of length n are associated
 with a position in the originating string.  Positional n-grams thus only
-match if they appear at the same location in a string.  If the parameter is
-set to 1, regular positional n-grams are extracted.  If the parameter is set
-to k, multiple positional n-grams are extracted with a shift of up to k-1
-positions.
+match if they appear at the same location in a string.  The additional
+parameter B<pos_shift> can be used to add a shift to the n-grams.  If the
+parameter is set to I<k>, multiple positional n-grams are extracted with a
+shift from I<-k> to I<+k>.
 
-=item B<ngram_sort = 0;>
+=item B<ngram_sort = false;>
 
 This parameter can be used to enable sorted n-grams (n-perms). During the
 extraction of an n-gram its symbols are sorted according to their
@@ -267,7 +269,7 @@ vector norm. Supported norms are "l1" for the Taxicab norm (L1) and
 the lengths of the strings varies significantly and thus vectors
 differ just due to the number of extracted features.
 
-=item B<vect_sign = 0;>
+=item B<vect_sign = false;>
 
 B<sally> uses a hash function to map individual features to dimensions in
 the vector space.  Depending on the number of bits used by this functions,
@@ -303,7 +305,7 @@ the data.  If this parameter is chosen too small, the embedding may suffer
 from collisions of features in the vector space.  If it is chosen too large,
 several application may choke from the vast amount of dimensions.
 
-=item B<explicit_hash = 0;>
+=item B<explicit_hash = false;>
 
 For performance reasons B<sally> maps features to dimensions without
 memorizing the features associated with these dimensions.  For certain
@@ -480,10 +482,10 @@ can be changed by using the command-line option B<--xx
 
   -i,  --input_format <format>   Set input format for strings.
        --chunk_size <num>        Set chunk size for processing.
-       --decode_str <0|1>        Enable URI-decoding of strings.
+       --decode_str              Enable URI-decoding of strings.
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
-       --reverse_str <0|1>       Reverse (flip) all strings.
+       --reverse_str             Reverse (flip) all strings.
        --stopword_file <file>    Provide a file with stop words.
   -o,  --output_format <format>  Set output format for vectors.
 
@@ -491,15 +493,16 @@ can be changed by using the command-line option B<--xx
 
   -n,  --ngram_len <num>         Set length of n-grams.
   -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.
-  -p,  --ngram_pos <0|1>         Enable positional n-grams.
-  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).
+  -p,  --ngram_pos               Enable positional n-grams.
+       --pos_shift <num>         Set shift of positional n-grams.
+  -s,  --ngram_sort              Enable sorted n-grams (n-perms).
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
-       --vect_sign <0|1>         Enabled signed embedding.
+       --vect_sign               Enabled signed embedding.
        --thres_low <float>       Enable minimum threshold for vectors.
        --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
-       --explicit_hash <0|1>     Enable explicit hash table.
+       --explicit_hash           Enable explicit hash table.
        --hash_file <file>	 Set file name for explicit hash table.
        --tfidf_file <file>       Set file name for TFIDF weighting.
 

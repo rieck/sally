@@ -30,7 +30,7 @@ typedef struct
 
     union
     {
-        long num;       /**< Integer value */
+        long num;       /**< Integer/ bool value */
         double flt;     /**< Float value  */
         char *str;      /**< String */
     } val;

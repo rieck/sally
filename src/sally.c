@@ -1,6 +1,6 @@
 /*
  * Sally - A Tool for Embedding Strings in Vector Spaces
- * Copyright (C) 2010-2013 Konrad Rieck (konrad@mlsec.org);
+ * Copyright (C) 2010-2014 Konrad Rieck (konrad@mlsec.org);
  *                         Christian Wressnegger (christian@mlsec.org)
  * --
  * This program is free software; you can redistribute it and/or modify it
@@ -31,7 +31,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:p:s:E:N:b:vqVhCD"
+#define OPTSTRING       "c:i:o:n:d:psE:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -42,23 +42,24 @@ static struct option longopts[] = {
     {"chunk_size", 1, NULL, 1000},
     {"fasta_regex", 1, NULL, 1001},
     {"lines_regex", 1, NULL, 1002},
-    {"decode_str", 1, NULL, 1005},
-    {"reverse_str", 1, NULL, 1007},
+    {"decode_str", 0, NULL, 1005},
+    {"reverse_str", 0, NULL, 1007},
     {"stopword_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
     {"ngram_delim", 1, NULL, 'd'},
-    {"ngram_pos", 1, NULL, 'p'},
-    {"ngram_sort", 1, NULL, 's'},
+    {"ngram_pos", 0, NULL, 'p'},
+    {"pos_shift", 1, NULL, 1012},
+    {"ngram_sort", 0, NULL, 's'},
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
-    {"vect_sign", 1, NULL, 1006},
+    {"vect_sign", 0, NULL, 1006},
     {"thres_low", 1, NULL, 1009},    
     {"thres_high", 1, NULL, 1010},   
     {"hash_bits", 1, NULL, 'b'},
-    {"explicit_hash", 1, NULL, 1003},
+    {"explicit_hash", 0, NULL, 1003},
     {"hash_file", 1, NULL, 1011},   
-    {"dim_reduce", 1, NULL, 1012}, /* <- last entry */   
-    {"dim_num", 1, NULL, 1013},
+    {"dim_reduce", 1, NULL, 1013},
+    {"dim_num", 1, NULL, 1014}, /* <- last entry */
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"verbose", 0, NULL, 'v'},
@@ -101,24 +102,25 @@ static void print_usage(void)
            "\nI/O options:\n"
            "  -i,  --input_format <format>   Set input format for strings.\n"
            "       --chunk_size <num>        Set chunk size for processing.\n"
-           "       --decode_str <0|1>        Enable URI-decoding of strings.\n"
+           "       --decode_str              Enable URI-decoding of strings.\n"
            "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
-           "       --reverse_str <0|1>       Reverse (flip) the input strings.\n"
+           "       --reverse_str             Reverse (flip) the input strings.\n"
            "       --stopword_file <file>    Provide a file with stop words.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
-           "  -p,  --ngram_pos <num>         Enable and set positional n-grams.\n"
-           "  -s,  --ngram_sort <0|1>        Enable sorted n-grams (n-perms).\n"
+           "  -p,  --ngram_pos               Enable positional n-grams.\n"
+           "       --pos_shift <num>         Set shift of positional n-grams.\n"
+           "  -s,  --ngram_sort              Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
-           "       --vect_sign <0|1>         Enable signed embedding.\n"
+           "       --vect_sign               Enable signed embedding.\n"
            "       --thres_low <float>       Enable minimum threshold for vectors.\n"
            "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-           "       --explicit_hash <0|1>     Enable explicit hash table.\n"
+           "       --explicit_hash           Enable explicit hash table.\n"
            "       --hash_file <file>        Set file name for explicit hash table.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
            "\nGeneric options:\n"
@@ -137,7 +139,7 @@ static void print_usage(void)
 static void print_version(void)
 {
     printf("Sally %s - A Tool for Embedding Strings in Vector Spaces\n"
-           "Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org)\n",
+           "Copyright (c) 2010-2014 Konrad Rieck (konrad@mlsec.org)\n",
            PACKAGE_VERSION);
 }
 
@@ -171,13 +173,13 @@ static void sally_parse_options(int argc, char **argv)
             config_set_string(&cfg, "input.lines_regex", optarg);
             break;
         case 1005:
-            config_set_int(&cfg, "input.decode_str", atoi(optarg));
+            config_set_bool(&cfg, "input.decode_str", CONFIG_TRUE);
             break;
         case 1006:
-            config_set_int(&cfg, "features.vect_sign", atoi(optarg));
+            config_set_bool(&cfg, "features.vect_sign", CONFIG_TRUE);
             break;
         case 1007:
-            config_set_int(&cfg, "input.reverse_str", atoi(optarg));
+            config_set_bool(&cfg, "input.reverse_str", CONFIG_TRUE);
             break;
         case 1008:
             config_set_string(&cfg, "input.stopword_file", optarg);
@@ -192,9 +194,12 @@ static void sally_parse_options(int argc, char **argv)
             config_set_string(&cfg, "features.hash_file", optarg);
             break;
         case 1012:
-            config_set_string(&cfg, "filter.dim_reduce", optarg);
+            config_set_int(&cfg, "features.pos_shift", atoi(optarg));
             break;
         case 1013:
+            config_set_string(&cfg, "filter.dim_reduce", optarg);
+            break;
+        case 1014:
             config_set_int(&cfg, "filter.dim_num", atoi(optarg));
             break;
         case 'n':
@@ -204,10 +209,10 @@ static void sally_parse_options(int argc, char **argv)
             config_set_string(&cfg, "features.ngram_delim", optarg);
             break;
         case 'p':
-            config_set_int(&cfg, "features.ngram_pos", atoi(optarg));
+            config_set_bool(&cfg, "features.ngram_pos", CONFIG_TRUE);
             break;
         case 's':
-            config_set_int(&cfg, "features.ngram_sort", atoi(optarg));
+            config_set_bool(&cfg, "features.ngram_sort", CONFIG_TRUE);
             break;
         case 'E':
             config_set_string(&cfg, "features.vect_embed", optarg);
@@ -219,7 +224,7 @@ static void sally_parse_options(int argc, char **argv)
             config_set_int(&cfg, "features.hash_bits", atoi(optarg));
             break;
         case 1003:
-            config_set_int(&cfg, "features.explicit_hash", atoi(optarg));
+            config_set_bool(&cfg, "features.explicit_hash", CONFIG_TRUE);
             break;
         case 1004:
             config_set_string(&cfg, "features.tfidf_file", optarg);
@@ -358,7 +363,7 @@ static void sally_init()
         stopwords_load(cfg_str);
 
     /* Check for feature hash table */
-    config_lookup_int(&cfg, "features.explicit_hash", &ehash);
+    config_lookup_bool(&cfg, "features.explicit_hash", &ehash);
     config_lookup_string(&cfg, "features.hash_file", &cfg_str);
     if (ehash || strlen(cfg_str) > 0) {
         info_msg(1, "Enabling feature hash table.");
@@ -487,7 +492,7 @@ static void sally_exit()
         gzclose(z);
     }
     
-    config_lookup_int(&cfg, "features.explicit_hash", &ehash);
+    config_lookup_bool(&cfg, "features.explicit_hash", &ehash);
     if (ehash || strlen(hash_file) > 0)
         fhash_destroy();
 
