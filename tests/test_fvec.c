@@ -56,7 +56,7 @@ void init_sally(test_t t)
 {
     config_set_string(&cfg, "features.ngram_delim", t.dlm);
     config_set_int(&cfg, "features.ngram_len", t.nlen);
-    fvec_delim_set(t.dlm); /* usually done in sally_init */
+    fvec_delim_set(t.dlm);      /* usually done in sally_init */
 }
 
 
@@ -91,110 +91,112 @@ int test_static()
 
 int test_arithmetic()
 {
-	int i = 0, err = 0;
-	double d1, d2 = 0.0;
+    int i = 0, err = 0;
+    double d1, d2 = 0.0;
     fvec_t *fa, *fb, *fc, *fd, *empty;
 
-	test_printf("Arithmetic operations for feature vectors");
+    test_printf("Arithmetic operations for feature vectors");
 
     init_sally(tests[2]);
-    fa = fvec_extract(tests[2].str, strlen(tests[2].str)); /* nlen = 1, len = 3 */
+    fa = fvec_extract(tests[2].str, strlen(tests[2].str));      /* nlen = 1, len = 3 */
 
     init_sally(tests[5]);
-    fb = fvec_extract(tests[5].str, strlen(tests[5].str)); /* nlen = 2, len = 3 */
+    fb = fvec_extract(tests[5].str, strlen(tests[5].str));      /* nlen = 2, len = 3 */
 
     empty = fvec_extract("", 0);
 
 
     /* Simple vector comparison */ i++;
     if (!fvec_equals(fa, fa)) {
-    	err++;
-    	test_error("(%d) fa == fa", i);
+        err++;
+        test_error("(%d) fa == fa", i);
     }
 
     fc = fvec_clone(fa);
     if (!fvec_equals(fa, fc)) {
-    	err++;
-    	test_error("(%d) fa == fc", i);
+        err++;
+        test_error("(%d) fa == fc", i);
     }
 
     fc->val[1] = 666;
     if (fvec_equals(fa, fc)) {
-    	err++;
-    	test_error("(%d) fa != fc", i);
+        err++;
+        test_error("(%d) fa != fc", i);
     }
 
     fd = fvec_clone(fa);
     fc->len = 1;
     fd->len = 1;
     if (!fvec_equals(fc, fd)) {
-    	err++;
-    	test_error("(%d) fc == fd", i);
+        err++;
+        test_error("(%d) fc == fd", i);
     }
     fvec_destroy(fc);
     fvec_destroy(fd);
 
     if (fvec_equals(fa, fb)) {
-    	err++;
-    	test_error("(%d) fa != fb", i);
+        err++;
+        test_error("(%d) fa != fb", i);
     }
     if (fvec_equals(fb, fa)) {
-    	err++;
-    	test_error("(%d) fb != fa", i);
+        err++;
+        test_error("(%d) fb != fa", i);
     }
     if (fvec_equals(fa, empty)) {
-    	err++;
-    	test_error("(%d) fa != []", i);
+        err++;
+        test_error("(%d) fa != []", i);
     }
     if (fvec_equals(empty, fa)) {
-    	err++;
-    	test_error("(%d) [] != fa", i);
+        err++;
+        test_error("(%d) [] != fa", i);
     }
     if (!fvec_equals(empty, empty)) {
-    	err++;
-    	test_error("(%d) [] == []", i);
+        err++;
+        test_error("(%d) [] == []", i);
     }
 
-	/* Element-wise multiplication with an empty feature vector */ i++;
+    /* Element-wise multiplication with an empty feature vector */
+    i++;
     fc = fvec_clone(fa);
 
     fvec_times(fc, empty);
     fvec_sparsify(fc);
     if (fc->len != 0) {
-    	err++;
-    	test_error("(%d) len %d != 0", i, fc->len);
+        err++;
+        test_error("(%d) len %d != 0", i, fc->len);
     }
 
     fvec_destroy(fc);
 
-	/* Addition with an empty feature vector */ i++;
+    /* Addition with an empty feature vector */ i++;
     fc = fvec_clone(fa);
 
     fvec_add(fc, empty);
     if (!fvec_equals(fa, fc)) {
-    	err++;
-    	test_error("(%d) addition failed!", i);
+        err++;
+        test_error("(%d) addition failed!", i);
     }
 
     fvec_destroy(fc);
 
-	/* Dot product with an empty feature vector */ i++;
+    /* Dot product with an empty feature vector */ i++;
     d1 = fvec_dot(empty, fa);
     d2 = fvec_dot(fa, empty);
 
     if (d1 != 0 || d2 != 0) {
-    	err++;
-    	test_error("(%d) dot product failed!", i);
+        err++;
+        test_error("(%d) dot product failed!", i);
     }
 
-	/* Scalar multiplication with 0 */ i++;
+    /* Scalar multiplication with 0 */
+    i++;
     fc = fvec_clone(fa);
 
     fvec_mul(fc, 0.0);
     fvec_sparsify(fc);
     if (fc->len != 0) {
-    	err++;
-    	test_error("(%d) scalar product failed!", i);
+        err++;
+        test_error("(%d) scalar product failed!", i);
     }
 
     fvec_destroy(fc);
@@ -207,8 +209,8 @@ int test_arithmetic()
     fvec_destroy(fb);
     fvec_destroy(empty);
 
-	test_return(err, i);
-	return err;
+    test_return(err, i);
+    return err;
 }
 
 /* 
@@ -222,7 +224,7 @@ int test_stress()
 
     test_printf("Stress test for feature vectors");
     config_set_string(&cfg, "features.ngram_delim", "0");
-    fvec_delim_set("0"); /* usually done in sally_init */
+    fvec_delim_set("0");        /* usually done in sally_init */
     fhash_init();
 
     for (i = 0; i < STRESS_RUNS; i++) {
@@ -255,7 +257,7 @@ int test_stress_omp()
 
     test_printf("Stress test for feature vectors (OpenMP)");
     config_set_string(&cfg, "features.ngram_delim", "0");
-    fvec_delim_set("0"); /* usually done in sally_init */
+    fvec_delim_set("0");        /* usually done in sally_init */
     fhash_init();
 
 #ifdef ENABLE_OPENMP
@@ -295,7 +297,7 @@ int test_read_write()
 
     config_set_string(&cfg, "features.ngram_delim", " ");
     config_set_int(&cfg, "features.ngram_len", 2);
-    fvec_delim_set(" "); /* usually done in sally_init */
+    fvec_delim_set(" ");        /* usually done in sally_init */
 
     /* Create and write feature vectors */
     z = gzopen(TEST_FILE, "w9");

@@ -43,40 +43,40 @@ int input_stdin_read(string_t *strs, int lt)
     assert(strs && lt > 0);
 
     char buf[1024];
-    size_t len = 1; 
-    
+    size_t len = 1;
+
     char *x = malloc(sizeof(char) * 1024);
-    if(x == NULL) {
+    if (x == NULL) {
         error("Failed to allocate memory");
         return 0;
     }
     x[0] = '\0';
-    
+
     /* read entire standard input */
-    while(fgets(buf, 1024, stdin)) {
+    while (fgets(buf, 1024, stdin)) {
         char *old = x;
         len += strlen(buf);
         x = realloc(x, len);
-        if(!x) {
+        if (!x) {
             error("Failed to reallocate memory");
             free(old);
             return 0;
         }
-        
+
         strncat(x, buf, 1023);
     }
-    
-    if(ferror(stdin)) {
+
+    if (ferror(stdin)) {
         free(x);
         error("Error reading from stdin.");
         return 0;
     }
-    
-    strs[0].label = 0.0f; 
+
+    strs[0].label = 0.0f;
     strs[0].src = strdup("stdin");
     strs[0].str = x;
     strs[0].len = strlen(x);
-    
+
     return 1;
 }
 

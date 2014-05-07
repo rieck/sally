@@ -53,8 +53,8 @@ static struct option longopts[] = {
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
     {"vect_sign", 0, NULL, 1006},
-    {"thres_low", 1, NULL, 1009},    
-    {"thres_high", 1, NULL, 1010},   
+    {"thres_low", 1, NULL, 1009},
+    {"thres_high", 1, NULL, 1010},
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 0, NULL, 1003},
     {"hash_file", 1, NULL, 1011},   
@@ -263,7 +263,7 @@ static void sally_parse_options(int argc, char **argv)
 #endif
 
     /* Check configuration */
-    if(!config_check(&cfg)) {
+    if (!config_check(&cfg)) {
         exit(EXIT_FAILURE);
     }
 
@@ -275,7 +275,7 @@ static void sally_parse_options(int argc, char **argv)
 
     argc -= optind;
     argv += optind;
-    
+
     /* Check for input and output arguments */
     if (argc != 2) {
         print_usage();
@@ -284,7 +284,7 @@ static void sally_parse_options(int argc, char **argv)
         input = argv[0];
         output = argv[1];
     }
-    
+
     /* Last but not least. Warn about default config */
     if (!user_conf) {
         warning("No config file given. Using defaults (see -D)");
@@ -299,7 +299,7 @@ static void sally_parse_options(int argc, char **argv)
  */
 static void sally_load_config(int argc, char **argv)
 {
-    char* cfg_file = NULL;
+    char *cfg_file = NULL;
     int ch;
 
     /* Check for config file in command line */
@@ -312,7 +312,7 @@ static void sally_load_config(int argc, char **argv)
             print_usage();
             exit(EXIT_SUCCESS);
             break;
-        default:                                                                    
+        default:
             /* empty */
             break;
         }
@@ -349,7 +349,7 @@ static void sally_init()
 
     /* Set delimiters */
     config_lookup_string(&cfg, "features.ngram_delim", &cfg_str);
-    if (strlen(cfg_str) > 0) 
+    if (strlen(cfg_str) > 0)
         fvec_delim_set(cfg_str);
 
     /* Check for TFIDF weighting */
@@ -457,7 +457,7 @@ static void sally_process()
 
         prog_bar(0, entries, i + read);
     }
-    
+
     free(fvec);
     free(strs);
 }
@@ -484,14 +484,14 @@ static void sally_exit()
 
     config_lookup_string(&cfg, "features.hash_file", &hash_file);
     if (strlen(hash_file) > 0) {
-        info_msg(1, "Saving explicit hash table to '%s'.", hash_file);    
+        info_msg(1, "Saving explicit hash table to '%s'.", hash_file);
         gzFile z = gzopen(hash_file, "w9");
         if (!z)
             error("Could not open hash file '%s'", hash_file);
         fhash_write(z);
         gzclose(z);
     }
-    
+
     config_lookup_bool(&cfg, "features.explicit_hash", &ehash);
     if (ehash || strlen(hash_file) > 0)
         fhash_destroy();

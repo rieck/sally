@@ -309,7 +309,7 @@ static int fwrite_fvec_feat(fvec_t *fv, FILE *f)
         fentry_t *fe = fhash_get(fv->dim[i]);
         for (j = k = 0; fe && j < fe->len && k < 4096 - 5; j++) {
             if (fe->data[j] == '%') {
-                /* Matlab requires that "%" is separately encoded as "%%" */ 
+                /* Matlab requires that "%" is separately encoded as "%%" */
                 buf[k++] = '%';
                 buf[k++] = '%';
             } else if (isprint(fe->data[j])) {

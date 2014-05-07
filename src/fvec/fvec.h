@@ -23,7 +23,7 @@ typedef uint64_t feat_t;
 
 /** Zero value in each feature */
 #define FVEC_ZERO	1e-9
- 
+
 /**
  * Sparse feature vector. The vector is stored as a sorted list 
  * of non-zero dimensions containing real numbers. The dimensions
@@ -60,7 +60,7 @@ void fvec_set_label(fvec_t *fv, float l);
 void fvec_set_source(fvec_t *fv, char *s);
 void fvec_write(fvec_t *f, gzFile);
 fvec_t *fvec_zero();
-void fvec_truncate(fvec_t* const fv);
+void fvec_truncate(fvec_t *const fv);
 fvec_t *fvec_read(gzFile);
 void fvec_save(fvec_t *fv, char *f);
 fvec_t *fvec_load(char *);
