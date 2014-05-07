@@ -66,10 +66,12 @@ void reduce_simhash(fvec_t *fv, int num)
     assert(fv && num > 0);
     feat_t *dim;
     float *val;
-    int i, j;
+    int i, j, hash_bits;
 
-    if (num > sizeof(feat_t) * 8)
-        num = sizeof(feat_t) * 8;
+    config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
+
+    if (num > hash_bits)
+        num = hash_bits;
 
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
@@ -85,7 +87,6 @@ void reduce_simhash(fvec_t *fv, int num)
     for (i = 0; i < fv->len; i++) {
         feat_t hash = fv->dim[i];
         for (j = 0; j < num; j++) {
-            dim[j] = j;
             if (hash & 1)
                 val[j] += fv->val[i];
             else
@@ -93,6 +94,10 @@ void reduce_simhash(fvec_t *fv, int num)
             hash = hash >> 1;
         }
     }
+
+    /* Set indices */
+    for (j = 0; j < num; j++) 
+        dim[j] = j;
 
     /* Binarize feature hash */
     for (j = 0; j < num; j++)
@@ -154,7 +159,7 @@ void reduce_minhash(fvec_t *fv, int num)
         }
 
         dim[i] = i;
-        val[i] = (min_hash << j) & 1;
+        val[i] = (min_hash >> j) & 1;
     }
 
     /* Exchange data */
