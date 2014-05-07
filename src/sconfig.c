@@ -44,10 +44,10 @@ static config_default_t defaults[] = {
     {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},
     {"features", "vect_sign", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "thres_low", CONFIG_TYPE_FLOAT, {.flt = 0}},
-    {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},    
+    {"features", "thres_high", CONFIG_TYPE_FLOAT, {.flt = 0}},
     {"features", "hash_bits", CONFIG_TYPE_INT, {.num = 22}},
     {"features", "explicit_hash", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
-    {"features", "hash_file", CONFIG_TYPE_STRING, {.str = ""}},    
+    {"features", "hash_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
     {NULL}
@@ -190,7 +190,8 @@ static void config_default(config_t *cfg)
                 config_setting_remove(cs, defaults[i].name);
                 vs = config_setting_add(cs, defaults[i].name,
                                         CONFIG_TYPE_BOOL);
-                config_setting_set_bool(vs, j == 0 ? CONFIG_FALSE : CONFIG_TRUE);
+                config_setting_set_bool(vs,
+                                        j == 0 ? CONFIG_FALSE : CONFIG_TRUE);
                 continue;
             }
 
@@ -214,7 +215,7 @@ int config_check(config_t *cfg)
     int i1;
 
     /* Add default values where missing */
-    config_default(cfg);    
+    config_default(cfg);
 
     /* Sanity checks */
     config_lookup_string(cfg, "input.stopword_file", &s1);
@@ -223,7 +224,7 @@ int config_check(config_t *cfg)
         error("Stop words can only be used if delimiters are defined.");
         return 0;
     }
-    
+
     config_lookup_float(cfg, "features.thres_low", &f1);
     config_lookup_float(cfg, "features.thres_high", &f2);
     if (f1 != 0.0 && f2 != 0.0 && f1 > f2) {
@@ -237,7 +238,7 @@ int config_check(config_t *cfg)
         error("'explicit_hash' and 'hash_file' must not be used togther");
         return 0;
     }
-    
+
     return 1;
 }
 

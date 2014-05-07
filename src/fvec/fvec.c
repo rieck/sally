@@ -90,11 +90,11 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
         error("Could not extract feature vector");
         return NULL;
     }
-    
+
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
     config_lookup_bool(&cfg, "features.ngram_pos", (int *) &pos);
-    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);    
+    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);
 
     /* Check for empty sequence */
     if (l == 0)
@@ -118,13 +118,13 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
 
-#ifdef ENABLE_EVALTIME 
+#ifdef ENABLE_EVALTIME
     double t1 = time_stamp();
 #endif
 
     /* Loop over position shifts (0 if pos is disabled) */
     for (int s = -shift; s <= shift; s++) {
-        if (!dlm_str || strlen(dlm_str) == 0) {    
+        if (!dlm_str || strlen(dlm_str) == 0) {
             extract_ngrams(fv, x, l, pos, s);
         } else {
             extract_wgrams(fv, x, l, pos, s);
@@ -151,11 +151,10 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
             fvec_thres(fv, flt1, flt2);
         }
     }
-    
 #ifdef ENABLE_EVALTIME
     printf("strlen %u embed %f\n", l, time_stamp() - t1);
-#endif    
-    
+#endif
+
     return fv;
 }
 
@@ -171,13 +170,15 @@ fvec_t *fvec_zero()
 /**
  * Truncates the given features vector down to 0-length
  */
-void fvec_truncate(fvec_t* const fv)
+void fvec_truncate(fvec_t *const fv)
 {
-	assert(fv != NULL);
+    assert(fv != NULL);
 
     fv->len = 0;
-    if (fv->dim) free(fv->dim);
-    if (fv->val) free(fv->val);
+    if (fv->dim)
+        free(fv->dim);
+    if (fv->val)
+        free(fv->val);
 
     fv->dim = NULL;
     fv->val = NULL;
@@ -443,7 +444,7 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
 
-    if (fhash_enabled()) 
+    if (fhash_enabled())
         cache = calloc(l, sizeof(fentry_t));
 
     for (i = 1; t < x + l; i++) {
@@ -553,29 +554,28 @@ void fvec_realloc(fvec_t *fv)
     feat_t *p_dim = NULL;
     float *p_val = NULL;
 
-    if (fv->len <= 0)
-    {
-    	fvec_truncate(fv);
-    	return;
+    if (fv->len <= 0) {
+        fvec_truncate(fv);
+        return;
     }
 
-	/*
-	 * Explicit reallocation. Don't use realloc(). On some platforms
-	 * realloc() will not shrink memory blocks or copy to smaller sizes.
-	 * Consequently, realloc() may result in memory leaks.
-	 */
-	p_dim = malloc(fv->len * sizeof(feat_t));
-	p_val = malloc(fv->len * sizeof(float));
-	if (!p_dim || !p_val) {
-		error("Could not re-allocate feature vector");
-		free(p_dim);
-		free(p_val);
-		return;
-	}
+    /*
+     * Explicit reallocation. Don't use realloc(). On some platforms
+     * realloc() will not shrink memory blocks or copy to smaller sizes.
+     * Consequently, realloc() may result in memory leaks.
+     */
+    p_dim = malloc(fv->len * sizeof(feat_t));
+    p_val = malloc(fv->len * sizeof(float));
+    if (!p_dim || !p_val) {
+        error("Could not re-allocate feature vector");
+        free(p_dim);
+        free(p_val);
+        return;
+    }
 
-	/* Copy to new feature vector */
-	memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
-	memcpy(p_val, fv->val, fv->len * sizeof(float));
+    /* Copy to new feature vector */
+    memcpy(p_dim, fv->dim, fv->len * sizeof(feat_t));
+    memcpy(p_val, fv->val, fv->len * sizeof(float));
 
     /* Free old */
     free(fv->dim);
@@ -804,4 +804,3 @@ void fvec_delim_reset()
 }
 
 /** @} */
-

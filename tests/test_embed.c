@@ -57,9 +57,8 @@ int test_embed_tfidf()
     fvec_mul(w, n);
     fvec_log2(w);
 
-    if (!idf_check(w))
-    {
-    	err++;
+    if (!idf_check(w)) {
+        err++;
         test_error("(%d) internal idf values seem to be wrong", i);
     }
 

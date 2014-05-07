@@ -87,7 +87,7 @@ void idf_create(char *input)
         error("Could not allocate string space");
         return;
     }
-    
+
     idf_weights = fvec_zero();
 
     /* Open input */
@@ -160,8 +160,8 @@ void idf_destroy()
  */
 int idf_check(fvec_t *f)
 {
-	assert(f != NULL);
-	return (idf_weights != NULL && fvec_equals(idf_weights, f));
+    assert(f != NULL);
+    return (idf_weights != NULL && fvec_equals(idf_weights, f));
 }
 
 /** @} */

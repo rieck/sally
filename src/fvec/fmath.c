@@ -161,11 +161,11 @@ static void fvec_times_loop(fvec_t *fa, fvec_t *fb)
             fa->val[i++] *= fb->val[j++];
         }
     }
-    
+
     /* Zero-out remaining values in fa */
-    while(i < fa->len)
+    while (i < fa->len)
         fa->val[i++] = 0.0;
-        
+
     /* The parent function should sparsify fa. */
 }
 
@@ -202,7 +202,7 @@ static void fvec_times_bsearch(fvec_t *fa, fvec_t *fb)
         if (!found)
             fa->val[j] = 0.0;
     }
-    
+
     /* The parent function should sparsify fa. */
 }
 
@@ -217,8 +217,8 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
     double a = fa->len, b = fb->len;
 
     if (b <= 0) {
-    	fvec_truncate(fa);
-    	return;
+        fvec_truncate(fa);
+        return;
     }
 
     /* Choose times functions */
@@ -227,7 +227,7 @@ void fvec_times(fvec_t *fa, fvec_t *fb)
     } else {
         fvec_times_loop(fa, fb);
     }
-        
+
     fvec_sparsify(fa);
 }
 
@@ -372,13 +372,13 @@ void fvec_invert(fvec_t *f)
  * @param tl Minimum threshold
  * @param th Maximum threshold
  */
-void fvec_thres(fvec_t *f, double tl, double th) 
+void fvec_thres(fvec_t *f, double tl, double th)
 {
     int i;
     assert(f);
-    
+
     for (i = 0; i < f->len; i++) {
-        if (tl != 0.0 && f->val[i] < tl) 
+        if (tl != 0.0 && f->val[i] < tl)
             f->val[i] = 0.0;
         if (th != 0.0 && f->val[i] > th)
             f->val[i] = 0.0;
@@ -399,10 +399,10 @@ void fvec_sparsify(fvec_t *f)
             f->dim[j] = f->dim[i];
         }
         /* Count only non-zero elements only */
-        if (fabs(f->val[i]) > FVEC_ZERO) 
+        if (fabs(f->val[i]) > FVEC_ZERO)
             j++;
     }
-    
+
     f->len = j;
     fvec_realloc(f);
 }
@@ -419,16 +419,16 @@ int fvec_equals(fvec_t *fa, fvec_t *fb)
     unsigned long i = 0;
 
     if (fa->len != fb->len) {
-    	return FALSE;
+        return FALSE;
     }
 
     if (fa == fb) {
-    	return TRUE;
+        return TRUE;
     }
 
     for (i = 0; i < fa->len; i++) {
         if (fa->dim[i] != fb->dim[i] || fabs(fa->val[i] - fb->val[i]) > 1e-6)
-    		return FALSE;
+            return FALSE;
     }
 
     return TRUE;
