@@ -79,13 +79,13 @@ fvec_t *fvec_extract(char *x, int l)
  * @param l Length of sequence
  * @return feature vector
  */
-fvec_t *fvec_extract_intern(char *x, int l)
+inline fvec_t *fvec_extract_intern(char *x, int l)
 {
-    int i, blend = 0, len;
+    int i, blend, len;
 
     /* Get config */
-    config_lookup_bool(&cfg, "features.ngram_blend", (int *) &blend);
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &len);
+    config_lookup_bool(&cfg, "features.ngram_blend", &blend);
+    config_lookup_int(&cfg, "features.ngram_len", &len);
 
     /* Extract n-grams */
     fvec_t *fv = fvec_extract_intern2(x, l);
@@ -109,7 +109,7 @@ fvec_t *fvec_extract_intern(char *x, int l)
  * @param l Length of sequence
  * @return feature vector
  */
-fvec_t *fvec_extract_intern2(char *x, int l)
+inline fvec_t *fvec_extract_intern2(char *x, int l)
 {
     fvec_t *fv;
     int pos, shift;
