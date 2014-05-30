@@ -52,6 +52,7 @@ static config_default_t defaults[] = {
     {"features", "tfidf_file", CONFIG_TYPE_STRING, {.str = "tfidf.fv"}},
     {"filter", "dim_reduce", CONFIG_TYPE_STRING, {.str = "none" }},
     {"filter", "dim_num", CONFIG_TYPE_INT, {.num = 32}},
+    {"filter", "bloom_num", CONFIG_TYPE_INT, {.num = 2}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
     {NULL}
 };

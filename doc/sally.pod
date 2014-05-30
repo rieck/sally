@@ -389,11 +389,25 @@ the feature configuration section.
 =item I<"minhash">
 
 Each feature vector is reduced to a "minimum hash" with B<dim_num> bits. The
-string features associated with each dimension are hash and sorted multiple
-times as proposed by Broder (1997).  In each round the smallest hash value
-is appended to the minimum hash.  The number of hash bits in each round is
-defined by B<hash_bits> in the feature configuration section and the number
-of rounds is simply determined by ceil(B<dim_num> / B<hash_bits>).
+string features associated with each dimension are hashed and sorted
+multiple times as proposed by Broder (1997).  In each round the smallest
+hash value is appended to the minimum hash.  The number of hash bits in each
+round is defined by B<hash_bits> in the feature configuration section and
+the number of rounds is simply determined by ceil(B<dim_num> /
+B<hash_bits>).
+
+
+=item I<"bloom">
+
+Each feature vector is reduced to a small Boom filter with B<dim_num> bits. 
+The string features associated with each dimension are hashed using
+B<bloom_num> hash functions.  For each string feature and each hash function
+one bit in the filter is set.  As a result, the filter is populated with
+bits similar to a real Bloom filter.  To avoid saturating the filter,
+B<dim_num> should be significantly larger than B<bloom_num> if several
+string features are associated with one feature vector.  As a rule of thumb
+you can set B<bloom_num> = 0.7 * B<dim_num> / I<vec_len>, where I<vec_len>
+is the expected number of string features.
 
 =back
 
@@ -401,6 +415,13 @@ of rounds is simply determined by ceil(B<dim_num> / B<hash_bits>).
 
 This parameter defines the number of dimensions/bits to generate using
 unsupervised dimension reduction.
+
+=item B<bloom_num = 2;> 
+
+This parameters specifies how many hash functions are used to map a feature
+vector and its string features to a Bloom filter.  To avoid saturating the
+filter, you should choose B<bloom_num> significantly smaller than the size
+of the Bloom filter B<dim_num>.
 
 =back
 

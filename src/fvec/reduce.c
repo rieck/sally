@@ -47,6 +47,8 @@ void dim_reduce(fvec_t *fv)
         reduce_simhash(fv, dim_num);
     } else if (!strcasecmp(method, "minhash")) {
         reduce_minhash(fv, dim_num);
+    } else if (!strcasecmp(method, "bloom")) {
+        reduce_bloom(fv, dim_num);    
     } else {
         warning("Unknown dimension reduction method. Skipping.");
     }
@@ -172,6 +174,56 @@ void reduce_minhash(fvec_t *fv, int num)
     fv->dim = dim;
     fv->val = val;
     fv->len = num;
+}
+
+
+/**
+ * Reduce the feature vector to a small Bloom filter.  The string features
+ * associated with each dimension are hashed using k hash functions.  For
+ * each string feature and each hash function one bit in the filter is set. 
+ * As a result, the filter is populated similar to a real Bloom filter,
+ * except for that the size of the filter is very small.
+ *
+ * @param fv Feature vector @param num Number of bits
+ */
+void reduce_bloom(fvec_t *fv, int num) 
+{ 
+    assert(fv && num > 0); 
+    feat_t *dim;
+    float *val;
+    int bloom_num, i, k;
+    
+    config_lookup_int(&cfg, "filter.bloom_num", &bloom_num);
+
+    dim = (feat_t *) calloc(num, sizeof(feat_t)); 
+    val = (float *) calloc(num, sizeof(float));
+
+    if (!dim || !val) { 
+        error("Could not allocate feature vector contents");
+        free(dim); 
+        free(val); 
+        return; 
+    }
+
+    /* Fill dimension indices */
+    for (i = 0; i < num; i++) 
+        dim[i] = i;
+
+    /* Fill Bloom filter */
+    for (i = 0; i < fv->len; i++) {
+        for (k = 0; k < bloom_num; k++) {
+            feat_t h = rehash(fv->dim[i], k);
+            val[h % num] = 1.0;
+        }
+    }
+    
+    /* Exchange data */ 
+    free(fv->dim); 
+    free(fv->val);
+
+    fv->dim = dim; 
+    fv->val = val; 
+    fv->len = num; 
 }
 
 /** @} */
