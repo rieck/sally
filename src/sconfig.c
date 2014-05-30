@@ -39,6 +39,7 @@ static config_default_t defaults[] = {
     {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
     {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "ngram_blend", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "ngram_sort", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "vect_embed", CONFIG_TYPE_STRING, {.str = "cnt"}},
     {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},
@@ -93,6 +94,10 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
         break;
     case CONFIG_TYPE_INT:
         fprintf(f, "%s\t= %d;\n", n, config_setting_get_int(cs));
+        break;
+    case CONFIG_TYPE_BOOL:
+        fprintf(f, "%s\t= %s;\n", n, config_setting_get_bool(cs)
+                   ? "true" : "false");
         break;
     default:
         error("Unsupported type for configuration setting '%s'", n);
