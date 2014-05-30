@@ -30,7 +30,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:psE:N:b:vqVhCD"
+#define OPTSTRING       "c:i:o:n:d:psSXE:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -51,11 +51,11 @@ static struct option longopts[] = {
     {"ngram_sort", 0, NULL, 's'},
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
-    {"vect_sign", 0, NULL, 1006},
+    {"vect_sign", 0, NULL, 'S'},
     {"thres_low", 1, NULL, 1009},
     {"thres_high", 1, NULL, 1010},
     {"hash_bits", 1, NULL, 'b'},
-    {"explicit_hash", 0, NULL, 1003},
+    {"explicit_hash", 0, NULL, 'X'},
     {"hash_file", 1, NULL, 1011},
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
@@ -113,11 +113,11 @@ static void print_usage(void)
            "  -s,  --ngram_sort              Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
-           "       --vect_sign               Enable signed embedding.\n"
+           "  -S,  --vect_sign               Enable signed embedding.\n"
            "       --thres_low <float>       Enable minimum threshold for vectors.\n"
            "       --thres_high <float>      Enable maximum threshold for vectors.\n"
            "  -b,  --hash_bits <num>         Set number of hash bits.\n"
-           "       --explicit_hash           Enable explicit hash table.\n"
+           "  -X,  --explicit_hash           Enable explicit hash table.\n"
            "       --hash_file <file>        Set file name for explicit hash table.\n"
            "       --tfidf_file <file>       Set file name for TFIDF weighting.\n"
            "\nGeneric options:\n"
@@ -172,7 +172,8 @@ static void sally_parse_options(int argc, char **argv)
         case 1005:
             config_set_bool(&cfg, "input.decode_str", CONFIG_TRUE);
             break;
-        case 1006:
+        case 1006:	/* Old index */
+        case 'S':
             config_set_bool(&cfg, "features.vect_sign", CONFIG_TRUE);
             break;
         case 1007:
@@ -214,7 +215,8 @@ static void sally_parse_options(int argc, char **argv)
         case 'b':
             config_set_int(&cfg, "features.hash_bits", atoi(optarg));
             break;
-        case 1003:
+        case 1003:	/* Old index */
+        case 'X':
             config_set_bool(&cfg, "features.explicit_hash", CONFIG_TRUE);
             break;
         case 1004:

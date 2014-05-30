@@ -439,11 +439,11 @@ can be changed by using the command-line option B<--xx
   -s,  --ngram_sort              Enable sorted n-grams (n-perms).
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.
-       --vect_sign               Enabled signed embedding.
+  -S,  --vect_sign               Enabled signed embedding.
        --thres_low <float>       Enable minimum threshold for vectors.
        --thres_high <float>      Enable maximum threshold for vectors.
   -b,  --hash_bits <num>         Set number of hash bits.
-       --explicit_hash           Enable explicit hash table.
+  -X,  --explicit_hash           Enable explicit hash table.
        --hash_file <file>	 Set file name for explicit hash table.
        --tfidf_file <file>       Set file name for TFIDF weighting.
 
