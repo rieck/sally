@@ -38,6 +38,10 @@ void fvec_embed(fvec_t *fv, const char *n)
     int i;
     double s = 0;
 
+    /* No features, no embedding :( */
+    if (fv->len == 0)
+        return;
+
     if (!strcasecmp(n, "cnt")) {
         /* Nothing */
     } else if (!strcasecmp(n, "bin")) {
