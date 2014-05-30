@@ -39,6 +39,7 @@ static config_default_t defaults[] = {
     {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
     {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
+    {"features", "ngram_blend", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "ngram_sort", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "vect_embed", CONFIG_TYPE_STRING, {.str = "cnt"}},
     {"features", "vect_norm", CONFIG_TYPE_STRING, {.str = "none"}},

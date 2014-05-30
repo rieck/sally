@@ -244,6 +244,14 @@ parameter B<pos_shift> can be used to add a shift to the n-grams.  If the
 parameter is set to I<k>, multiple positional n-grams are extracted with a
 shift from I<-k> to I<+k>.
 
+=item B<ngram_blend = false;>
+
+The parameter B<ngram_blend> can be used to enable blended n-grams. In this
+setting, n-grams starting from length 1 up to length B<ngram_len> are
+extracted and used for creating a feature vector.  That is, all n-gram
+lengths are blended in a joint feature vector, hence the name of this
+approach.
+
 =item B<ngram_sort = false;>
 
 This parameter can be used to enable sorted n-grams (n-perms). During the
@@ -436,6 +444,7 @@ can be changed by using the command-line option B<--xx
   -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.
   -p,  --ngram_pos               Enable positional n-grams.
        --pos_shift <num>         Set shift of positional n-grams.
+  -B,  --ngram_blend             Enable blended n-grams.
   -s,  --ngram_sort              Enable sorted n-grams (n-perms).
   -E,  --vect_embed <embed>      Set embedding mode for vectors.
   -N,  --vect_norm <norm>        Set normalization mode for vectors.

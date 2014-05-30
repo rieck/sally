@@ -49,39 +49,71 @@ static void count_feat(fvec_t *fv);
 static int cmp_feat(const void *x, const void *y);
 static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static void cache_flush(fentry_t *c, int l);
+static void fvec_postprocess(fvec_t *fv);
+static fvec_t *fvec_extract_intern2(char *x, int l);
 
 /* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
 
-
 /**
- * Allocates and extracts a feature vector from a string.
+ * Allocates and extracts a feature vector from a string with
+ * postprocessing and blended n-grams.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
- *
  * @return feature vector
  */
 fvec_t *fvec_extract(char *x, int l)
 {
-    return fvec_extract_ex(x, l, TRUE);
+    /* Extract features */
+    fvec_t *fv = fvec_extract_intern(x, l);
+
+    /* Post-processing */
+    fvec_postprocess(fv);
+    return fv;
+}
+
+/*
+ * Internal: Allocates and extracts a feature vector from a string
+ * without postprocessing but blended n-grams
+ * @param x String of bytes (with space delimiters)
+ * @param l Length of sequence
+ * @return feature vector
+ */
+fvec_t *fvec_extract_intern(char *x, int l)
+{
+    int i, blend = 0, len;
+
+    /* Get config */
+    config_lookup_bool(&cfg, "features.ngram_blend", (int *) &blend);
+    config_lookup_int(&cfg, "features.ngram_len", (int *) &len);
+
+    /* Extract n-grams */
+    fvec_t *fv = fvec_extract_intern2(x, l);
+
+    /* Blended n-grams */
+    for (i = 1; blend && i < len; i++) {
+        config_set_int(&cfg, "features.ngram_len", i);
+        fvec_t *fx = fvec_extract_intern2(x, l);
+        fvec_add(fv, fx);
+        fvec_destroy(fx);
+    }
+    config_set_int(&cfg, "features.ngram_len", len);
+
+    return fv;
 }
 
 /**
- * Allocates and extracts a feature vector from a string.
+ * Internal: Allocates and extracts a feature vector from a string without
+ * postprocessing and no blended n-grams.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
- * @param postprocess Indicates whether the extracted feature should be
- *                    post-processed regarding embedding, normalization,
- *                    feature thresholds, etc.
- *
  * @return feature vector
  */
-fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
+fvec_t *fvec_extract_intern2(char *x, int l)
 {
     fvec_t *fv;
     int pos, shift;
-    const char *dlm_str, *cfg_str;
-    double flt1, flt2;
+    const char *dlm_str;
     assert(x && l >= 0);
 
     /* Allocate feature vector */
@@ -118,10 +150,6 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
 
-#ifdef ENABLE_EVALTIME
-    double t1 = time_stamp();
-#endif
-
     /* Loop over position shifts (0 if pos is disabled) */
     for (int s = -shift; s <= shift; s++) {
         if (!dlm_str || strlen(dlm_str) == 0) {
@@ -137,25 +165,30 @@ fvec_t *fvec_extract_ex(char *x, int l, int postprocess)
     /* Count features  */
     count_feat(fv);
 
-    if (postprocess) {
-        /* Compute embedding and normalization */
-        config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
-        fvec_embed(fv, cfg_str);
-        config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
-        fvec_norm(fv, cfg_str);
-
-        /* Apply thresholding */
-        config_lookup_float(&cfg, "features.thres_low", &flt1);
-        config_lookup_float(&cfg, "features.thres_high", &flt2);
-        if (flt1 != 0.0 || flt2 != 0.0) {
-            fvec_thres(fv, flt1, flt2);
-        }
-    }
-#ifdef ENABLE_EVALTIME
-    printf("strlen %u embed %f\n", l, time_stamp() - t1);
-#endif
-
     return fv;
+}
+
+/**
+ * Internal post-processing of feature vectors.
+ * @param fv feature vector
+ */
+void fvec_postprocess(fvec_t *fv)
+{
+    const char *cfg_str;
+    double flt1, flt2;
+
+    /* Compute embedding and normalization */
+    config_lookup_string(&cfg, "features.vect_embed", &cfg_str);
+    fvec_embed(fv, cfg_str);
+    config_lookup_string(&cfg, "features.vect_norm", &cfg_str);
+    fvec_norm(fv, cfg_str);
+
+    /* Apply thresholding */
+    config_lookup_float(&cfg, "features.thres_low", &flt1);
+    config_lookup_float(&cfg, "features.thres_high", &flt2);
+    if (flt1 != 0.0 || flt2 != 0.0) {
+        fvec_thres(fv, flt1, flt2);
+    }
 }
 
 /**

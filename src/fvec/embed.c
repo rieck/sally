@@ -117,7 +117,7 @@ void idf_create(char *input)
             continue;
 
         for (j = 0; j < read; j++) {
-            fvec_t *x = fvec_extract_ex(strs[j].str, strs[j].len, FALSE);
+            fvec_t *x = fvec_extract_intern(strs[j].str, strs[j].len);
             fvec_binarize(x);
             fvec_add(idf_weights, x);
             fvec_destroy(x);

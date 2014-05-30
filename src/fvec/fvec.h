@@ -52,7 +52,7 @@ typedef struct
 
 /* Functions */
 fvec_t *fvec_extract(char *, int l);
-fvec_t *fvec_extract_ex(char *x, int l, int postprocess);
+fvec_t *fvec_extract_intern(char *x, int l);
 void fvec_destroy(fvec_t *);
 void fvec_print(FILE *, fvec_t *);
 void fvec_realloc(fvec_t *);

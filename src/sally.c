@@ -30,7 +30,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:d:psE:N:b:vqVhCD"
+#define OPTSTRING       "c:i:o:n:d:psBE:N:b:vqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -48,6 +48,7 @@ static struct option longopts[] = {
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 0, NULL, 'p'},
     {"pos_shift", 1, NULL, 1012},       /* <- last entry */
+    {"ngram_blend", 0, NULL, 'B'},
     {"ngram_sort", 0, NULL, 's'},
     {"vect_embed", 1, NULL, 'E'},
     {"vect_norm", 1, NULL, 'N'},
@@ -110,6 +111,7 @@ static void print_usage(void)
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
            "  -p,  --ngram_pos               Enable positional n-grams.\n"
            "       --pos_shift <num>         Set shift of positional n-grams.\n"
+           "  -B,  --ngram_blend             Enabled blended n-grams.\n"
            "  -s,  --ngram_sort              Enable sorted n-grams (n-perms).\n"
            "  -E,  --vect_embed <embed>      Set embedding mode for vectors.\n"
            "  -N,  --vect_norm <norm>        Set normalization mode for vectors.\n"
@@ -201,6 +203,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 'p':
             config_set_bool(&cfg, "features.ngram_pos", CONFIG_TRUE);
+            break;
+        case 'B':
+            config_set_bool(&cfg, "features.ngram_blend", CONFIG_TRUE);
             break;
         case 's':
             config_set_bool(&cfg, "features.ngram_sort", CONFIG_TRUE);
