@@ -48,7 +48,7 @@ void dim_reduce(fvec_t *fv)
     } else if (!strcasecmp(method, "minhash")) {
         reduce_minhash(fv, dim_num);
     } else if (!strcasecmp(method, "bloom")) {
-        reduce_bloom(fv, dim_num);    
+        reduce_bloom(fv, dim_num);
     } else {
         warning("Unknown dimension reduction method. Skipping.");
     }
@@ -101,7 +101,7 @@ void reduce_simhash(fvec_t *fv, int num)
     }
 
     /* Set indices */
-    for (j = 0; j < num; j++) 
+    for (j = 0; j < num; j++)
         dim[j] = j;
 
     /* Binarize feature hash */
@@ -186,27 +186,27 @@ void reduce_minhash(fvec_t *fv, int num)
  *
  * @param fv Feature vector @param num Number of bits
  */
-void reduce_bloom(fvec_t *fv, int num) 
-{ 
-    assert(fv && num > 0); 
+void reduce_bloom(fvec_t *fv, int num)
+{
+    assert(fv && num > 0);
     feat_t *dim;
     float *val;
     int bloom_num, i, k;
-    
+
     config_lookup_int(&cfg, "filter.bloom_num", &bloom_num);
 
-    dim = (feat_t *) calloc(num, sizeof(feat_t)); 
+    dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
 
-    if (!dim || !val) { 
+    if (!dim || !val) {
         error("Could not allocate feature vector contents");
-        free(dim); 
-        free(val); 
-        return; 
+        free(dim);
+        free(val);
+        return;
     }
 
     /* Fill dimension indices */
-    for (i = 0; i < num; i++) 
+    for (i = 0; i < num; i++)
         dim[i] = i;
 
     /* Fill Bloom filter */
@@ -216,14 +216,14 @@ void reduce_bloom(fvec_t *fv, int num)
             val[h % num] = 1.0;
         }
     }
-    
-    /* Exchange data */ 
-    free(fv->dim); 
+
+    /* Exchange data */
+    free(fv->dim);
     free(fv->val);
 
-    fv->dim = dim; 
-    fv->val = val; 
-    fv->len = num; 
+    fv->dim = dim;
+    fv->val = val;
+    fv->len = num;
 }
 
 /** @} */
