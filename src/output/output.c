@@ -28,6 +28,7 @@
 #include "output_text.h"
 #include "output_matlab.h"
 #include "output_cluto.h"
+#include "output_stdout.h"
 
 /**
  * Structure for output interface
@@ -63,6 +64,10 @@ void output_config(const char *format)
         func.output_open = output_cluto_open;
         func.output_write = output_cluto_write;
         func.output_close = output_cluto_close;
+    } else if (!strcasecmp(format, "stdout")) {
+        func.output_open = output_stdout_open;
+        func.output_write = output_stdout_write;
+        func.output_close = output_stdout_close;
     } else {
         error("Unknown ouptut format '%s', using 'text' instead.", format);
         output_config("text");

@@ -295,6 +295,12 @@ static void sally_parse_options(int argc, char **argv)
         output = argv[1];
     }
 
+    /* Check for stdin and stdout "filenames" */
+    if (!strcmp(input, "-"))
+        config_set_string(&cfg, "input.input_format", "stdin");
+    if (!strcmp(output, "-"))
+        config_set_string(&cfg, "output.output_format", "stdout");
+
     /* Last but not least. Warn about default config */
     if (!user_conf) {
         warning("No config file given. Using defaults (see -D)");
