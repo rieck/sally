@@ -391,7 +391,7 @@ static void sally_init()
     input_config(cfg_str);
     info_msg(1, "Opening '%0.40s' with input module '%s'.", input, cfg_str);
     entries = input_open(input);
-    if (entries < 0)
+    if (entries == -1)
         fatal("Could not open input source");
 
     /* Open output */
@@ -425,11 +425,14 @@ static void sally_process()
     if (!fvec || !strs)
         fatal("Could not allocate memory for embedding");
 
-    info_msg(1, "Processing %d strings in chunks of %d.", entries, chunk);
+    info_msg(1, "Processing strings in chunks of %d.", chunk);
 
-    for (i = 0, read = 0; i < entries; i += read) {
+    for (i = 0, read = 0; TRUE; i += read) {
         read = input_read(strs, chunk);
-        if (read <= 0)
+        if (read == 0)
+            break;
+        
+        if (read < 0)
             fatal("Failed to read strings from input '%s'", input);
 
         /* Generic preprocessing of input */
@@ -459,7 +462,8 @@ static void sally_process()
         if (fhash_enabled() && !strlen(hash_file) > 0)
             fhash_reset();
 
-        prog_bar(0, entries, i + read);
+        if (entries > 0)
+            prog_bar(0, entries, i + read);
     }
 
     free(fvec);

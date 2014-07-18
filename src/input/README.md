@@ -19,7 +19,8 @@ The development of a new input module basically involves three steps:
    This function opens the input source for reading of strings. For example,
    if `xxx` refers to an archive, this functions corresponds to opening the
    archive and preparing it for loading entries.  The function returns the
-   number of available entries.
+   number of available entries, -1 on error or -2 if the number cannot be
+   determined.
      
        `int input_xxx_read(string_t *strs, int len);`
      

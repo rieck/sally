@@ -12,7 +12,7 @@
 #ifndef INPUT_STDIN_H
 #define INPUT_STDIN_H
 
-/* Stdin module */
+/* Lines module */
 int input_stdin_open(char *);
 int input_stdin_read(string_t *, int);
 void input_stdin_close(void);
