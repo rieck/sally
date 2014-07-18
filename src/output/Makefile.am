@@ -10,7 +10,8 @@ noinst_LTLIBRARIES	= liboutput.la
 
 liboutput_la_SOURCES	= output.c output.h output_libsvm.c output_libsvm.h \
                           output_text.c output_text.h output_matlab.c \
-                          output_matlab.h output_cluto.c output_cluto.h
+                          output_matlab.h output_cluto.c output_cluto.h \
+                          output_stdout.c output_stdout.h
 
 beautify:
 	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \

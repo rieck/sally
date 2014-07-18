@@ -468,6 +468,19 @@ representation of the feature and I<value> the value at the dimension.  If
 parameter B<explicit_hash> is not enabled in the configuration, the field
 I<feature> is empty.
 
+=item I<"stdout">
+
+The feature vectors of the embedded strings are written to standard output
+(stdout) as text.  Each feature vector is represented as a list of
+dimensions in the following form:
+
+    dimension:feature:value,... source
+
+I<dimension> specifies the index of the dimension, I<feature> a textual
+representation of the feature and I<value> the value at the dimension.  If
+parameter B<explicit_hash> is not enabled in the configuration, the field
+I<feature> is empty.
+
 =item I<"matlab">
 
 The feature vectors of the embedded strings are stored in Matlab
