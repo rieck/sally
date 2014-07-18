@@ -82,7 +82,7 @@ int output_stdout_write(fvec_t **x, int len)
 
         /* Print source of string */
         if (x[j]->src)
-            fprintf(stdout, " %s", x[j]->src);
+            fprintf(stdout, " # %s", x[j]->src);
 
         fprintf(stdout, "\n");
     }
