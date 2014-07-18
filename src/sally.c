@@ -21,7 +21,7 @@
 #include "sconfig.h"
 
 /* Global variables */
-int verbose = 1;
+int verbose = 0;
 int print_conf = 0;
 config_t cfg;
 
