@@ -33,6 +33,7 @@ extern config_t cfg;
 
 /* Local variables */
 static FILE *f = NULL;
+int skip_null = CONFIG_FALSE;
 
 /**
  * Opens a file for writing libsvm format
@@ -48,6 +49,8 @@ int output_libsvm_open(char *fn)
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
+    
+    config_lookup_bool(&cfg, "output.skip_null", &skip_null);
 
     /* Write sally header */
 #if 0
@@ -69,9 +72,9 @@ int output_libsvm_write(fvec_t **x, int len)
     int j, i;
 
     for (j = 0; j < len; j++) {
-#ifdef ENABLE_EVALTIME
-        double t1 = time_stamp();
-#endif
+        /* Skipp null vectors */
+        if (skip_null && x[j]->len == 0)
+            continue;
 
         /* Print feature vector */
         fprintf(f, "%g ", x[j]->label);
@@ -84,10 +87,6 @@ int output_libsvm_write(fvec_t **x, int len)
             fprintf(f, "# %s", x[j]->src);
 
         fprintf(f, "\n");
-
-#ifdef ENABLE_EVALTIME
-        printf("fdim %lu write %f\n", x[j]->len, time_stamp() - t1);
-#endif
     }
 
     return TRUE;

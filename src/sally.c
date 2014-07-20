@@ -31,7 +31,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:m:r:d:psBSXE:N:b:vqVhCD"
+#define OPTSTRING       "c:i:o:n:m:r:d:psBSXE:N:b:kvqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -63,6 +63,7 @@ static struct option longopts[] = {
     {"dim_num", 1, NULL, 'm'}, 
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
+    {"skip_null", 0, NULL, 'k'},
     {"verbose", 0, NULL, 'v'},
     {"print_config", 0, NULL, 'C'},
     {"print_defaults", 0, NULL, 'D'},
@@ -109,6 +110,7 @@ static void print_usage(void)
            "       --reverse_str             Reverse (flip) the input strings.\n"
            "       --stopword_file <file>    Provide a file with stop words.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
+           "  -k,  --skip_null               Skip null vectors in output.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
@@ -241,6 +243,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 'o':
             config_set_string(&cfg, "output.output_format", optarg);
+            break;
+        case 'k':
+            config_set_bool(&cfg, "output.skip_null", CONFIG_TRUE);
             break;
         case 'q':
             verbose = 0;

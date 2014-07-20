@@ -31,6 +31,9 @@
 /* External variables */
 extern config_t cfg;
 
+/* Static variables */
+static int skip_null = CONFIG_FALSE;
+
 /**
  * Opens a file for writing stdout format
  * @param fn File name
@@ -44,6 +47,8 @@ int output_stdout_open(char *fn)
         error("Could not open <stdout>");
         return FALSE;
     }
+
+    config_lookup_bool(&cfg, "output.skip_null", &skip_null);
 
     /* Write sally header */
     sally_version(stdout, "# ", "Output module for stdout format");
@@ -63,6 +68,10 @@ int output_stdout_write(fvec_t **x, int len)
     int j, i, k;
 
     for (j = 0; j < len; j++) {
+        /* Skip null vectors */
+        if (skip_null && x[j]->len == 0)
+            continue;
+    
         for (i = 0; i < x[j]->len; i++) {
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);

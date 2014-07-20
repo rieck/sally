@@ -54,6 +54,7 @@ static config_default_t defaults[] = {
     {"filter", "dim_num", CONFIG_TYPE_INT, {.num = 32}},
     {"filter", "bloom_num", CONFIG_TYPE_INT, {.num = 2}},
     {"output", "output_format", CONFIG_TYPE_STRING, {.str = "libsvm"}},
+    {"output", "skip_null", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {NULL}
 };
 

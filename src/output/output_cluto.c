@@ -35,6 +35,7 @@ static FILE *f = NULL;
 static long rows = 0;
 static long cols = 0;
 static long entries = 0;
+static int skip_null = CONFIG_FALSE;
 
 /**
  * Opens a file for writing cluto format
@@ -52,6 +53,7 @@ int output_cluto_open(char *fn)
         return FALSE;
     }
 
+    config_lookup_bool(&cfg, "output.skip_null", &skip_null);
     config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
     cols = 1 << bits;
 
@@ -73,6 +75,10 @@ int output_cluto_write(fvec_t **x, int len)
     int j, i;
 
     for (j = 0; j < len; j++) {
+        /* Skip empty vector */
+        if (skip_null && x[j]->len == 0)
+            continue;
+    
         for (i = 0; i < x[j]->len; i++) {
             fprintf(f, "%llu ", (long long unsigned int) x[j]->dim[i] + 1);
             fprintf(f, "%g", x[j]->val[i]);

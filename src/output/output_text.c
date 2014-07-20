@@ -33,6 +33,7 @@ extern config_t cfg;
 
 /* Local variables */
 static FILE *f = NULL;
+static int skip_null = CONFIG_FALSE;
 
 /**
  * Opens a file for writing text format
@@ -48,6 +49,8 @@ int output_text_open(char *fn)
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
+
+    config_lookup_bool(&cfg, "output.skip_null", &skip_null);
 
     /* Write sally header */
     sally_version(f, "# ", "Output module for text format");
@@ -67,6 +70,10 @@ int output_text_write(fvec_t **x, int len)
     int j, i, k;
 
     for (j = 0; j < len; j++) {
+        /* Skip null vectors */
+        if (skip_null && x[j]->len == 0)
+            continue;
+    
         for (i = 0; i < x[j]->len; i++) {
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);

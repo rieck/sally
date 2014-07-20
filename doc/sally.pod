@@ -503,6 +503,12 @@ spaces and thus the B<"hash_bits"> should be set to values below 24.
 
 =back
 
+=item I<skip_null = false;>
+
+If this parameter is enabled, B<sally> will not output null vectors, that
+is, vectors where all dimensions are zero.  These vectors occur if a string
+does not contain a single string feature.
+
 =back
 
 =item B<};>
@@ -528,6 +534,7 @@ can be changed by using the command-line option B<--xx
        --reverse_str             Reverse (flip) all strings.
        --stopword_file <file>    Provide a file with stop words.
   -o,  --output_format <format>  Set output format for vectors.
+  -k,  --skip_null               Skip null vectors in output.
 
 =head2 Feature options
 
