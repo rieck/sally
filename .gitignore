@@ -12,6 +12,7 @@
 /build
 /config.*
 /configure
+/compile
 /depcomp
 /doc/sally.man
 /install-sh
