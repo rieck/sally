@@ -78,7 +78,7 @@ int output_cluto_write(fvec_t **x, int len)
         /* Skip empty vector */
         if (skip_null && x[j]->len == 0)
             continue;
-    
+
         for (i = 0; i < x[j]->len; i++) {
             fprintf(f, "%llu ", (long long unsigned int) x[j]->dim[i] + 1);
             fprintf(f, "%g", x[j]->val[i]);

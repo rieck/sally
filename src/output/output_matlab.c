@@ -437,7 +437,7 @@ int output_matlab_write(fvec_t **x, int len)
         /* Skip null vectors */
         if (skip_null && x[j]->len == 0)
             continue;
-    
+
         /* Write matlab stuff */
         bytes += fwrite_fvec_data(x[j], f);
         bytes += fwrite_fvec_src(x[j], f);

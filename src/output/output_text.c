@@ -73,7 +73,7 @@ int output_text_write(fvec_t **x, int len)
         /* Skip null vectors */
         if (skip_null && x[j]->len == 0)
             continue;
-    
+
         for (i = 0; i < x[j]->len; i++) {
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);

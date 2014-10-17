@@ -71,11 +71,12 @@ int output_stdout_write(fvec_t **x, int len)
         /* Skip null vectors */
         if (skip_null && x[j]->len == 0)
             continue;
-    
+
         for (i = 0; i < x[j]->len; i++) {
             /* Print feature (hash and string) */
             fentry_t *fe = fhash_get(x[j]->dim[i]);
-            fprintf(stdout, "%llu:", (long long unsigned int) x[j]->dim[i] + 1);
+            fprintf(stdout, "%llu:",
+                    (long long unsigned int) x[j]->dim[i] + 1);
             for (k = 0; fe && k < fe->len; k++) {
                 if (isprint(fe->data[k]) && !strchr("%:, ", fe->data[k]))
                     fprintf(stdout, "%c", fe->data[k]);

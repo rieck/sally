@@ -49,7 +49,7 @@ int output_libsvm_open(char *fn)
         error("Could not open output file '%s'.", fn);
         return FALSE;
     }
-    
+
     config_lookup_bool(&cfg, "output.skip_null", &skip_null);
 
     /* Write sally header */
