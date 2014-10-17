@@ -31,7 +31,7 @@ additionally using command-line options.
     |  lines  |   --  |  Sally  |  --  |  matlab  |
     |   ...   |   /   '---------'   \  |   ...    |
     '---------'                        '----------'
-      Input           Embedding          Output 
+      Input           Embedding          Output
 
 
 B<sally> implements a standard technique for mapping strings to a
@@ -61,15 +61,15 @@ with little loss of accuracy.
 The configuration of B<sally> is specified in a configuration file.
 This file is structured into the three sections B<input>, B<features>
 and B<output>, which define the parameters of the input format, the
-feature extraction and the output format, respectively. 
+feature extraction and the output format, respectively.
 
 All parameters of the configuration can be also be specified on the
 command-line. That is, if a parameter is specified in the
 configuration as B<xx = "yy">, it can be alternatively supplied as a
 command-line option by B<--xx "yy">.
 
-If no configuration file is provided, B<sally> resorts to a default 
-configuration. This default configuration can be dumped using the 
+If no configuration file is provided, B<sally> resorts to a default
+configuration. This default configuration can be dumped using the
 command-line option B<-D>.
 
 =head2 Input formats
@@ -90,20 +90,20 @@ This parameter specifies the input format.
 
 =over 14
 
-=item I<"dir"> 
+=item I<"dir">
 
 The input strings are available as binary files in a directory and the
 name of the directory is given as I<input> to B<sally>. The suffixes
 of the files are used as labels for the extracted vectors.
 
-=item I<"arc"> 
+=item I<"arc">
 
 The input strings are available as binary files in a compressed
 archive, such as a zip or tgz archive.  The name of the archive is
 given as I<input> to B<sally>.  The suffixes of the files are used as
 labels for the extracted vectors.
 
-=item I<"lines"> 
+=item I<"lines">
 
 The input strings are available as lines in a text file. The name of the
 file is given as I<input> to B<sally>.  The lines need to be separated by
@@ -117,14 +117,14 @@ given as I<input> to B<sally>.  Labels can be extracted from the description
 of each sequence using a regular expression (see B<fasta_regex>).  Comments
 are allowed if they are preceded by either ';' or '>'.
 
-=item I<"stdin"> 
+=item I<"stdin">
 
 The input strings are read form standard input (stdin) as text lines. The
 parameter I<input> is ignored.  The lines need to be separated by newline
 and may not contain the NUL character.  Labels can be extracted from each
 line using a regular expression (see B<lines_regex>).
 
-=back 
+=back
 
 =item B<chunk_size = 256;>
 
@@ -160,14 +160,14 @@ parameter is a regular expression matching labels, such as +1 and -1.
 =item B<reverse_str = false;>
 
 If this parameter is set to 1, the bytes of all input strings will
-be reversed. Such reversing might help in situations where the 
+be reversed. Such reversing might help in situations where the
 reading direction of the input strings is unspecified.
 
 =item B<stopword_file = "";>
 
 Stop words (irrelevant words) can be filtered from the strings by providing
 a file containing these words; one per line. Non-printable characters
-can be escaped using URI encoding (%XX). Stop words can only be filtered, if 
+can be escaped using URI encoding (%XX). Stop words can only be filtered, if
 a set of delimiters is defined using B<ngram_delim>.
 
 =back
@@ -180,7 +180,7 @@ a set of delimiters is defined using B<ngram_delim>.
 
 The strings loaded by B<sally> are characterized by a set of features,
 where each feature is associated with one dimension of the vector
-space. Different types of features can be extracted by changing the 
+space. Different types of features can be extracted by changing the
 following parameters.
 
 =over 4
@@ -260,7 +260,7 @@ extraction of an n-gram its symbols are sorted according to their
 lexographical order. That is, if n-grams are composed of bytes, these bytes
 are sorted. If the n-grams are composed of words, the respective words are
 sorted. Sorted n-grams can be used to compensate minor perturbation in
-string data. For example, the strings "abac" and "aabc" contain the same 
+string data. For example, the strings "abac" and "aabc" contain the same
 sorted 3-grams, namely "aab" and "abc".
 
 =item B<vect_embed = "bin";>
@@ -291,21 +291,21 @@ larger values.
 
 =item B<thres_low = 0;>
 
-This parameter defines a minimum threshold for the entries in each vector. 
+This parameter defines a minimum threshold for the entries in each vector.
 Values below the threshold are removed.  The parameter can be used to filter
-low-valued features from the vectors, such as very infrequent words. 
+low-valued features from the vectors, such as very infrequent words.
 If the parameter is set to 0, the thresholding is disabled.
 
 =item B<thres_high = 0;>
 
-This parameter defines a maximum threshold for the entries in each vector. 
+This parameter defines a maximum threshold for the entries in each vector.
 Values above the threshold are removed.  The parameter can be used to filter
-high-valued features from the vectors, such as very frequent words. 
+high-valued features from the vectors, such as very frequent words.
 If the parameter is set to 0, the thresholding is disabled.
 
 =item B<hash_bits = 22;>
 
-B<sally> uses a hash function to map individual features to dimensions. 
+B<sally> uses a hash function to map individual features to dimensions.
 This parameter specifies the number of bits used by this hash function and
 defines the maximum dimensionality of the vector space with 2 ** bits.  As
 the embedding of B<sally> is usually sparse and only a small fraction of
@@ -380,7 +380,7 @@ No dimension reduction is performed.
 
 =item I<"simhash">
 
-Each feature vector is reduced to a similarity hash with B<dim_num> bits. 
+Each feature vector is reduced to a similarity hash with B<dim_num> bits.
 The string features associated with each dimension are hashed and aggregated
 to a single hash value as proposed by Charikar (STOC 2002).  For
 convenience, the computed hash value is again represented as a feature
@@ -400,7 +400,7 @@ B<hash_bits>).
 
 =item I<"bloom">
 
-Each feature vector is reduced to a small Boom filter with B<dim_num> bits. 
+Each feature vector is reduced to a small Boom filter with B<dim_num> bits.
 The string features associated with each dimension are hashed using
 B<bloom_num> hash functions.  For each string feature and each hash function
 one bit in the filter is set.  As a result, the filter is populated with
@@ -417,7 +417,7 @@ is the expected number of string features.
 This parameter defines the number of dimensions/bits to generate using
 unsupervised dimension reduction.
 
-=item B<bloom_num = 2;> 
+=item B<bloom_num = 2;>
 
 This parameters specifies how many hash functions are used to map a feature
 vector and its string features to a Bloom filter.  To avoid saturating the
@@ -436,7 +436,7 @@ Once the input strings have been embedded in a vector space, B<sally>
 stores the resulting vectors in one of several common formats, which
 allows for applying typical tools of statistics and machine learning
 to the data, for example, Matlab, Octave, Shogun, Weka, SVMLight and
-LibSVM.  
+LibSVM.
 
 =over 4
 
@@ -450,19 +450,19 @@ Following is a list of output formats supported by B<sally>:
 
 =over 14
 
-=item I<"libsvm"> 
+=item I<"libsvm">
 
 The feature vectors of the embedded strings are stored in the common
 libsvm format, which is supported by Shogun, SVMLight and LibSVM. The
 name of the output file is given as I<output> to B<sally>.
 
-=item I<"text"> 
+=item I<"text">
 
-The feature vectors of the embedded strings are stored as plain text. 
+The feature vectors of the embedded strings are stored as plain text.
 Each feature vector is represented as a list of dimensions, which is written
 to I<output> in the following form
- 
-    dimension:feature:value,... source 
+
+    dimension:feature:value,... source
 
 I<dimension> specifies the index of the dimension, I<feature> a textual
 representation of the feature and I<value> the value at the dimension.  If
@@ -492,7 +492,7 @@ efficiently operate with sparse vectors in Matlab. If the sparse
 representation is lost during computations, excessive run-time and
 memory requirements are likely.
 
-=item I<"cluto"> 
+=item I<"cluto">
 
 The feature vectors of the embedded strings are stored as a sparse
 matrix suitable for the clustering tool Cluto. The first line of
@@ -500,6 +500,14 @@ the file is a header for Cluto, while the remaining lines correspond
 to feature vectors. The name of the output file is given as I<output>
 to B<sally>. Note that Cluto can not handle arbitrarily large vector
 spaces and thus the B<"hash_bits"> should be set to values below 24.
+
+=item I<"json">
+
+The feature vectors of the embedded strings are stored as JSON objects.
+Each object contains a list of dimension indices denoted I<dim> and
+corresponding values denoted as I<val>.  Depending on the configuration the
+source for each object as well as the actual string feature associated with
+each dimension are also stored in the JSON object.
 
 =back
 
@@ -568,7 +576,7 @@ can be changed by using the command-line option B<--xx
 
 =over 4
 
-=item F<PREFIX/share/doc/sally/example.cfg> 
+=item F<PREFIX/share/doc/sally/example.cfg>
 
 An example configuration file for B<sally>. See the configuration
 section for further details.
