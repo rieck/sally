@@ -471,7 +471,7 @@ static void sally_process()
         output_free(fvec, read);
 
         /* Reset hash if enabled but no hash file is set */
-        if (fhash_enabled() && !strlen(hash_file) > 0)
+        if (fhash_enabled() && strlen(hash_file) == 0)
             fhash_reset();
 
         if (entries > 0)
