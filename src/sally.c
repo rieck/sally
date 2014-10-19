@@ -7,7 +7,7 @@
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.  This program is distributed without any
- * warranty. See the GNU General Public License for more details. 
+ * warranty. See the GNU General Public License for more details.
  */
 
 #include "config.h"
@@ -58,9 +58,9 @@ static struct option longopts[] = {
     {"thres_high", 1, NULL, 1010},
     {"hash_bits", 1, NULL, 'b'},
     {"explicit_hash", 0, NULL, 'X'},
-    {"hash_file", 1, NULL, 1011},   
+    {"hash_file", 1, NULL, 1011},
     {"dim_reduce", 1, NULL, 'r'},
-    {"dim_num", 1, NULL, 'm'}, 
+    {"dim_num", 1, NULL, 'm'},
     {"tfidf_file", 1, NULL, 1004},
     {"output_format", 1, NULL, 'o'},
     {"skip_null", 0, NULL, 'k'},
@@ -157,7 +157,10 @@ static void print_version(void)
  */
 static void sally_parse_options(int argc, char **argv)
 {
-    int ch, user_conf = FALSE;
+    int ch;
+#ifdef WARN_NO_CONF
+    int no_conf = TRUE;
+#endif
 
     optind = 0;
 
@@ -165,7 +168,9 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
-            user_conf = TRUE;
+#ifdef WARN_NO_CONF
+            no_conf = FALSE;
+#endif
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -306,10 +311,12 @@ static void sally_parse_options(int argc, char **argv)
     if (!strcmp(output, "-"))
         config_set_string(&cfg, "output.output_format", "stdout");
 
+#ifdef WARN_NO_CONF
     /* Last but not least. Warn about default config */
-    if (!user_conf) {
+    if (no_conf) {
         warning("No config file given. Using defaults (see -D)");
     }
+#endif
 }
 
 
@@ -436,7 +443,7 @@ static void sally_process()
         read = input_read(strs, chunk);
         if (read == 0)
             break;
-        
+
         if (read < 0)
             fatal("Failed to read strings from input '%s'", input);
 
@@ -451,7 +458,7 @@ static void sally_process()
             fvec[j] = fvec_extract(strs[j].str, strs[j].len);
             fvec_set_label(fvec[j], strs[j].label);
             fvec_set_source(fvec[j], strs[j].src);
-            
+
             /* Dimension reduction */
             dim_reduce(fvec[j]);
         }
@@ -515,7 +522,7 @@ static void sally_exit()
 }
 
 /**
- * Main function of Sally tool 
+ * Main function of Sally tool
  * @param argc Number of arguments
  * @param argv Argument values
  * @return exit code
