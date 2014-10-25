@@ -55,7 +55,7 @@ fi
 # libconfig
 PKG_CHECK_MODULES([PKGCONFIG], [libconfig >= 1.4], [], 
     AC_MSG_ERROR([The library libconfig is required for compilation.
-    Debian/Ubuntu package: libconfig9-dev
+    Debian/Ubuntu package: libconfig8-dev
     Source code: http://www.hyperrealm.com/libconfig/
     ])
 )
