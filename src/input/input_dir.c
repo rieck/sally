@@ -129,7 +129,7 @@ static char *load_file(char *path, char *name, int *size)
     char *x = NULL, file[512];
     struct stat st;
 
-#ifdef ENABLE_OPENMP
+#ifdef WITH_OPENMP
 #pragma omp critical (snprintf)
 #endif
     {

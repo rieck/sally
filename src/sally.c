@@ -277,11 +277,6 @@ static void sally_parse_options(int argc, char **argv)
         }
     }
 
-#ifdef ENABLE_EVALTIME
-    config_set_int(&cfg, "input.chunk_size", 1);
-    verbose = 0;
-#endif
-
     /* Check configuration */
     if (!config_check(&cfg)) {
         exit(EXIT_FAILURE);
@@ -450,7 +445,7 @@ static void sally_process()
         /* Generic preprocessing of input */
         input_preproc(strs, read);
 
-#ifdef ENABLE_OPENMP
+#ifdef HAVE_OPENMP
 #pragma omp parallel for
 #endif
         for (j = 0; j < read; j++) {

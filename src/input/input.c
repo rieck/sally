@@ -7,14 +7,14 @@
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.  This program is distributed without any
- * warranty. See the GNU General Public License for more details. 
+ * warranty. See the GNU General Public License for more details.
  */
 
-/** 
+/**
  * @defgroup input Input interface
  *
- * Generic implementation of functions for reading strings in various 
- * formats. 
+ * Generic implementation of functions for reading strings in various
+ * formats.
  *
  * @{
  */
@@ -60,7 +60,7 @@ extern char delim[256];
 /** External variables */
 extern config_t cfg;
 
-/** 
+/**
  * Configure the input of Sally
  * @param format Name of input format
  */
@@ -78,11 +78,14 @@ void input_config(const char *format)
         func.input_open = input_fasta_open;
         func.input_read = input_fasta_read;
         func.input_close = input_lines_close;
-#ifdef ENABLE_LIBARCHIVE
+
     } else if (!strcasecmp(format, "arc")) {
+#ifdef WITH_LIBARCHIVE
         func.input_open = input_arc_open;
         func.input_read = input_arc_read;
         func.input_close = input_arc_close;
+#else
+        warning("Sally has been compiled without support for libarchive");
 #endif
     } else if (!strcasecmp(format, "stdin")) {
         func.input_open = input_stdin_open;
@@ -116,7 +119,7 @@ int input_read(string_t *strs, int len)
 }
 
 /**
- * Wrapper for closing the input source. 
+ * Wrapper for closing the input source.
  */
 void input_close(void)
 {
@@ -140,7 +143,7 @@ void input_free(string_t *strs, int len)
 }
 
 /**
- * Read in and hash stop words 
+ * Read in and hash stop words
  * @param file stop word file
  */
 void stopwords_load(const char *file)
@@ -183,7 +186,7 @@ void stopwords_destroy()
     }
 }
 
-/** 
+/**
  * Filter stopwords in place
  * @param str input string
  * @param len length of string
@@ -226,7 +229,7 @@ int stopwords_filter(char *str, int len)
     return k;
 }
 
-/** 
+/**
  * In-place pre-processing of strings
  */
 void input_preproc(string_t *strs, int len)

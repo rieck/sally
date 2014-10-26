@@ -97,19 +97,6 @@ Options for configure
 
     --prefix=PATH           Set directory prefix for installation
 
-By default Sally is installed into /usr/local. If you prefer a
-different location, use this option to select an installation
-directory.
-
-    --enable-libarchive     Enable support for loading archives
-     
-If this feature is enabled, Sally can also be applied to read the
-contents of archives, such as .tgz and .zip.  This allows for
-processing string data in compressed form and may drastically save
-storage space.
-
-    --enable-openmp         Enable support for OpenMP (experimental)
-    
 This feature enables support for OpenMP in Sally. It is still
 experimental.  Sally will execute certain parts of the processing in
 parallel making use of multi-core architectures where possible.

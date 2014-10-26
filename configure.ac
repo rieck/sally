@@ -31,130 +31,96 @@ if test "$GCC" = "yes" ; then
    CFLAGS="$CFLAGS -std=c99 -Wall -fPIC"
 fi
 
-# libm
-AC_CHECK_HEADERS([math.h], HEADER_MATH="yes")
-AC_CHECK_LIB([m], pow, LIBRARY_MATH="yes")
-if test "x$LIBRARY_MATH" != "x" && test "x$HEADER_MATH" != "x" ; then
-    LIBS="-lm $LIBS"
-else
-    AC_MSG_ERROR([The library libm is required for compilation])
-fi
 
-# libz
+# Optional packages
+AC_ARG_WITH([libarchive], [AS_HELP_STRING([--with-libarchive],
+            [support for reading archives @<:@default=check@:>@])],
+            [], [with_libarchive=check])
+AC_ARG_WITH([openmp], [AS_HELP_STRING([--with-openmp],
+            [support for multi-processing @<:@default=check@:>@])],
+            [], [with_openmp=check])
+
+
+# Check for zlib (required)
 AC_CHECK_HEADERS([zlib.h], HEADER_ZLIB="yes")
 AC_CHECK_LIB([z], gzopen, LIBRARY_ZLIB="yes")
 if test "x$LIBRARY_ZLIB" != "x" && test "x$HEADER_ZLIB" != "x" ; then
     LIBS="-lz $LIBS"
+    AC_DEFINE([HAVE_ZLIB], [1], [Define if you have zlib])
+    HAVE_ZLIB=yes
 else
-    AC_MSG_ERROR([The library libz is required for compilation.
-    Debian/Ubuntu package: libz-dev
-    Source code: http://www.zlib.net/
-    ])
+    HAVE_ZLIB=no
+    AC_MSG_FAILURE([libz not found. see README.md])
 fi
 
-# libconfig
-PKG_CHECK_MODULES([PKGCONFIG], [libconfig >= 1.3.2], [], 
-    AC_MSG_ERROR([The library libconfig is required for compilation.
-    Debian/Ubuntu package: libconfig8-dev
-    Source code: http://www.hyperrealm.com/libconfig/
-    ])
-)
-
-CFLAGS="$CFLAGS $PKGCONFIG_CFLAGS"
-LIBS="$LIBS $PKGCONFIG_LIBS"
-AM_CPPFLAGS="$AM_CPPFLAGS `pkg-config --cflags-only-I libconfig`"
-AC_CHECK_HEADERS([libconfig.h], HEADER_LIBCONFIG="yes")
-
-# features
-AC_ARG_ENABLE(openmp, 
-    [  --enable-openmp         enable support for OpenMP ],
-    [ 
-	if test "x$enableval" = "xyes" ; then
-		ENABLE_OPENMP=yes
-		AC_DEFINE(ENABLE_OPENMP, 1, [Enable support for OpenMP])
-        else
-		ENABLE_OPENMP=no
-        fi
-    ], [ ENABLE_OPENMP=no ]
-)
-
-# OpenMP support
-AX_OPENMP([
-   HAVE_OPENMP=yes
-   AC_DEFINE(HAVE_OPENMP, 1, [Enable OpenMP support])
-],[
-   HAVE_OPENMP=no
-])
-
-if test "x$ENABLE_OPENMP" = "xyes" ; then
-   if test "x$HAVE_OPENMP" = "xno" ; then
-      AC_MSG_ERROR([OpenMP support enabled but OpenMP not available])
-   fi
-   CFLAGS="$CFLAGS $OPENMP_CFLAGS"
-fi 
-
-# libarchive
-AC_ARG_ENABLE(libarchive,
-    [  --enable-libarchive     enable support for loading archives. ],
-    [
-        if test "x$enableval" = "xyes" ; then
-                ENABLE_LIBARCHIVE=yes
-                AC_DEFINE(ENABLE_LIBARCHIVE, 1, [Enable support for loading archives])
-        else
-                ENABLE_LIBARCHIVE=no
-        fi
-    ], [ ENABLE_LIBARCHIVE=no ]
-)
-
+# Check for libarchive (optional)
 AC_CHECK_HEADERS([archive.h], HEADER_LIBARCHIVE="yes")
 AC_CHECK_LIB([archive], archive_read_new, LIBRARY_LIBARCHIVE="yes")
-
-if test "x$ENABLE_LIBARCHIVE" = "xyes" ; then
-    if test "x$LIBRARY_LIBARCHIVE" != "x" && test "x$HEADER_LIBARCHIVE" != "x" ; then
-        LIBS="-larchive $LIBS"
-    else
-        AC_MSG_ERROR([libarchive requested but not available
-    Debian/Ubuntu package: libarchive-dev
-    Source code: http://code.google.com/p/libarchive
-	])
+if test "x$LIBRARY_LIBARCHIVE" != "x" && \
+   test "x$HEADER_LIBARCHIVE" != "x" && \
+   test "x$with_libarchive" != "xno" ; then
+    AC_DEFINE([HAVE_LIBARCHIVE], [1], [Define if you have libarchive])
+    LIBS="-larchive $LIBS"
+    HAVE_LIBARCHIVE=yes
+else
+    HAVE_LIBARCHIVE=no
+    if test "x$with_libarchive" == "xyes" ; then
+        AC_MSG_FAILURE([libarchive not found. see README.md])
     fi
 fi
+
+# Check for libconfig (required)
+AC_CHECK_HEADERS([libconfig.h], HEADER_LIBCONFIG="yes")
+PKG_CHECK_MODULES([PKGCONFIG], [libconfig >= 1.3.2], LIBRARY_LIBCONFIG="yes")
+if test "x$LIBRARY_LIBCONFIG" != "x" && test "x$HEADER_LIBCONFIG" != "x" ; then
+    CFLAGS="$CFLAGS $PKGCONFIG_CFLAGS"
+    LIBS="$LIBS $PKGCONFIG_LIBS"
+    AM_CPPFLAGS="$AM_CPPFLAGS `pkg-config --cflags-only-I libconfig`"
+    HAVE_LIBCONFIG=yes
+    AC_DEFINE([HAVE_LIBCONFIG], [1], [Define if you have libconfig])
+else
+    HAVE_LIBCONFIG=no
+    AC_MSG_FAILURE([libconfig not found. see README.md])
+fi
+
+# Check for OpenMP (optional)
+AC_CHECK_HEADERS([omp.h], HEADER_OPENMP="yes")
+AX_OPENMP(LIBRARY_OPENMP="yes")
+if test "x$LIBRARY_OPENMP" != "x" && \
+   test "x$HEADER_OPENMP" != "x" && \
+   test "x$with_openmp" != "xno" ; then
+    CFLAGS="$CFLAGS $OPENMP_CFLAGS"
+    HAVE_OPENMP=yes
+    AC_DEFINE([HAVE_OPENMP], [1], [Define if you have OpenMP])
+else
+    HAVE_OPENMP=no
+    if test "x$with_openmp" == "xyes" ; then
+        AC_MSG_FAILURE([no openmp support. see README.md])
+    fi
+fi
+
+# Optional features
+AC_ARG_ENABLE([md5hash], [AS_HELP_STRING([--enable-md5hash],
+    [enable MD5 hash function])],
+    [
+        AC_DEFINE([ENABLE_MD5HASH], [1], [Define if MD5 hash enabled])
+        ENABLE_MD5HASH=yes
+    ], [ENABLE_MD5HASH=no])
+
+
 
 # Check headers
 AC_CHECK_HEADERS([getopt.h string.h strings.h])
 AC_CHECK_HEADERS([uthash.h uthash/uthash.h], HEADER_UTHASH="yes")
 
 # Check functions
-AC_CHECK_FUNC(log2, AC_DEFINE(HAVE_FUNC_LOG2, 1, 
+AC_CHECK_FUNC(log2, AC_DEFINE(HAVE_FUNC_LOG2, 1,
        [Define to 1 if you have the function log2]))
-
-# MD5 hash flag
-AC_ARG_ENABLE(md5hash,
-    [  --enable-md5hash        enable MD5 as alternative hash ],
-    [
-        if test "x$enableval" = "xyes" ; then
-                ENABLE_MD5HASH=yes
-                AC_DEFINE(ENABLE_MD5HASH, 1, [Enable MD5 as alternative hash])
-        else
-                ENABLE_MD5HASH=no
-        fi
-    ], [ ENABLE_MD5HASH=no ]
-)
-
-# evaluation of run-time
-AC_ARG_ENABLE(evaltime, 
-    [  --enable-evaltime       enable run-time evaluation (debug only) ],
-    [ 
-	if test "x$enableval" = "xyes" ; then
-		AC_DEFINE(ENABLE_EVALTIME, 1, [Enable run-time evaluation])
-        fi
-    ], []
-)
 
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([LIB_VERSION])
 
-AC_CONFIG_FILES([ 
+AC_CONFIG_FILES([
    Makefile \
    src/Makefile \
    src/input/Makefile \
@@ -166,16 +132,19 @@ AC_CONFIG_FILES([
 ])
 
 AC_OUTPUT_COMMANDS([],[
-   ENABLE_OPENMP=$ENABLE_OPENMP
+   HAVE_OPENMP=$HAVE_OPENMP
+   HAVE_LIBARCHIVE=$HAVE_LIBARCHIVE
    ENABLE_MD5HASH=$ENABLE_MD5HASH
-   ENABLE_LIBARCHIVE=$ENABLE_LIBARCHIVE
 ])
 
 AC_OUTPUT
 
 echo
-echo " .Oo Features:"
-echo "     Support for loading archives (--enable-libarchive):    $ENABLE_LIBARCHIVE"
-echo "     MD5 as alternative hash (--enable-md5hash):            $ENABLE_MD5HASH"
-echo "     Support for multi-processing (--enable-openmp):        $ENABLE_OPENMP"
+echo " .Oo Optional packages:"
+echo "     Support for reading archives (--with-libarchive):       $HAVE_LIBARCHIVE"
+echo "     Support for multi-processing (--with-openmp):           $HAVE_OPENMP"
+echo " .Oo Optional features:"
+echo "     MD5 as alternative hash (--enable-md5hash):             $ENABLE_MD5HASH"
 echo
+
+

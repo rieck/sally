@@ -12,7 +12,7 @@
 #ifndef INPUT_ARC_H
 #define INPUT_ARC_H
 
-#ifdef ENABLE_LIBARCHIVE
+#ifdef WITH_LIBARCHIVE
 /* Archive module */
 int input_arc_open(char *);
 int input_arc_read(string_t *, int);

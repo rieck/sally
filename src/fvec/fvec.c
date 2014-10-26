@@ -245,7 +245,7 @@ static void cache_flush(fentry_t *c, int l)
     int i;
 
     /* Flush cache and add features to hash */
-#ifdef ENABLE_OPENMP
+#ifdef HAVE_OPENMP
 #pragma omp critical
 #endif
     {

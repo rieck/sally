@@ -126,10 +126,6 @@ int input_lines_read(string_t *strs, int len)
     char buf[32], *line = NULL;
 
     for (i = 0; i < len; i++) {
-#ifdef ENABLE_EVALTIME
-        double t1 = time_stamp();
-#endif
-
         line = NULL;
         read = gzgetline(&line, &size, in);
         if (read == -1) {
@@ -147,10 +143,6 @@ int input_lines_read(string_t *strs, int len)
         snprintf(buf, 32, "line%d", line_num++);
         strs[j].src = strdup(buf);
         j++;
-
-#ifdef ENABLE_EVALTIME
-        printf("strlen %d read %f\n", strs[j - 1].len, time_stamp() - t1);
-#endif
     }
 
     return j;
