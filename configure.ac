@@ -26,11 +26,16 @@ AC_PROG_INSTALL
 AC_CONFIG_MACRO_DIR(m4)
 AC_PROG_LIBTOOL
 
+# By default remove assert statements
+CFLAGS="$CFLAGS -DNDEBUG"
+
+# By default we include the math library
+LIBS="$LIBS -lm"
+
 # Set GCC and C99 flags if present
 if test "$GCC" = "yes" ; then
    CFLAGS="$CFLAGS -std=c99 -Wall -fPIC"
 fi
-
 
 # Optional packages
 AC_ARG_WITH([libarchive], [AS_HELP_STRING([--with-libarchive],
