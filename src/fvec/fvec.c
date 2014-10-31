@@ -43,14 +43,14 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static void extract_wgrams(fvec_t *, char *x, int l, int p, int s);
-static void extract_ngrams(fvec_t *, char *x, int l, int p, int s);
-static void count_feat(fvec_t *fv);
-static int cmp_feat(const void *x, const void *y);
-static void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
-static void cache_flush(fentry_t *c, int l);
-static void fvec_postprocess(fvec_t *fv);
-static fvec_t *fvec_extract_intern2(char *x, int l);
+static inline void extract_wgrams(fvec_t *, char *x, int l, int p, int s);
+static inline void extract_ngrams(fvec_t *, char *x, int l, int p, int s);
+static inline void count_feat(fvec_t *fv);
+static inline int cmp_feat(const void *x, const void *y);
+static inline void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
+static inline void cache_flush(fentry_t *c, int l);
+static inline void fvec_postprocess(fvec_t *fv);
+static inline fvec_t *fvec_extract_intern2(char *x, int l);
 
 /* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
@@ -79,7 +79,7 @@ fvec_t *fvec_extract(char *x, int l)
  * @param l Length of sequence
  * @return feature vector
  */
-inline fvec_t *fvec_extract_intern(char *x, int l)
+fvec_t *fvec_extract_intern(char *x, int l)
 {
     int i, blend;
     cfg_int len;
@@ -110,7 +110,7 @@ inline fvec_t *fvec_extract_intern(char *x, int l)
  * @param l Length of sequence
  * @return feature vector
  */
-inline fvec_t *fvec_extract_intern2(char *x, int l)
+fvec_t *fvec_extract_intern2(char *x, int l)
 {
     fvec_t *fv;
     int pos;

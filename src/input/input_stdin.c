@@ -78,7 +78,7 @@ int input_stdin_open(char *name)
     assert(name);
     const char *pattern;
 
-    if (!stdin) {
+    if (stdin == NULL) {
         error("Could not open <stdin>");
         return -1;
     }
