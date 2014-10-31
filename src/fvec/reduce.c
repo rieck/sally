@@ -39,7 +39,7 @@ void dim_reduce(fvec_t *fv)
 
     /* Get dimension reduction method */
     config_lookup_string(&cfg, "filter.dim_reduce", &method);
-    config_lookup_int(&cfg, "filter.dim_num", &dim_num);
+    CONFIG_LOOKUP_INT(&cfg, "filter.dim_num", &dim_num);
 
     if (!strcasecmp(method, "none")) {
         /* Do nothing ;) */
@@ -73,7 +73,7 @@ void reduce_simhash(fvec_t *fv, int num)
     float *val;
     int i, j, hash_bits;
 
-    config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
+    CONFIG_LOOKUP_INT(&cfg, "features.hash_bits", &hash_bits);
 
     if (num > hash_bits)
         num = hash_bits;
@@ -134,7 +134,7 @@ void reduce_minhash(fvec_t *fv, int num)
     float *val;
     int i, j, k, hash_bits;
 
-    config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
+    CONFIG_LOOKUP_INT(&cfg, "features.hash_bits", &hash_bits);
 
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));
@@ -193,7 +193,7 @@ void reduce_bloom(fvec_t *fv, int num)
     float *val;
     int bloom_num, i, k;
 
-    config_lookup_int(&cfg, "filter.bloom_num", &bloom_num);
+    CONFIG_LOOKUP_INT(&cfg, "filter.bloom_num", &bloom_num);
 
     dim = (feat_t *) calloc(num, sizeof(feat_t));
     val = (float *) calloc(num, sizeof(float));

@@ -380,7 +380,7 @@ int output_matlab_open(char *fn)
     int r = 0;
 
     config_lookup_bool(&cfg, "output.skip_null", &skip_null);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    CONFIG_LOOKUP_INT(&cfg, "features.hash_bits", (int *) &bits);
     if (bits > 31) {
         error("Matlab can not handle features with more than 31 bits");
         return FALSE;

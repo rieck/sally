@@ -85,7 +85,7 @@ inline fvec_t *fvec_extract_intern(char *x, int l)
 
     /* Get config */
     config_lookup_bool(&cfg, "features.ngram_blend", &blend);
-    config_lookup_int(&cfg, "features.ngram_len", &len);
+    CONFIG_LOOKUP_INT(&cfg, "features.ngram_len", &len);
 
     /* Extract n-grams */
     fvec_t *fv = fvec_extract_intern2(x, l);
@@ -126,7 +126,7 @@ inline fvec_t *fvec_extract_intern2(char *x, int l)
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
     config_lookup_bool(&cfg, "features.ngram_pos", (int *) &pos);
-    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);
+    CONFIG_LOOKUP_INT(&cfg, "features.pos_shift", (int *) &shift);
 
     /* Check for empty sequence */
     if (l == 0)
@@ -362,9 +362,9 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
+    CONFIG_LOOKUP_INT(&cfg, "features.ngram_len", (int *) &nlen);
     config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    CONFIG_LOOKUP_INT(&cfg, "features.hash_bits", (int *) &bits);
     config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
 
     /* Set bits of hash mask */
@@ -469,9 +469,9 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
+    CONFIG_LOOKUP_INT(&cfg, "features.ngram_len", (int *) &nlen);
     config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    CONFIG_LOOKUP_INT(&cfg, "features.hash_bits", (int *) &bits);
     config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
 
     /* Set bits of hash mask */

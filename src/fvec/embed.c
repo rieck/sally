@@ -75,7 +75,7 @@ void idf_create(char *input)
     const char *tfidf_file;
 
     config_lookup_string(&cfg, "input.input_format", &in_format);
-    config_lookup_int(&cfg, "input.chunk_size", &chunk);
+    CONFIG_LOOKUP_INT(&cfg, "input.chunk_size", &chunk);
     config_lookup_string(&cfg, "features.tfidf_file", &tfidf_file);
 
     /* Load old file if present */

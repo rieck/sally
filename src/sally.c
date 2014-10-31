@@ -423,7 +423,7 @@ static void sally_process()
     config_lookup_string(&cfg, "features.hash_file", &hash_file);
 
     /* Get chunk size */
-    config_lookup_int(&cfg, "input.chunk_size", &chunk);
+    CONFIG_LOOKUP_INT(&cfg, "input.chunk_size", &chunk);
 
     /* Allocate space */
     fvec_t **fvec = malloc(sizeof(fvec_t *) * chunk);
