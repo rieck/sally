@@ -159,7 +159,8 @@ static void config_default(config_t *cfg)
                 continue;
 
             /* Check for mis-interpreted integer */
-            if (config_setting_lookup_int(cs, defaults[i].name, &j)) {
+            CONFIG_SETTING_LOOKUP_INT(cs, defaults[i].name, &j);
+            if (j) {
                 config_setting_remove(cs, defaults[i].name);
                 vs = config_setting_add(cs, defaults[i].name,
                                         CONFIG_TYPE_FLOAT);
@@ -173,8 +174,8 @@ static void config_default(config_t *cfg)
             config_setting_set_float(vs, defaults[i].val.flt);
             break;
         case CONFIG_TYPE_INT:
-            if (config_setting_lookup_int(cs, defaults[i].name, &j))
-                continue;
+            CONFIG_SETTING_LOOKUP_INT(cs, defaults[i].name, &j);
+            if (j) continue;
 
             /* Check for mis-interpreted float */
             if (config_setting_lookup_float(cs, defaults[i].name, &f)) {
@@ -195,7 +196,8 @@ static void config_default(config_t *cfg)
                 continue;
 
             /* Check for mis-interpreted integer */
-            if (config_setting_lookup_int(cs, defaults[i].name, &j)) {
+            CONFIG_SETTING_LOOKUP_INT(cs, defaults[i].name, &j);
+            if (j) {
                 config_setting_remove(cs, defaults[i].name);
                 vs = config_setting_add(cs, defaults[i].name,
                                         CONFIG_TYPE_BOOL);

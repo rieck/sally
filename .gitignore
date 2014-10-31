@@ -36,3 +36,4 @@ src/sally
 test-driver
 tests/test_*
 CHANGES
+/Debug
