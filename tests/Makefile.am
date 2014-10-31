@@ -9,6 +9,11 @@ AM_CPPFLAGS             = @AM_CPPFLAGS@ -I$(top_srcdir)/src \
 EXTRA_DIST		= test.in \
                           test_options.sh \
                           test_options.txt \
+                          test_configs.sh \
+                          test_configs.txt \
+                          config1.cfg \
+                          config2.cfg \
+                          config3.cfg \
                           strings.txt
                           
 TESTS_ENVIRONMENT       = TEST_FILE='$(srcdir)/test.in' \
@@ -16,7 +21,7 @@ TESTS_ENVIRONMENT       = TEST_FILE='$(srcdir)/test.in' \
                           SRCDIR='$(top_srcdir)'
                           
 TESTS                   = test_fhash test_fvec test_embed test_ngrams \
-                          test_options.sh
+                          test_options.sh test_configs.sh
 
 noinst_PROGRAMS         = test_fhash test_fvec test_embed test_ngrams
 
