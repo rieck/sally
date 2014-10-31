@@ -6,9 +6,18 @@ AM_CPPFLAGS             = @AM_CPPFLAGS@ -I$(top_srcdir)/src \
 			  -I$(top_srcdir)/src/input \
 			  -I$(top_srcdir)/src/output
 			  
-EXTRA_DIST		= test.in
-TESTS_ENVIRONMENT       = export TEST_FILE='$(srcdir)/test.in';
-TESTS                   = test_fhash test_fvec test_embed test_ngrams
+EXTRA_DIST		= test.in \
+                          test_options.sh \
+                          test_options.txt \
+                          strings.txt
+                          
+TESTS_ENVIRONMENT       = TEST_FILE='$(srcdir)/test.in' \
+                          BUILDDIR='$(top_builddir)' \
+                          SRCDIR='$(top_srcdir)'
+                          
+TESTS                   = test_fhash test_fvec test_embed test_ngrams \
+                          test_options.sh
+
 noinst_PROGRAMS         = test_fhash test_fvec test_embed test_ngrams
 
 test_fhash_SOURCES       = test_fhash.c tests.c tests.h
