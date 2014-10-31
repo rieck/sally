@@ -80,7 +80,7 @@ void input_config(const char *format)
         func.input_close = input_lines_close;
 
     } else if (!strcasecmp(format, "arc")) {
-#ifdef WITH_LIBARCHIVE
+#ifdef HAVE_LIBARCHIVE
         func.input_open = input_arc_open;
         func.input_read = input_arc_read;
         func.input_close = input_arc_close;

@@ -25,7 +25,7 @@
 #include "util.h"
 #include "murmur.h"
 
-#ifdef WITH_LIBARCHIVE
+#ifdef HAVE_LIBARCHIVE
 
 #include <archive.h>
 #include <archive_entry.h>
