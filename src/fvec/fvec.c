@@ -127,8 +127,8 @@ inline fvec_t *fvec_extract_intern2(char *x, int l)
 
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-    config_lookup_bool(&cfg, "features.ngram_pos", (int *) &pos);
-    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);
+    config_lookup_bool(&cfg, "features.ngram_pos", &pos);
+    config_lookup_int(&cfg, "features.pos_shift", &shift);
 
     /* Check for empty sequence */
     if (l == 0)
@@ -365,10 +365,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_int(&cfg, "features.ngram_len", &nlen);
+    config_lookup_bool(&cfg, "features.ngram_sort", &sort);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
+    config_lookup_bool(&cfg, "features.vect_sign", &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
@@ -473,10 +473,10 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_int(&cfg, "features.ngram_len", &nlen);
+    config_lookup_bool(&cfg, "features.ngram_sort", &sort);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
+    config_lookup_bool(&cfg, "features.vect_sign", &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;

@@ -95,7 +95,7 @@ static void config_setting_fprint(FILE *f, config_setting_t * cs, int d)
         fprintf(f, "%s\t= %7.5f;\n", n, config_setting_get_float(cs));
         break;
     case CONFIG_TYPE_INT:
-        fprintf(f, "%s\t= %d;\n", n, config_setting_get_int(cs));
+        fprintf(f, "%s\t= %ld;\n", n, (long) config_setting_get_int(cs));
         break;
     case CONFIG_TYPE_BOOL:
         fprintf(f, "%s\t= %s;\n", n, config_setting_get_bool(cs)

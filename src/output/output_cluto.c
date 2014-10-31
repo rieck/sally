@@ -54,7 +54,7 @@ int output_cluto_open(char *fn)
     }
 
     config_lookup_bool(&cfg, "output.skip_null", &skip_null);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
     cols = 1 << bits;
 
     /* Write dummy header. We fix it later */
