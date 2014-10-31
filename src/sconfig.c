@@ -132,7 +132,8 @@ void config_fprint(FILE *f, config_t *cfg)
  */
 static void config_default(config_t *cfg)
 {
-    int i, j;
+    int i, b;
+    cfg_int j;
     const char *s;
     double f;
     config_setting_t *cs, *vs;
@@ -191,7 +192,7 @@ static void config_default(config_t *cfg)
             config_setting_set_int(vs, defaults[i].val.num);
             break;
         case CONFIG_TYPE_BOOL:
-            if (config_setting_lookup_bool(cs, defaults[i].name, &j))
+            if (config_setting_lookup_bool(cs, defaults[i].name, &b))
                 continue;
 
             /* Check for mis-interpreted integer */

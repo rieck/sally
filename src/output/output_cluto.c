@@ -45,7 +45,7 @@ static int skip_null = CONFIG_FALSE;
 int output_cluto_open(char *fn)
 {
     assert(fn);
-    int bits;
+    cfg_int bits;
 
     f = fopen(fn, "w");
     if (!f) {

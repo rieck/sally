@@ -35,7 +35,7 @@ extern config_t cfg;
 /* Local variables */
 FILE *f = NULL;
 static uint32_t elements = 0;
-static int bits = 0;
+static cfg_int bits = 0;
 static uint32_t bytes = 0;
 static int skip_null = CONFIG_FALSE;
 

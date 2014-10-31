@@ -35,7 +35,7 @@ extern config_t cfg;
 void dim_reduce(fvec_t *fv)
 {
     const char *method;
-    int dim_num;
+    cfg_int dim_num;
 
     /* Get dimension reduction method */
     config_lookup_string(&cfg, "filter.dim_reduce", &method);
@@ -71,7 +71,8 @@ void reduce_simhash(fvec_t *fv, int num)
     assert(fv && num > 0);
     feat_t *dim;
     float *val;
-    int i, j, hash_bits;
+    int i, j;
+    cfg_int hash_bits;
 
     config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
 
@@ -132,7 +133,8 @@ void reduce_minhash(fvec_t *fv, int num)
     assert(fv && num > 0);
     feat_t *dim, min_hash = 0;
     float *val;
-    int i, j, k, hash_bits;
+    int i, j, k;
+    cfg_int hash_bits;
 
     config_lookup_int(&cfg, "features.hash_bits", &hash_bits);
 
@@ -191,7 +193,8 @@ void reduce_bloom(fvec_t *fv, int num)
     assert(fv && num > 0);
     feat_t *dim;
     float *val;
-    int bloom_num, i, k;
+    int i, k;
+    cfg_int bloom_num;
 
     config_lookup_int(&cfg, "filter.bloom_num", &bloom_num);
 
