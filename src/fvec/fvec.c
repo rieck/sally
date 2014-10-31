@@ -81,7 +81,8 @@ fvec_t *fvec_extract(char *x, int l)
  */
 inline fvec_t *fvec_extract_intern(char *x, int l)
 {
-    int i, blend, len;
+    int i, blend;
+    cfg_int len;
 
     /* Get config */
     config_lookup_bool(&cfg, "features.ngram_blend", &blend);
@@ -112,7 +113,8 @@ inline fvec_t *fvec_extract_intern(char *x, int l)
 inline fvec_t *fvec_extract_intern2(char *x, int l)
 {
     fvec_t *fv;
-    int pos, shift;
+    int pos;
+    cfg_int shift;
     const char *dlm_str;
     assert(x && l >= 0);
 
@@ -125,8 +127,8 @@ inline fvec_t *fvec_extract_intern2(char *x, int l)
 
     /* Get configuration */
     config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-    config_lookup_bool(&cfg, "features.ngram_pos", (int *) &pos);
-    config_lookup_int(&cfg, "features.pos_shift", (int *) &shift);
+    config_lookup_bool(&cfg, "features.ngram_pos", &pos);
+    config_lookup_int(&cfg, "features.pos_shift", &shift);
 
     /* Check for empty sequence */
     if (l == 0)
@@ -354,7 +356,8 @@ static char *sort_words(char *str, int len, char delim)
 static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
 {
     assert(fv && x && l > 0);
-    int nlen, sort, bits, sign, flen;
+    int sort, sign, flen;
+    cfg_int nlen, bits;
     unsigned int i, j = l, ci = 0;
     unsigned int dlm = 0;
     unsigned int fstart, fnext = 0, fnum = 0;
@@ -362,10 +365,10 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_int(&cfg, "features.ngram_len", &nlen);
+    config_lookup_bool(&cfg, "features.ngram_sort", &sort);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
+    config_lookup_bool(&cfg, "features.vect_sign", &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;
@@ -464,15 +467,16 @@ static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
     assert(fv && x);
 
     unsigned int i = 0, ci = 0;
-    int nlen, sort, bits, flen, sign;
+    int sort, flen, sign;
+    cfg_int nlen, bits;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", (int *) &nlen);
-    config_lookup_bool(&cfg, "features.ngram_sort", (int *) &sort);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
-    config_lookup_bool(&cfg, "features.vect_sign", (int *) &sign);
+    config_lookup_int(&cfg, "features.ngram_len", &nlen);
+    config_lookup_bool(&cfg, "features.ngram_sort", &sort);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
+    config_lookup_bool(&cfg, "features.vect_sign", &sign);
 
     /* Set bits of hash mask */
     feat_t hash_mask = ((long long unsigned) 2 << (bits - 1)) - 1;

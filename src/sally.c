@@ -416,7 +416,7 @@ static void sally_init()
 static void sally_process()
 {
     long read, i, j;
-    int chunk;
+    cfg_int chunk;
     const char *hash_file;
 
     /* Check if a hash file is set */

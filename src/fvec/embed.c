@@ -70,7 +70,7 @@ void fvec_embed(fvec_t *fv, const char *n)
 void idf_create(char *input)
 {
     long read, entries, i, j;
-    int chunk;
+    cfg_int chunk;
     const char *in_format;
     const char *tfidf_file;
 

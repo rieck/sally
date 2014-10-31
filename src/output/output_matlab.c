@@ -35,7 +35,7 @@ extern config_t cfg;
 /* Local variables */
 FILE *f = NULL;
 static uint32_t elements = 0;
-static int bits = 0;
+static cfg_int bits = 0;
 static uint32_t bytes = 0;
 static int skip_null = CONFIG_FALSE;
 
@@ -380,7 +380,7 @@ int output_matlab_open(char *fn)
     int r = 0;
 
     config_lookup_bool(&cfg, "output.skip_null", &skip_null);
-    config_lookup_int(&cfg, "features.hash_bits", (int *) &bits);
+    config_lookup_int(&cfg, "features.hash_bits", &bits);
     if (bits > 31) {
         error("Matlab can not handle features with more than 31 bits");
         return FALSE;
