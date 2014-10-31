@@ -336,7 +336,7 @@ uint64_t rehash(uint64_t f, int n)
     int i;
 
     for (i = 0; i < n; i++)
-        r = (nrand48(seed) << 32) + nrand48(seed);
+        r = (((uint64_t) nrand48(seed)) << 32) + nrand48(seed);
 
     return f ^ r;
 }
