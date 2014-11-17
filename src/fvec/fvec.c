@@ -43,14 +43,16 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static inline void extract_wgrams(fvec_t *, char *x, int l, int p, int s);
-static inline void extract_ngrams(fvec_t *, char *x, int l, int p, int s);
+static inline void extract_wgrams(fvec_t *, char *x, int l, int nlen,
+                                  int pos, int shift);
+static inline void extract_ngrams(fvec_t *, char *x, int l, int nlen,
+                                  int pos, int shift);
 static inline void count_feat(fvec_t *fv);
 static inline int cmp_feat(const void *x, const void *y);
 static inline void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
 static inline void cache_flush(fentry_t *c, int l);
 static inline void fvec_postprocess(fvec_t *fv);
-static inline fvec_t *fvec_extract_intern2(char *x, int l);
+static inline fvec_t *fvec_extract_intern2(char *x, int l, int n);
 
 /* Global delimiter table */
 char delim[256] = { DELIM_NOT_INIT };
@@ -81,24 +83,22 @@ fvec_t *fvec_extract(char *x, int l)
  */
 fvec_t *fvec_extract_intern(char *x, int l)
 {
-    int i, blend;
-    cfg_int len;
+    int blend;
+    cfg_int i, n;
 
     /* Get config */
     config_lookup_bool(&cfg, "features.ngram_blend", &blend);
-    config_lookup_int(&cfg, "features.ngram_len", &len);
+    config_lookup_int(&cfg, "features.ngram_len", &n);
 
     /* Extract n-grams */
-    fvec_t *fv = fvec_extract_intern2(x, l);
+    fvec_t *fv = fvec_extract_intern2(x, l, n);
 
     /* Blended n-grams */
-    for (i = 1; blend && i < len; i++) {
-        config_set_int(&cfg, "features.ngram_len", i);
-        fvec_t *fx = fvec_extract_intern2(x, l);
+    for (i = 1; blend && i < n; i++) {
+        fvec_t *fx = fvec_extract_intern2(x, l, i);
         fvec_add(fv, fx);
         fvec_destroy(fx);
     }
-    config_set_int(&cfg, "features.ngram_len", len);
 
     return fv;
 }
@@ -108,9 +108,10 @@ fvec_t *fvec_extract_intern(char *x, int l)
  * postprocessing and no blended n-grams.
  * @param x String of bytes (with space delimiters)
  * @param l Length of sequence
+ * @param n N-gram length
  * @return feature vector
  */
-fvec_t *fvec_extract_intern2(char *x, int l)
+fvec_t *fvec_extract_intern2(char *x, int l, int n)
 {
     fvec_t *fv;
     int pos;
@@ -155,9 +156,9 @@ fvec_t *fvec_extract_intern2(char *x, int l)
     /* Loop over position shifts (0 if pos is disabled) */
     for (int s = -shift; s <= shift; s++) {
         if (!dlm_str || strlen(dlm_str) == 0) {
-            extract_ngrams(fv, x, l, pos, s);
+            extract_ngrams(fv, x, l, n, pos, s);
         } else {
-            extract_wgrams(fv, x, l, pos, s);
+            extract_wgrams(fv, x, l, n, pos, s);
         }
     }
 
@@ -350,14 +351,16 @@ static char *sort_words(char *str, int len, char delim)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
+ * @parma nlen N-gram len
  * @param pos Positional n-grams
  * @param shift Shift value
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
+static void extract_wgrams(fvec_t *fv, char *x, int l, int nlen, int pos,
+                           int shift)
 {
     assert(fv && x && l > 0);
     int sort, sign, flen;
-    cfg_int nlen, bits;
+    cfg_int bits;
     unsigned int i, j = l, ci = 0;
     unsigned int dlm = 0;
     unsigned int fstart, fnext = 0, fnum = 0;
@@ -365,7 +368,6 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", &nlen);
     config_lookup_bool(&cfg, "features.ngram_sort", &sort);
     config_lookup_int(&cfg, "features.hash_bits", &bits);
     config_lookup_bool(&cfg, "features.vect_sign", &sign);
@@ -459,21 +461,22 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int pos, int shift)
  * @param fv Feature vector
  * @param x Byte sequence 
  * @param l Length of sequence
+ * @param nlen N-gram length
  * @param pos Positional n-grams 
  * @param shift Shift value
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, int pos, int shift)
+static void extract_ngrams(fvec_t *fv, char *x, int l, int nlen, int pos,
+                           int shift)
 {
     assert(fv && x);
 
     unsigned int i = 0, ci = 0;
     int sort, flen, sign;
-    cfg_int nlen, bits;
+    cfg_int bits;
     char *fstr, *t = x;
     fentry_t *cache = NULL;
 
     /* Get configuration */
-    config_lookup_int(&cfg, "features.ngram_len", &nlen);
     config_lookup_bool(&cfg, "features.ngram_sort", &sort);
     config_lookup_int(&cfg, "features.hash_bits", &bits);
     config_lookup_bool(&cfg, "features.vect_sign", &sign);
