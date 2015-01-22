@@ -117,7 +117,7 @@ fvec_t *fvec_extract_intern2(char *x, int l, int n)
     int pos;
     cfg_int shift;
     const char *dlm_str;
-    assert(x && l >= 0);
+    assert(x && l >= 0 && n > 0);
 
     /* Allocate feature vector */
     fv = calloc(1, sizeof(fvec_t));

@@ -223,11 +223,18 @@ int config_check(config_t *cfg)
     const char *s1, *s2;
     double f1, f2;
     int i1;
+    cfg_int n;
 
     /* Add default values where missing */
     config_default(cfg);
 
     /* Sanity checks */
+    config_lookup_int(cfg, "features.ngram_len", &n);
+    if (n <= 0) {
+    	error("Illegal n-gram length specified");
+    	return 0;
+    }
+
     config_lookup_string(cfg, "input.stopword_file", &s1);
     config_lookup_string(cfg, "features.vect_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
