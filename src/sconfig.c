@@ -236,7 +236,7 @@ int config_check(config_t *cfg)
     }
 
     config_lookup_string(cfg, "input.stopword_file", &s1);
-    config_lookup_string(cfg, "features.vect_delim", &s2);
+    config_lookup_string(cfg, "features.ngram_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
         error("Stop words can only be used if delimiters are defined.");
         return 0;
