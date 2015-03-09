@@ -265,7 +265,7 @@ approach.
 This parameter can be used to enable sorted n-grams (n-perms). During the
 extraction of an n-gram its symbols are sorted according to their
 lexographical order. That is, if n-grams are composed of bytes, these bytes
-are sorted. If the n-grams are composed of words, the respective words are
+are sorted. If the n-grams are composed of tokens, the respective tokens are
 sorted. Sorted n-grams can be used to compensate minor perturbation in
 string data. For example, the strings "abac" and "aabc" contain the same
 sorted 3-grams, namely "aab" and "abc".
@@ -300,14 +300,14 @@ larger values.
 
 This parameter defines a minimum threshold for the entries in each vector.
 Values below the threshold are removed.  The parameter can be used to filter
-low-valued features from the vectors, such as very infrequent words.
+low-valued features from the vectors, such as very infrequent tokens.
 If the parameter is set to 0, the thresholding is disabled.
 
 =item B<thres_high = 0;>
 
 This parameter defines a maximum threshold for the entries in each vector.
 Values above the threshold are removed.  The parameter can be used to filter
-high-valued features from the vectors, such as very frequent words.
+high-valued features from the vectors, such as very frequent tokens.
 If the parameter is set to 0, the thresholding is disabled.
 
 =item B<hash_bits = 22;>
@@ -547,14 +547,14 @@ can be changed by using the command-line option B<--xx
        --fasta_regex <regex>     Set RE for labels in FASTA data.
        --lines_regex <regex>     Set RE for labels in text lines.
        --reverse_str             Reverse (flip) all strings.
-       --stopword_file <file>    Provide a file with stop words.
+       --stoptoken_file <file>   Provide a file with stop tokens.
   -o,  --output_format <format>  Set output format for vectors.
   -k,  --skip_null               Skip null vectors in output.
 
 =head2 Feature options
 
   -n,  --ngram_len <num>         Set length of n-grams.
-  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.
+  -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.
   -p,  --ngram_pos               Enable positional n-grams.
        --pos_shift <num>         Set shift of positional n-grams.
   -B,  --ngram_blend             Enable blended n-grams.
