@@ -25,7 +25,7 @@ rm -f $OUTPUT
 
 # Loop over some random options
 for OPTION in "--decode_str" "--reverse_str" "-n 3" "-n 1" "-p" \
-              "-g tokens -d %20%0a%0d" "-B" "-s -n 3" "-E bin" "-E cnt" \
+              "-g bytes" "-B" "-s -n 3" "-E bin" "-E cnt" \
               "-N l1" "-N l2" "-S" "-b 12" "-b 24" "-r simhash" \
               "-r minhash" ; do
     echo "$OPTION" >> $OUTPUT
