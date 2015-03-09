@@ -42,13 +42,13 @@ typedef struct
 
 
 /**
- * Auxiliary struct for storing arrays of words.
+ * Auxiliary struct for storing arrays of tokens.
  */
 typedef struct
 {
-    char *w;                /**< Pointer to word */
-    int l;                  /**< Length of word */
-} word_t;
+    char *w;                /**< Pointer to token */
+    int l;                  /**< Length of token */
+} token_t;
 
 /* Functions */
 fvec_t *fvec_extract(char *, int l);

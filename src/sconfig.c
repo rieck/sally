@@ -6,10 +6,10 @@
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.  This program is distributed without any
- * warranty. See the GNU General Public License for more details. 
+ * warranty. See the GNU General Public License for more details.
  */
 
-/** 
+/**
  * @defgroup sconfig Configuration functions
  * Functions for configuration of the Sally tool. Additionally default
  * values for each configuration parameter are specified in this module.
@@ -34,9 +34,10 @@ static config_default_t defaults[] = {
     {"input", "fasta_regex", CONFIG_TYPE_STRING, {.str = " (\\+|-)?[0-9]+"}},
     {"input", "lines_regex", CONFIG_TYPE_STRING, {.str = "^(\\+|-)?[0-9]+"}},
     {"input", "reverse_str", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
-    {"input", "stopword_file", CONFIG_TYPE_STRING, {.str = ""}},
+    {"input", "stoptoken_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 1}},
-    {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%0a%0d%20"}},
+    {"features", "ngram_gran", CONFIG_TYPE_STRING, {.str = "bytes"}},
+    {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "ngram_blend", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
@@ -59,7 +60,7 @@ static config_default_t defaults[] = {
 };
 
 /**
- * Print a configuration setting. 
+ * Print a configuration setting.
  * @param f File stream to print to
  * @param cs Configuration setting
  * @param d Current depth.
@@ -117,7 +118,7 @@ void config_print(config_t *cfg)
 }
 
 /**
- * Print the configuration to a file. 
+ * Print the configuration to a file.
  * @param f pointer to file stream
  * @param cfg configuration
  */
@@ -215,7 +216,7 @@ static void config_default(config_t *cfg)
 }
 
 /**
- * Checks if the configuration is valid and sane. 
+ * Checks if the configuration is valid and sane.
  * @return 1 if config is valid, 0 otherwise
  */
 int config_check(config_t *cfg)
@@ -235,10 +236,22 @@ int config_check(config_t *cfg)
     	return 0;
     }
 
-    config_lookup_string(cfg, "input.stopword_file", &s1);
+    config_lookup_string(cfg, "features.ngram_gran", &s1);
+    config_lookup_string(cfg, "features.ngram_delim", &s2);
+    if (!strcasecmp(s1, "tokens") && strlen(s2) == 0) {
+        error("Delimiters are required if the granularity is tokens.");
+        return 0;
+    }
+
+    /* Warning due to change of command-line options */
+    if (strcasecmp(s1, "tokens") && strlen(s2) > 0) {
+        warning("Granularity is %s. Delimiters are ignored.", s1);
+    }
+
+    config_lookup_string(cfg, "input.stoptoken_file", &s1);
     config_lookup_string(cfg, "features.ngram_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
-        error("Stop words can only be used if delimiters are defined.");
+        error("Stop tokens can only be used if delimiters are defined.");
         return 0;
     }
 

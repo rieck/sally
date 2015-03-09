@@ -192,6 +192,7 @@ int main(int argc, char **argv)
     config_init(&cfg);
     config_check(&cfg);
 
+    config_set_string(&cfg, "features.ngram_gran", "tokens");
     config_set_string(&cfg, "features.ngram_delim", " .,%0a%0d");
     config_set_int(&cfg, "features.ngram_len", 1);
     config_set_string(&cfg, "input.input_format", "lines");

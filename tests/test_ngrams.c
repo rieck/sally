@@ -30,9 +30,6 @@ typedef struct
     int len;    
 } test_t;
 
-
-
-
 int test_sorted_ngrams()
 {
     int i, err = 0;
@@ -50,6 +47,7 @@ int test_sorted_ngrams()
     test_printf("Testing sorted n-grams");
 
     /* Hack to set delimiters */
+    config_set_string(&cfg, "features.ngram_gran", "tokens");
     config_set_string(&cfg, "features.ngram_delim", " ");
     fvec_delim_set(" ");     
 
@@ -92,6 +90,7 @@ int test_blended_ngrams()
     test_printf("Testing blended n-grams");
 
     /* Hack to set delimiters */
+    config_set_string(&cfg, "features.ngram_gran", "tokens");    
     config_set_string(&cfg, "features.ngram_delim", " ");
     fvec_delim_set(" ");     
 
@@ -135,6 +134,7 @@ int test_pos_ngrams()
     test_printf("Testing positional n-grams");
 
     /* Hack to set delimiters */
+    config_set_string(&cfg, "features.ngram_gran", "tokens");    
     config_set_string(&cfg, "features.ngram_delim", " ");
     fvec_delim_set(" ");     
 

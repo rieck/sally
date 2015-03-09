@@ -57,6 +57,12 @@ void init_sally(test_t t)
     config_set_string(&cfg, "features.ngram_delim", t.dlm);
     config_set_int(&cfg, "features.ngram_len", t.nlen);
     fvec_delim_set(t.dlm);      /* usually done in sally_init */
+
+    /* Set granularity depending on delimiters */    
+    if (strlen(t.dlm) > 0)
+        config_set_string(&cfg, "features.ngram_gran", "tokens");
+    else
+        config_set_string(&cfg, "features.ngram_gran", "bytes");
 }
 
 

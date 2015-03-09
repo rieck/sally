@@ -31,7 +31,7 @@ static char *output = NULL;
 static long entries = 0;
 
 /* Option string */
-#define OPTSTRING       "c:i:o:n:m:r:d:psBSXE:N:b:kvqVhCD"
+#define OPTSTRING       "g:c:i:o:n:m:r:d:psBSXE:N:b:kvqVhCD"
 
 /**
  * Array of options of getopt_long()
@@ -44,8 +44,9 @@ static struct option longopts[] = {
     {"lines_regex", 1, NULL, 1002},
     {"decode_str", 0, NULL, 1005},
     {"reverse_str", 0, NULL, 1007},
-    {"stopword_file", 1, NULL, 1008},
+    {"stoptoken_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
+    {"ngram_gran", 1, NULL, 'g'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 0, NULL, 'p'},
     {"pos_shift", 1, NULL, 1012},       /* <- last entry */
@@ -108,12 +109,13 @@ static void print_usage(void)
            "       --fasta_regex <regex>     Set RE for labels in FASTA data.\n"
            "       --lines_regex <regex>     Set RE for labels in text lines.\n"
            "       --reverse_str             Reverse (flip) the input strings.\n"
-           "       --stopword_file <file>    Provide a file with stop words.\n"
+           "       --stoptoken_file <file>   Provide a file with stop tokens.\n"
            "  -o,  --output_format <format>  Set output format for vectors.\n"
            "  -k,  --skip_null               Skip null vectors in output.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
-           "  -d,  --ngram_delim <delim>     Set delimiters of words in n-grams.\n"
+           "  -g   --ngram_gran <type>       Set granularity: bytes, tokens.\n"
+           "  -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.\n"
            "  -p,  --ngram_pos               Enable positional n-grams.\n"
            "       --pos_shift <num>         Set shift of positional n-grams.\n"
            "  -B,  --ngram_blend             Enabled blended n-grams.\n"
@@ -195,7 +197,7 @@ static void sally_parse_options(int argc, char **argv)
             config_set_bool(&cfg, "input.reverse_str", CONFIG_TRUE);
             break;
         case 1008:
-            config_set_string(&cfg, "input.stopword_file", optarg);
+            config_set_string(&cfg, "input.stoptoken_file", optarg);
             break;
         case 1009:
             config_set_float(&cfg, "features.thres_low", atof(optarg));
@@ -217,6 +219,9 @@ static void sally_parse_options(int argc, char **argv)
             break;
         case 'n':
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
+            break;
+        case 'g':
+            config_set_string(&cfg, "features.ngram_gran", optarg);
             break;
         case 'd':
             config_set_string(&cfg, "features.ngram_delim", optarg);
@@ -380,10 +385,10 @@ static void sally_init()
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_create(input);
 
-    /* Load stop words */
-    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    /* Load stop tokens */
+    config_lookup_string(&cfg, "input.stoptoken_file", &cfg_str);
     if (strlen(cfg_str) > 0)
-        stopwords_load(cfg_str);
+        stoptokens_load(cfg_str);
 
     /* Check for feature hash table */
     config_lookup_bool(&cfg, "features.explicit_hash", &ehash);
@@ -493,9 +498,9 @@ static void sally_exit()
     if (!strcasecmp(cfg_str, "tfidf"))
         idf_destroy(input);
 
-    config_lookup_string(&cfg, "input.stopword_file", &cfg_str);
+    config_lookup_string(&cfg, "input.stoptoken_file", &cfg_str);
     if (strlen(cfg_str) > 0)
-        stopwords_destroy();
+        stoptokens_destroy();
 
     config_lookup_string(&cfg, "features.hash_file", &hash_file);
     if (strlen(hash_file) > 0) {

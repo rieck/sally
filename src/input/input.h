@@ -38,7 +38,7 @@ int input_read(string_t *, int);
 void input_close(void);
 
 /* Additional functions */
-void stopwords_load(const char *f);
-void stopwords_destroy();
+void stoptokens_load(const char *f);
+void stoptokens_destroy();
 
 #endif /* INPUT_H */

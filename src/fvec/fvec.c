@@ -43,10 +43,10 @@ extern int verbose;
 extern config_t cfg;
 
 /* Local functions */
-static inline void extract_wgrams(fvec_t *, char *x, int l, int nlen,
-                                  int pos, int shift);
-static inline void extract_ngrams(fvec_t *, char *x, int l, int nlen,
-                                  int pos, int shift);
+static inline void extract_token_ngrams(fvec_t *, char *x, int l, int nlen,
+                                        int pos, int shift);
+static inline void extract_byte_ngrams(fvec_t *, char *x, int l, int nlen,
+                                       int pos, int shift);
 static inline void count_feat(fvec_t *fv);
 static inline int cmp_feat(const void *x, const void *y);
 static inline void cache_put(fentry_t *c, fvec_t *fv, char *t, int l);
@@ -116,7 +116,7 @@ fvec_t *fvec_extract_intern2(char *x, int l, int n)
     fvec_t *fv;
     int pos;
     cfg_int shift;
-    const char *dlm_str;
+    const char *granu;
     assert(x && l >= 0 && n > 0);
 
     /* Allocate feature vector */
@@ -127,7 +127,7 @@ fvec_t *fvec_extract_intern2(char *x, int l, int n)
     }
 
     /* Get configuration */
-    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
+    config_lookup_string(&cfg, "features.ngram_gran", &granu);
     config_lookup_bool(&cfg, "features.ngram_pos", &pos);
     config_lookup_int(&cfg, "features.pos_shift", &shift);
 
@@ -150,15 +150,15 @@ fvec_t *fvec_extract_intern2(char *x, int l, int n)
         return NULL;
     }
 
-    /* Get configuration */
-    config_lookup_string(&cfg, "features.ngram_delim", &dlm_str);
-
     /* Loop over position shifts (0 if pos is disabled) */
     for (int s = -shift; s <= shift; s++) {
-        if (!dlm_str || strlen(dlm_str) == 0) {
-            extract_ngrams(fv, x, l, n, pos, s);
+        if (!strcasecmp(granu, "bytes")) {
+            extract_byte_ngrams(fv, x, l, n, pos, s);
+        } else if (!strcasecmp(granu, "tokens")) {
+            extract_token_ngrams(fv, x, l, n, pos, s);
         } else {
-            extract_wgrams(fv, x, l, n, pos, s);
+            error("Unknown granularity '%s'. Using 'bytes'.", granu);
+            extract_byte_ngrams(fv, x, l, n, pos, s);            
         }
     }
 
@@ -279,16 +279,16 @@ static int chrcmp(const void *v1, const void *v2)
 }
 
 /**
- * Compares two words (not necessary null terminated)
- * @param v1 first word 
- * @param v2 second word
+ * Compares two tokens (not necessary null terminated)
+ * @param v1 first token 
+ * @param v2 second token
  * @return comparison result as integer
  */
-static int wordcmp(const void *v1, const void *v2)
+static int tokencmp(const void *v1, const void *v2)
 {
     int l, c;
-    word_t *w1 = (word_t *) v1;
-    word_t *w2 = (word_t *) v2;
+    token_t *w1 = (token_t *) v1;
+    token_t *w2 = (token_t *) v2;
 
     if (w1->l > w2->l)
         l = w2->l;
@@ -302,42 +302,42 @@ static int wordcmp(const void *v1, const void *v2)
 }
 
 /**
- * Sorts the words in a string for sorted n-grams of words. A new string
+ * Sorts the tokens in a string for sorted n-grams of tokens. A new string
  * is allocated and the original one is freed.
  * @param str string
  * @param len Length of string
- * @param delim Delimiter for words
+ * @param delim Delimiter for tokens
  * @param return sorted string 
  */
-static char *sort_words(char *str, int len, char delim)
+static char *sort_tokens(char *str, int len, char delim)
 {
     assert(str);
     assert(len > 0);
 
     int i, j, k;
-    word_t words[len];
+    token_t tokens[len];
 
-    /* Extract words */
+    /* Extract tokens */
     for (i = k = 0, j = 0; i < len; i++) {
         if (str[i] == delim || i == len - 1) {
-            words[k].w = str + j;
-            words[k].l = i - j;
+            tokens[k].w = str + j;
+            tokens[k].l = i - j;
             if (i == len - 1)
-                words[k].l++;
+                tokens[k].l++;
 
             j = i + 1;
             k++;
         }
     }
 
-    /* Sort words */
-    qsort(words, k, sizeof(word_t), wordcmp);
+    /* Sort tokens */
+    qsort(tokens, k, sizeof(token_t), tokencmp);
 
     /* Allocate string with slack */
     char *s = malloc(len + sizeof(unsigned long));
     for (i = j = 0; i < k; i++) {
-        memcpy(s + j, words[i].w, words[i].l);
-        j += words[i].l + 1;
+        memcpy(s + j, tokens[i].w, tokens[i].l);
+        j += tokens[i].l + 1;
         s[j - 1] = delim;
     }
 
@@ -346,7 +346,7 @@ static char *sort_words(char *str, int len, char delim)
 }
 
 /**
- * Extracts word n-grams from a string. The features are represented 
+ * Extracts token n-grams from a string. The features are represented 
  * by hash values.
  * @param fv Feature vector
  * @param x Byte sequence 
@@ -355,8 +355,8 @@ static char *sort_words(char *str, int len, char delim)
  * @param pos Positional n-grams
  * @param shift Shift value
  */
-static void extract_wgrams(fvec_t *fv, char *x, int l, int nlen, int pos,
-                           int shift)
+static void extract_token_ngrams(fvec_t *fv, char *x, int l, int nlen,
+                                 int pos, int shift)
 {
     assert(fv && x && l > 0);
     int sort, sign, flen;
@@ -415,7 +415,7 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int nlen, int pos,
 
             /* Sorted n-grams code */
             if (sort)
-                fstr = sort_words(fstr, flen, dlm);
+                fstr = sort_tokens(fstr, flen, dlm);
 
             /* Positional n-grams code */
             if (pos) {
@@ -465,8 +465,8 @@ static void extract_wgrams(fvec_t *fv, char *x, int l, int nlen, int pos,
  * @param pos Positional n-grams 
  * @param shift Shift value
  */
-static void extract_ngrams(fvec_t *fv, char *x, int l, int nlen, int pos,
-                           int shift)
+static void extract_byte_ngrams(fvec_t *fv, char *x, int l, int nlen, int pos,
+                                int shift)
 {
     assert(fv && x);
 

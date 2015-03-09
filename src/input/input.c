@@ -46,14 +46,14 @@ typedef struct
 static func_t func;
 
 /**
- * Structure for stop words
+ * Structure for stop tokens
  */
 typedef struct
 {
-    uint64_t hash;              /* Hash of stop word */
+    uint64_t hash;              /* Hash of stop token */
     UT_hash_handle hh;          /* uthash handle */
-} stopword_t;
-static stopword_t *stopwords = NULL;
+} stoptoken_t;
+static stoptoken_t *stoptokens = NULL;
 
 /**< Delimiter table */
 extern char delim[256];
@@ -143,19 +143,19 @@ void input_free(string_t *strs, int len)
 }
 
 /**
- * Read in and hash stop words
- * @param file stop word file
+ * Read in and hash stop tokens
+ * @param file stop token file
  */
-void stopwords_load(const char *file)
+void stoptokens_load(const char *file)
 {
     char buf[1024];
     FILE *f;
 
-    info_msg(1, "Loading stop words from '%s'.", file);
+    info_msg(1, "Loading stop tokens from '%s'.", file);
     if (!(f = fopen(file, "r")))
-        fatal("Could not read stop word file %s", file);
+        fatal("Could not read stop token file %s", file);
 
-    /* Read stop words */
+    /* Read stop tokens */
     while (fgets(buf, 1024, f)) {
         int len = strip_newline(buf, strlen(buf));
         if (len <= 0)
@@ -164,55 +164,55 @@ void stopwords_load(const char *file)
         /* Decode URI-encoding */
         decode_str(buf);
 
-        /* Add stop word to hash table */
-        stopword_t *word = malloc(sizeof(stopword_t));
-        word->hash = hash_str(buf, len);
-        HASH_ADD(hh, stopwords, hash, sizeof(uint64_t), word);
+        /* Add stop token to hash table */
+        stoptoken_t *token = malloc(sizeof(stoptoken_t));
+        token->hash = hash_str(buf, len);
+        HASH_ADD(hh, stoptokens, hash, sizeof(uint64_t), token);
     }
     fclose(f);
 }
 
 /**
- * Destroy stop words table
+ * Destroy stop tokens table
  */
-void stopwords_destroy()
+void stoptokens_destroy()
 {
-    stopword_t *s;
+    stoptoken_t *s;
 
-    while (stopwords) {
-        s = stopwords;
-        HASH_DEL(stopwords, s);
+    while (stoptokens) {
+        s = stoptokens;
+        HASH_DEL(stoptokens, s);
         free(s);
     }
 }
 
 /**
- * Filter stopwords in place
+ * Filter stoptokens in place
  * @param str input string
  * @param len length of string
  * @return len of new string
  */
-int stopwords_filter(char *str, int len)
+int stoptokens_filter(char *str, int len)
 {
     int i, k, start = -1;
-    stopword_t *found;
+    stoptoken_t *found;
 
     for (i = 0, k = 0; i < len; i++) {
 
         int dlm = delim[(int) str[i]];
         int end = (i == len - 1);
 
-        /* Start of word */
+        /* Start of token */
         if (start == -1 && !dlm)
             start = i;
 
-        /* End of word */
+        /* End of token */
         if (start != -1 && (dlm || end)) {
             int len = (i - start) + (end ? 1 : 0);
             uint64_t hash = hash_str(str + start, len);
 
-            /* Check for stop word and copy if not */
-            HASH_FIND(hh, stopwords, &hash, sizeof(uint64_t), found);
+            /* Check for stop token and copy if not */
+            HASH_FIND(hh, stoptokens, &hash, sizeof(uint64_t), found);
             if (!found) {
                 memcpy(str + k, str + start, len);
                 k += len;
@@ -254,8 +254,8 @@ void input_preproc(string_t *strs, int len)
             }
         }
 
-        if (stopwords) {
-            strs[j].len = stopwords_filter(strs[j].str, strs[j].len);
+        if (stoptokens) {
+            strs[j].len = stoptokens_filter(strs[j].str, strs[j].len);
         }
     }
 }
