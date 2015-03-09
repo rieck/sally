@@ -14,11 +14,11 @@ documents, DNA sequences or log files, where it can handle common formats
 such as directories, archives and text files of string data.
 
 Sally implements a standard technique for mapping strings to a vector space
-that is often referred to as vector space model or bag-of-words model.  The
-strings are characterized by a set of features, where each feature is
-associated with one dimension of the vector space.  The following types of
-features are supported by Sally: bytes, tokens (words), n-grams of bytes and
-n-grams of tokens.
+that can be referred to generalized bag-of-words model.  The strings are
+characterized by a set of features, where each feature is associated with
+one dimension of the vector space.  The following types of features are
+supported by Sally: bytes, tokens (words), n-grams of bytes and n-grams of
+tokens.
 
 Sally proceeds by counting the occurrences of the specified features in
 each string and generating a sparse vector of count values. 

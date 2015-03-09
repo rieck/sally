@@ -34,12 +34,12 @@ additionally using command-line options.
       Input           Embedding          Output
 
 
-B<sally> implements a standard technique for mapping strings to a
-vector space that is often referred to as vector space model or
-bag-of-words model. The strings are characterized by a set of
-features, where each feature is associated with one dimension of the
-vector space.  The following types of features are supported by
-B<sally>: bytes, tokens, n-grams of bytes and n-grams of tokens.
+B<sally> implements a standard technique for mapping strings to a vector
+space that can be referred to as generalized bag-of-words model.  The
+strings are characterized by a set of features, where each feature is
+associated with one dimension of the vector space.  The following types of
+features are supported by B<sally>: bytes, tokens, n-grams of bytes and
+n-grams of tokens.
 
 B<sally> proceeds by counting the occurrences of the specified
 features in each string and generating a sparse vector of count
