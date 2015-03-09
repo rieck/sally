@@ -39,7 +39,7 @@ vector space that is often referred to as vector space model or
 bag-of-words model. The strings are characterized by a set of
 features, where each feature is associated with one dimension of the
 vector space.  The following types of features are supported by
-B<sally>: bytes, words, n-grams of bytes and n-grams of words.
+B<sally>: bytes, tokens, n-grams of bytes and n-grams of tokens.
 
 B<sally> proceeds by counting the occurrences of the specified
 features in each string and generating a sparse vector of count
@@ -163,11 +163,11 @@ If this parameter is set to 1, the bytes of all input strings will
 be reversed. Such reversing might help in situations where the
 reading direction of the input strings is unspecified.
 
-=item B<stopword_file = "";>
+=item B<stoptoken_file = "";>
 
-Stop words (irrelevant words) can be filtered from the strings by providing
-a file containing these words; one per line. Non-printable characters
-can be escaped using URI encoding (%XX). Stop words can only be filtered, if
+Stop tokens (irrelevant words) can be filtered from the strings by providing
+a file containing these tokens; one per line. Non-printable characters
+can be escaped using URI encoding (%XX). Stop tokens can only be filtered, if
 a set of delimiters is defined using B<ngram_delim>.
 
 =back
@@ -191,47 +191,54 @@ following parameters.
 
 =item B<ngram_len = 2;>
 
-=item B<ngram_delim = "%0a%0d";>
+=item B<ngram_gran = "bytes";>
 
-The parameter B<ngram_len> specifies the numbers of consecutive words that
-are considered as one feature, while the parameter B<ngram_delim> defines
-characters for delimiting these words.  The characters can be either
-specified as bytes or as hexadecimal numbers prefixed by "%".  If no
-delimiters are given, i.e. the parameter B<ngram_delim> is an empty string,
-B<sally> considers each byte as an individual word.  The following types of
-different feature types can be extracted using these parameters:
+The parameter B<ngram_len> specifies the numbers of consecutive symbols that
+are considered as one feature, while the parameter B<ngram_gran> defines the
+granularity of these symbols.  If the granularity is set to I<bytes>,
+B<sally> considers bytes as symbols, whereas if B<ngram_gran> is set to
+I<tokens>, all strings (token) separated by a set of delimiters are
+considered as symbols.  The following types of different feature types can
+be extracted using these parameters:
 
 =over 14
 
-=item I<words>
+=item I<tokens>
 
-The strings are partitioned into substrings (words) using a set of
-delimiter characters.  Such partitioning is typical for natural
-language processing, where the delimiters are usually defined as
-white-space and punctuation symbols.  An embedding using words is
-selected by defining a set of delimiter characters (B<ngram_delim>)
-and setting the n-gram length to 1 (B<ngram_len>).
+The strings are partitioned into substrings (tokens) using a set of
+delimiter characters.  Such partitioning is typical for natural language
+processing, where the delimiters are usually defined as white-space and
+punctuation symbols.  An embedding using tokens is selected by choosing
+I<tokens> as granularity (B<ngram_gran>), defining a set of delimiter
+characters (B<ngram_delim>) and setting the n-gram length to 1
+(B<ngram_len>).
 
 =item I<byte n-grams>
 
-The strings are characterized by all possible byte sequences of a
-fixed length n (byte n-grams).  These features are frequently used if
-no information about the structure of strings is available, such as in
-bioinformatics or computer security.  An embedding using byte n-grams
-is selected by defining the n-gram length (B<ngram_len>) and setting
-the delimiters to an empty string (B<ngram_delim>).
+The strings are characterized by all possible byte sequences of a fixed
+length n (byte n-grams).  These features are frequently used if no
+information about the structure of strings is available, such as in
+bioinformatics or computer security.  An embedding using byte n-grams is
+selected by choosing I<bytes> as granularity (B<ngram_gran>) and defining
+the n-gram length (B<ngram_len>).
 
-=item I<word n-grams>
+=item I<token n-grams>
 
-The strings are characterized by all possible word sequences of a
-fixed length n (word n-grams).  These features require the definition
-of a set of delimiters and a length n.  They are often used in natural
-language processing as a coarse way for capturing structure of text.
-An embedding using word n-grams is selected by defining a set of
-delimiter characters (B<ngram_delim>) and choosing an n-gram length
-(B<ngram_len>).
+The strings are characterized by all possible token sequences of a fixed
+length n (token n-grams).  These features require the definition of a set of
+delimiters and a length n.  They are often used in natural language
+processing as a coarse way for capturing structure of text.  An embedding
+using token n-grams is selected by choosing I<tokens> as granularity
+(B<ngram_gran>), defining a set of delimiter characters (B<ngram_delim>) and
+choosing an n-gram length (B<ngram_len>).
 
 =back
+
+=item B<ngram_delim = "%0a%0d";>
+
+The parameter B<ngram_delim> defines characters for delimiting tokens in
+strings, for example I<" %0a%0d">.  It is only considered, if the
+granularity is set to I<tokens>, otherwise it is ignored.
 
 =item B<ngram_pos = false;>
 
