@@ -7,7 +7,7 @@
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.  This program is distributed without any
- * warranty. See the GNU General Public License for more details. 
+ * warranty. See the GNU General Public License for more details.
  */
 
 #include "tests.h"
@@ -27,7 +27,7 @@ typedef struct
     int nlen;
     int flag;
     /* Number of n-grams */
-    int len;    
+    int len;
 } test_t;
 
 int test_sorted_ngrams()
@@ -47,13 +47,13 @@ int test_sorted_ngrams()
     test_printf("Testing sorted n-grams");
 
     /* Hack to set delimiters */
-    config_set_string(&cfg, "features.ngram_gran", "tokens");
+    config_set_string(&cfg, "features.granularity", "tokens");
     config_set_string(&cfg, "features.ngram_delim", " ");
-    fvec_delim_set(" ");     
+    fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {
         config_set_int(&cfg, "features.ngram_len", t[i].nlen);
-        config_set_bool(&cfg, "features.ngram_sort", t[i].flag); 
+        config_set_bool(&cfg, "features.ngram_sort", t[i].flag);
 
         /* Extract features */
         f = fvec_extract(t[i].str, strlen(t[i].str));
@@ -67,7 +67,7 @@ int test_sorted_ngrams()
         fvec_destroy(f);
     }
 
-    config_set_bool(&cfg, "features.ngram_sort", 0); 
+    config_set_bool(&cfg, "features.ngram_sort", 0);
 
     test_return(err, i);
     return err;
@@ -90,13 +90,13 @@ int test_blended_ngrams()
     test_printf("Testing blended n-grams");
 
     /* Hack to set delimiters */
-    config_set_string(&cfg, "features.ngram_gran", "tokens");    
+    config_set_string(&cfg, "features.granularity", "tokens");
     config_set_string(&cfg, "features.ngram_delim", " ");
-    fvec_delim_set(" ");     
+    fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {
         config_set_int(&cfg, "features.ngram_len", t[i].nlen);
-        config_set_bool(&cfg, "features.ngram_blend", t[i].flag); 
+        config_set_bool(&cfg, "features.ngram_blend", t[i].flag);
 
         /* Extract features */
         f = fvec_extract(t[i].str, strlen(t[i].str));
@@ -110,7 +110,7 @@ int test_blended_ngrams()
         fvec_destroy(f);
     }
 
-    config_set_bool(&cfg, "features.ngram_blend", 0); 
+    config_set_bool(&cfg, "features.ngram_blend", 0);
 
     test_return(err, i);
     return err;
@@ -134,15 +134,15 @@ int test_pos_ngrams()
     test_printf("Testing positional n-grams");
 
     /* Hack to set delimiters */
-    config_set_string(&cfg, "features.ngram_gran", "tokens");    
+    config_set_string(&cfg, "features.granularity", "tokens");
     config_set_string(&cfg, "features.ngram_delim", " ");
-    fvec_delim_set(" ");     
+    fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {
-    
+
         config_set_int(&cfg, "features.ngram_len", t[i].nlen);
         config_set_bool(&cfg, "features.ngram_pos", t[i].flag);
-        config_set_int(&cfg, "features.pos_shift", 0); 
+        config_set_int(&cfg, "features.pos_shift", 0);
 
         /* Extract features */
         f = fvec_extract(t[i].str, strlen(t[i].str));
@@ -173,7 +173,7 @@ int main(int argc, char **argv)
     /* Create config */
     config_init(&cfg);
     config_check(&cfg);
-    
+
     fhash_init();
 
     err |= test_sorted_ngrams();

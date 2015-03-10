@@ -127,7 +127,7 @@ fvec_t *fvec_extract_intern2(char *x, int l, int n)
     }
 
     /* Get configuration */
-    config_lookup_string(&cfg, "features.ngram_gran", &granu);
+    config_lookup_string(&cfg, "features.granularity", &granu);
     config_lookup_bool(&cfg, "features.ngram_pos", &pos);
     config_lookup_int(&cfg, "features.pos_shift", &shift);
 

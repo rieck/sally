@@ -191,12 +191,12 @@ following parameters.
 
 =item B<ngram_len = 2;>
 
-=item B<ngram_gran = "bytes";>
+=item B<granularity = "bytes";>
 
 The parameter B<ngram_len> specifies the numbers of consecutive symbols that
-are considered as one feature, while the parameter B<ngram_gran> defines the
+are considered as one feature, while the parameter B<granularity> defines the
 granularity of these symbols.  If the granularity is set to I<bytes>,
-B<sally> considers bytes as symbols, whereas if B<ngram_gran> is set to
+B<sally> considers bytes as symbols, whereas if B<granularity> is set to
 I<tokens>, all strings (token) separated by a set of delimiters are
 considered as symbols.  The following types of different feature types can
 be extracted using these parameters:
@@ -209,7 +209,7 @@ The strings are partitioned into substrings (tokens) using a set of
 delimiter characters.  Such partitioning is typical for natural language
 processing, where the delimiters are usually defined as white-space and
 punctuation symbols.  An embedding using tokens is selected by choosing
-I<tokens> as granularity (B<ngram_gran>), defining a set of delimiter
+I<tokens> as granularity (B<granularity>), defining a set of delimiter
 characters (B<ngram_delim>) and setting the n-gram length to 1
 (B<ngram_len>).
 
@@ -219,7 +219,7 @@ The strings are characterized by all possible byte sequences of a fixed
 length n (byte n-grams).  These features are frequently used if no
 information about the structure of strings is available, such as in
 bioinformatics or computer security.  An embedding using byte n-grams is
-selected by choosing I<bytes> as granularity (B<ngram_gran>) and defining
+selected by choosing I<bytes> as granularity (B<granularity>) and defining
 the n-gram length (B<ngram_len>).
 
 =item I<token n-grams>
@@ -229,7 +229,7 @@ length n (token n-grams).  These features require the definition of a set of
 delimiters and a length n.  They are often used in natural language
 processing as a coarse way for capturing structure of text.  An embedding
 using token n-grams is selected by choosing I<tokens> as granularity
-(B<ngram_gran>), defining a set of delimiter characters (B<ngram_delim>) and
+(B<granularity>), defining a set of delimiter characters (B<ngram_delim>) and
 choosing an n-gram length (B<ngram_len>).
 
 =back
@@ -555,7 +555,7 @@ can be changed by using the command-line option B<--xx
 
   -n,  --ngram_len <num>         Set length of n-grams.
   -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.
-  -g   --ngram_gran <type>       Set granularity: bytes, tokens.
+  -g   --granularity <type>      Set granularity: bytes, tokens.
   -p,  --ngram_pos               Enable positional n-grams.
        --pos_shift <num>         Set shift of positional n-grams.
   -B,  --ngram_blend             Enable blended n-grams.

@@ -60,9 +60,9 @@ void init_sally(test_t t)
 
     /* Set granularity depending on delimiters */    
     if (strlen(t.dlm) > 0)
-        config_set_string(&cfg, "features.ngram_gran", "tokens");
+        config_set_string(&cfg, "features.granularity", "tokens");
     else
-        config_set_string(&cfg, "features.ngram_gran", "bytes");
+        config_set_string(&cfg, "features.granularity", "bytes");
 }
 
 

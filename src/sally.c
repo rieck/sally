@@ -46,7 +46,7 @@ static struct option longopts[] = {
     {"reverse_str", 0, NULL, 1007},
     {"stoptoken_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
-    {"ngram_gran", 1, NULL, 'g'},
+    {"granularity", 1, NULL, 'g'},
     {"ngram_delim", 1, NULL, 'd'},
     {"ngram_pos", 0, NULL, 'p'},
     {"pos_shift", 1, NULL, 1012},       /* <- last entry */
@@ -114,7 +114,7 @@ static void print_usage(void)
            "  -k,  --skip_null               Skip null vectors in output.\n"
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
-           "  -g   --ngram_gran <type>       Set granularity: bytes, tokens.\n"
+           "  -g   --granularity <type>      Set granularity: bytes, tokens.\n"
            "  -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.\n"
            "  -p,  --ngram_pos               Enable positional n-grams.\n"
            "       --pos_shift <num>         Set shift of positional n-grams.\n"
@@ -215,7 +215,7 @@ static void sally_parse_options(int argc, char **argv)
             config_set_int(&cfg, "features.ngram_len", atoi(optarg));
             break;
         case 'g':
-            config_set_string(&cfg, "features.ngram_gran", optarg);
+            config_set_string(&cfg, "features.granularity", optarg);
             break;
         case 'd':
             config_set_string(&cfg, "features.ngram_delim", optarg);
@@ -343,9 +343,9 @@ static void sally_load_config(int argc, char **argv)
                   config_error_text(&cfg), config_error_line(&cfg));
 
         /* Check for new granularity parameter */
-        ret = config_lookup_string(&cfg, "features.ngram_gran", &str);
+        ret = config_lookup_string(&cfg, "features.granularity", &str);
         if (ret == CONFIG_FALSE)
-            fatal("Your configuration is missing the new 'ngram_gran' "
+            fatal("Your configuration is missing the new 'granularity' "
                   "parameter. Please consult the manual page and upgrade "
                   "your configuration.");
     }
