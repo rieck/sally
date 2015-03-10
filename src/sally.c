@@ -160,9 +160,6 @@ static void print_version(void)
 static void sally_parse_options(int argc, char **argv)
 {
     int ch;
-#ifdef WARN_NO_CONF
-    int no_conf = TRUE;
-#endif
 
     optind = 0;
 
@@ -170,9 +167,6 @@ static void sally_parse_options(int argc, char **argv)
         switch (ch) {
         case 'c':
             /* Skip. See sally_load_config(). */
-#ifdef WARN_NO_CONF
-            no_conf = FALSE;
-#endif
             break;
         case 'i':
             config_set_string(&cfg, "input.input_format", optarg);
@@ -310,13 +304,6 @@ static void sally_parse_options(int argc, char **argv)
         config_set_string(&cfg, "input.input_format", "stdin");
     if (!strcmp(output, "-"))
         config_set_string(&cfg, "output.output_format", "stdout");
-
-#ifdef WARN_NO_CONF
-    /* Last but not least. Warn about default config */
-    if (no_conf) {
-        warning("No config file given. Using defaults (see -D)");
-    }
-#endif
 }
 
 
