@@ -14,7 +14,7 @@ documents, DNA sequences or log files, where it can handle common formats
 such as directories, archives and text files of string data.
 
 Sally implements a standard technique for mapping strings to a vector space
-that can be referred to generalized bag-of-words model.  The strings are
+that can be referred to as generalized bag-of-words model.  The strings are
 characterized by a set of features, where each feature is associated with
 one dimension of the vector space.  The following types of features are
 supported by Sally: bytes, tokens (words), n-grams of bytes and n-grams of
