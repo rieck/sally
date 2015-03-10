@@ -33,7 +33,7 @@ for OPTION in "--decode_str" "--reverse_str" "-n 3" "-n 1" "-p" \
 done
 
 # Save output
-cp $OUTPUT /tmp/test_options.txt
+#cp $OUTPUT /tmp/test_options.txt
 
 # Diff output and precomputed data
 diff $TEST $OUTPUT
