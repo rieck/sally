@@ -54,7 +54,7 @@ test_t tests[] = {
 
 void init_sally(test_t t)
 {
-    config_set_string(&cfg, "features.ngram_delim", t.dlm);
+    config_set_string(&cfg, "features.token_delim", t.dlm);
     config_set_int(&cfg, "features.ngram_len", t.nlen);
     fvec_delim_set(t.dlm);      /* usually done in sally_init */
 
@@ -229,7 +229,7 @@ int test_stress()
     char buf[STR_LENGTH + 1];
 
     test_printf("Stress test for feature vectors");
-    config_set_string(&cfg, "features.ngram_delim", "0");
+    config_set_string(&cfg, "features.token_delim", "0");
     fvec_delim_set("0");        /* usually done in sally_init */
     fhash_init();
 
@@ -262,7 +262,7 @@ int test_stress_omp()
     char buf[STR_LENGTH + 1];
 
     test_printf("Stress test for feature vectors (OpenMP)");
-    config_set_string(&cfg, "features.ngram_delim", "0");
+    config_set_string(&cfg, "features.token_delim", "0");
     fvec_delim_set("0");        /* usually done in sally_init */
     fhash_init();
 
@@ -301,7 +301,7 @@ int test_read_write()
 
     test_printf("reading and saving of feature vectors");
 
-    config_set_string(&cfg, "features.ngram_delim", " ");
+    config_set_string(&cfg, "features.token_delim", " ");
     config_set_int(&cfg, "features.ngram_len", 2);
     fvec_delim_set(" ");        /* usually done in sally_init */
 

@@ -48,7 +48,7 @@ int test_sorted_ngrams()
 
     /* Hack to set delimiters */
     config_set_string(&cfg, "features.granularity", "tokens");
-    config_set_string(&cfg, "features.ngram_delim", " ");
+    config_set_string(&cfg, "features.token_delim", " ");
     fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {
@@ -91,7 +91,7 @@ int test_blended_ngrams()
 
     /* Hack to set delimiters */
     config_set_string(&cfg, "features.granularity", "tokens");
-    config_set_string(&cfg, "features.ngram_delim", " ");
+    config_set_string(&cfg, "features.token_delim", " ");
     fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {
@@ -135,7 +135,7 @@ int test_pos_ngrams()
 
     /* Hack to set delimiters */
     config_set_string(&cfg, "features.granularity", "tokens");
-    config_set_string(&cfg, "features.ngram_delim", " ");
+    config_set_string(&cfg, "features.token_delim", " ");
     fvec_delim_set(" ");
 
     for (i = 0; t[i].str; i++) {

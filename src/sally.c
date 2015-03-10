@@ -47,7 +47,7 @@ static struct option longopts[] = {
     {"stoptoken_file", 1, NULL, 1008},
     {"ngram_len", 1, NULL, 'n'},
     {"granularity", 1, NULL, 'g'},
-    {"ngram_delim", 1, NULL, 'd'},
+    {"token_delim", 1, NULL, 'd'},
     {"ngram_pos", 0, NULL, 'p'},
     {"pos_shift", 1, NULL, 1012},       /* <- last entry */
     {"ngram_blend", 0, NULL, 'B'},
@@ -115,7 +115,7 @@ static void print_usage(void)
            "\nFeature options:\n"
            "  -n,  --ngram_len <num>         Set length of n-grams.\n"
            "  -g   --granularity <type>      Set granularity: bytes, tokens.\n"
-           "  -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.\n"
+           "  -d,  --token_delim <delim>     Set delimiters of tokens in n-grams.\n"
            "  -p,  --ngram_pos               Enable positional n-grams.\n"
            "       --pos_shift <num>         Set shift of positional n-grams.\n"
            "  -B,  --ngram_blend             Enabled blended n-grams.\n"
@@ -218,7 +218,7 @@ static void sally_parse_options(int argc, char **argv)
             config_set_string(&cfg, "features.granularity", optarg);
             break;
         case 'd':
-            config_set_string(&cfg, "features.ngram_delim", optarg);
+            config_set_string(&cfg, "features.token_delim", optarg);
             break;
         case 'p':
             config_set_bool(&cfg, "features.ngram_pos", CONFIG_TRUE);
@@ -371,7 +371,7 @@ static void sally_init()
         config_print(&cfg);
 
     /* Set delimiters */
-    config_lookup_string(&cfg, "features.ngram_delim", &cfg_str);
+    config_lookup_string(&cfg, "features.token_delim", &cfg_str);
     if (strlen(cfg_str) > 0)
         fvec_delim_set(cfg_str);
 

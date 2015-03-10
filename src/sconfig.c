@@ -37,7 +37,7 @@ static config_default_t defaults[] = {
     {"input", "stoptoken_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 1}},
     {"features", "granularity", CONFIG_TYPE_STRING, {.str = "tokens"}},
-    {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%20%0a%0d"}},
+    {"features", "token_delim", CONFIG_TYPE_STRING, {.str = "%20%0a%0d"}},
     {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "ngram_blend", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
@@ -237,14 +237,14 @@ int config_check(config_t *cfg)
     }
 
     config_lookup_string(cfg, "features.granularity", &s1);
-    config_lookup_string(cfg, "features.ngram_delim", &s2);
+    config_lookup_string(cfg, "features.token_delim", &s2);
     if (!strcasecmp(s1, "tokens") && strlen(s2) == 0) {
         error("Delimiters are required if the granularity is tokens.");
         return 0;
     }
 
     config_lookup_string(cfg, "input.stoptoken_file", &s1);
-    config_lookup_string(cfg, "features.ngram_delim", &s2);
+    config_lookup_string(cfg, "features.token_delim", &s2);
     if (strlen(s1) > 0 && strlen(s2) == 0) {
         error("Stop tokens can only be used if delimiters are defined.");
         return 0;

@@ -15,4 +15,3 @@ beautify:
 		-T fvec_t -T string_t -T gzFile -T feat_t \
 		-T fentry_t \
 		$(libfvec_la_SOURCES)
-	

@@ -168,7 +168,7 @@ reading direction of the input strings is unspecified.
 Stop tokens (irrelevant words) can be filtered from the strings by providing
 a file containing these tokens; one per line. Non-printable characters
 can be escaped using URI encoding (%XX). Stop tokens can only be filtered, if
-a set of delimiters is defined using B<ngram_delim>.
+a set of delimiters is defined using B<token_delim>.
 
 =back
 
@@ -210,7 +210,7 @@ delimiter characters.  Such partitioning is typical for natural language
 processing, where the delimiters are usually defined as white-space and
 punctuation symbols.  An embedding using tokens is selected by choosing
 I<tokens> as granularity (B<granularity>), defining a set of delimiter
-characters (B<ngram_delim>) and setting the n-gram length to 1
+characters (B<token_delim>) and setting the n-gram length to 1
 (B<ngram_len>).
 
 =item I<byte n-grams>
@@ -229,14 +229,14 @@ length n (token n-grams).  These features require the definition of a set of
 delimiters and a length n.  They are often used in natural language
 processing as a coarse way for capturing structure of text.  An embedding
 using token n-grams is selected by choosing I<tokens> as granularity
-(B<granularity>), defining a set of delimiter characters (B<ngram_delim>) and
+(B<granularity>), defining a set of delimiter characters (B<token_delim>) and
 choosing an n-gram length (B<ngram_len>).
 
 =back
 
-=item B<ngram_delim = "%0a%0d";>
+=item B<token_delim = " %0a%0d";>
 
-The parameter B<ngram_delim> defines characters for delimiting tokens in
+The parameter B<token_delim> defines characters for delimiting tokens in
 strings, for example I<" %0a%0d">.  It is only considered, if the
 granularity is set to I<tokens>, otherwise it is ignored.
 
@@ -554,7 +554,7 @@ can be changed by using the command-line option B<--xx
 =head2 Feature options
 
   -n,  --ngram_len <num>         Set length of n-grams.
-  -d,  --ngram_delim <delim>     Set delimiters of tokens in n-grams.
+  -d,  --token_delim <delim>     Set delimiters of tokens.
   -g   --granularity <type>      Set granularity: bytes, tokens.
   -p,  --ngram_pos               Enable positional n-grams.
        --pos_shift <num>         Set shift of positional n-grams.

@@ -14,7 +14,7 @@ sally_LDADD		= libsally.la
 noinst_LTLIBRARIES     	= libsally.la
 libsally_la_SOURCES	= util.c util.h sconfig.c \
 			  sconfig.h common.h uthash.h murmur.c \
-			  murmur.h md5.c md5.h 
+			  murmur.h md5.c md5.h
 libsally_la_LIBADD	= input/libinput.la \
 			  output/liboutput.la \
 			  fvec/libfvec.la
@@ -23,4 +23,3 @@ beautify:
 	gindent -i4 -npsl -di0 -br -d0 -cli0 -npcs -ce -nfc1 -nut \
 		-T fvec_t -T FILE -T config_t \
 		$(libsally_la_SOURCES) $(sally_SOURCES)
-	
