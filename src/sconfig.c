@@ -36,8 +36,8 @@ static config_default_t defaults[] = {
     {"input", "reverse_str", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"input", "stoptoken_file", CONFIG_TYPE_STRING, {.str = ""}},
     {"features", "ngram_len", CONFIG_TYPE_INT, {.num = 1}},
-    {"features", "ngram_gran", CONFIG_TYPE_STRING, {.str = "bytes"}},
-    {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = ""}},
+    {"features", "ngram_gran", CONFIG_TYPE_STRING, {.str = "tokens"}},
+    {"features", "ngram_delim", CONFIG_TYPE_STRING, {.str = "%20%0a%0d"}},
     {"features", "ngram_pos", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
     {"features", "pos_shift", CONFIG_TYPE_INT, {.num = 0}},
     {"features", "ngram_blend", CONFIG_TYPE_BOOL, {.num = CONFIG_FALSE}},
@@ -241,11 +241,6 @@ int config_check(config_t *cfg)
     if (!strcasecmp(s1, "tokens") && strlen(s2) == 0) {
         error("Delimiters are required if the granularity is tokens.");
         return 0;
-    }
-
-    /* Warning due to change of command-line options */
-    if (strcasecmp(s1, "tokens") && strlen(s2) > 0) {
-        warning("Granularity is %s. Delimiters are ignored.", s1);
     }
 
     config_lookup_string(cfg, "input.stoptoken_file", &s1);

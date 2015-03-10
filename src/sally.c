@@ -315,7 +315,8 @@ static void sally_parse_options(int argc, char **argv)
 static void sally_load_config(int argc, char **argv)
 {
     char *cfg_file = NULL;
-    int ch;
+    int ch, ret;
+    const char *str;
 
     /* Check for config file in command line */
     while ((ch = getopt_long(argc, argv, OPTSTRING, longopts, NULL)) != -1) {
@@ -340,6 +341,13 @@ static void sally_load_config(int argc, char **argv)
         if (config_read_file(&cfg, cfg_file) != CONFIG_TRUE)
             fatal("Could not read configuration (%s in line %d)",
                   config_error_text(&cfg), config_error_line(&cfg));
+
+        /* Check for new granularity parameter */
+        ret = config_lookup_string(&cfg, "features.ngram_gran", &str);
+        if (ret == CONFIG_FALSE)
+            fatal("Your configuration is missing the new 'ngram_gran' "
+                  "parameter. Please consult the manual page and upgrade "
+                  "your configuration.");
     }
 
     /* Check configuration */
