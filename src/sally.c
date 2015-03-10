@@ -348,6 +348,20 @@ static void sally_load_config(int argc, char **argv)
             fatal("Your configuration is missing the new 'granularity' "
                   "parameter. Please consult the manual page and upgrade "
                   "your configuration.");
+
+        /* Check for old ngram_delim parameter */
+        ret = config_lookup_string(&cfg, "features.ngram_delim", &str);
+        if (ret == CONFIG_TRUE)
+            fatal("The 'ngram_delim' parameter in your configuration "
+                  "is obsolete. Please consult the manual page and use "
+                  "'token_delim' instead.");
+
+        /* Check for new token_delim parameter */
+        ret = config_lookup_string(&cfg, "features.token_delim", &str);
+        if (ret == CONFIG_FALSE)
+            fatal("Your configuration is missing the new 'token_delim' "
+                  "parameter. Please consult the manual page and upgrade "
+                  "your configuration.");
     }
 
     /* Check configuration */
