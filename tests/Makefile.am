@@ -20,8 +20,10 @@ TESTS_ENVIRONMENT       = TEST_FILE='$(srcdir)/test.in' \
                           BUILDDIR='$(top_builddir)' \
                           SRCDIR='$(top_srcdir)'
                           
-TESTS                   = test_fhash test_fvec test_embed test_ngrams \
-                          test_options.sh test_configs.sh
+TESTS                   = test_fhash test_fvec test_embed test_ngrams
+if !ENABLE_MD5HASH
+TESTS                  += test_options.sh test_configs.sh
+endif
 
 noinst_PROGRAMS         = test_fhash test_fvec test_embed test_ngrams
 

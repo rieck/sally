@@ -112,6 +112,7 @@ AC_ARG_ENABLE([md5hash], [AS_HELP_STRING([--enable-md5hash],
         ENABLE_MD5HASH=yes
     ], [ENABLE_MD5HASH=no])
 
+AM_CONDITIONAL([ENABLE_MD5HASH], [test x$ENABLE_MD5HASH = xyes])
 
 
 # Check headers
