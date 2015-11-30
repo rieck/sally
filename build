@@ -35,17 +35,17 @@ case $arg in
 
    schulle*)
        echo "Configuration: Schulle (ESX Cluster)"
-
        CC="gcc" \
        CFLAGS="-pedantic -pipe -O3 -g" \
        ./configure
        ;;
 
-   kindl*)
-       echo "Configuration: Kindl (OpenBSD)"
-       LDFLAGS="-L/usr/local/lib" \
-       CPPFLAGS="-I/usr/local/include" \
-       CFLAGS="-pedantic -pipe -O3 -g" \
+   conversion)
+       echo "Configuration: Conversion"
+       CC="gcc" \
+       LDFLAGS="-L/usr/local/opt/libarchive/lib" \
+       CPPFLAGS="-I/usr/local/opt/libarchive/include" \
+       CFLAGS="-pedantic -pipe -O3 -g -Wconversion" \
        ./configure --prefix=/opt/rieck
        ;;
    profile|debug)
