@@ -34,7 +34,7 @@ Dependencies
 
 +   zlib >= 1.2.1, <http://www.zlib.net/>
 +   libconfig >= 1.3.2, <http://www.hyperrealm.com/libconfig/>
-+   libarchive >= 2.70,  <http://libarchive.github.com/>
++   libarchive >= 3.1.2,  <http://libarchive.github.com/>
 
 #### Debian & Ubuntu Linux
 
