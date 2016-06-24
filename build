@@ -14,30 +14,13 @@ fi
 
 # Apply configuration
 case $arg in
-   scarecrow*|sec01*)
-       echo "Configuration: Laptop (Goettingen)"
+   scarecrow*|freeze*)
+       echo "Configuration: Laptop"
        CC="gcc" \
        LDFLAGS="-L/usr/local/opt/libarchive/lib" \
        CPPFLAGS="-I/usr/local/opt/libarchive/include" \
        CFLAGS="-pedantic -pipe -O3 -g" \
        ./configure --prefix=/opt/rieck
-       ;;
-
-   gwd*)
-       echo "Configuration: GWDG Cluster (Goettingen)"
-       CC="gcc" \
-       LDFLAGS="-L$HOME/usr/lib" \
-       CPPFLAGS="-I$HOME/usr/include" \
-       PKG_CONFIG_PATH="$HOME/usr/lib/pkgconfig" \
-       CFLAGS="-pedantic -pipe -O3 -g" \
-       ./configure --prefix=$HOME/usr
-       ;;
-
-   schulle*)
-       echo "Configuration: Schulle (ESX Cluster)"
-       CC="gcc" \
-       CFLAGS="-pedantic -pipe -O3 -g" \
-       ./configure
        ;;
 
    conversion)
@@ -48,6 +31,7 @@ case $arg in
        CFLAGS="-pedantic -pipe -O3 -g -Wconversion" \
        ./configure --prefix=/opt/rieck
        ;;
+
    profile|debug)
        echo "Configuration: Profiling & Debugging"
        CC="gcc" \
@@ -56,6 +40,7 @@ case $arg in
        CFLAGS="-g -lprofiler  -Wl,-no_pie" \
        ./configure --prefix=/opt/rieck
        ;;
+
    *)
        echo "Unknown system or configuration"
        exit
