@@ -45,6 +45,14 @@ and Ubuntu Linux
     libz-dev
     libconfig8-dev
     libarchive-dev 
+    
+The following packages need to be installed for compiling Sally on Centos
+and RHEL Linux
+
+    gcc 
+    zlib-devel
+    libconfig-devel
+    libarchive-devel 
 
 For bootstrapping Sally from the GIT repository or manipulating the
 automake/autoconf configuration, the following additional packages are
@@ -82,11 +90,15 @@ need be additionally installed
 Compilation & Installation
 --
 
-From GIT repository first run
+From GIT repository, run:
 
     $ ./bootstrap
+    $ ./configure [options]
+    $ make
+    $ make check
+    $ make install
 
-From tarball run
+From tarball, run:
 
     $ ./configure [options]
     $ make
@@ -96,6 +108,13 @@ From tarball run
 Options for configure
 
     --prefix=PATH           Set directory prefix for installation
+    
+If you forget get a compilation error due to not inclduding a requierd
+library, you can run the following commands to reset you tree;
+
+    git reset --hard
+    git clean -xfd
+    git pull
 
 This feature enables support for OpenMP in Sally. It is still
 experimental.  Sally will execute certain parts of the processing in
