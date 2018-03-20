@@ -105,18 +105,13 @@ From tarball, run:
     $ make check
     $ make install
 
-Options for configure
+### Options for configure
+
+This option sets the prefix of the installation path. 
 
     --prefix=PATH           Set directory prefix for installation
     
-If you forget get a compilation error due to not inclduding a requierd
-library, you can run the following commands to reset you tree;
-
-    git reset --hard
-    git clean -xfd
-    git pull
-
-This feature enables support for OpenMP in Sally. It is still
+This option enables support for OpenMP in Sally. It is still
 experimental.  Sally will execute certain parts of the processing in
 parallel making use of multi-core architectures where possible.
  
