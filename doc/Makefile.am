@@ -5,7 +5,8 @@ man1_MANS = sally.man
 doc_DATA = example.cfg
 
 EXTRA_DIST = sally.pod doxygen.cfg sally.pdf sally.txt \
-             latex-pre.inc.in latex-post.inc example.cfg
+             latex-pre.inc.in latex-post.inc example.cfg \
+             README.md
 
 sally.man: sally.pod
 	pod2man -c "User Manual" -s 1 -r "sally $(VERSION)" $< > $@
