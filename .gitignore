@@ -14,7 +14,6 @@
 /configure
 /compile
 /depcomp
-/doc/sally.man
 /install-sh
 /libtool
 /ltmain.sh
@@ -28,7 +27,6 @@ Makefile-sally.mk
 Makefile.in
 doc/html
 doc/latex-pre.inc
-doc/sally.pdf
 doc/sally.txt
 nbproject/
 sally.komodoproject
