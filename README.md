@@ -34,7 +34,7 @@ vectors.  Sally then normalizes the vector, for example using the L1 or L2
 norm, and outputs it in a specified format, such as plain text or in
 LibSVM or Matlab format.
 
-Consult the manual page of Sally for more information.
+Consult the [manual page](docs/sally.pdf) of Sally for more information.
 
 Dependencies
 --
