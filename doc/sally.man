@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SALLY 1"
-.TH SALLY 1 "2017-09-26" "sally 1.0.0" "User Manual"
+.TH SALLY 1 "2019-05-08" "sally 1.0.0" "User Manual"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -698,11 +698,6 @@ can be changed by using the command-line option \fB\-\-xx
 .IX Item "PREFIX/share/doc/sally/example.cfg"
 An example configuration file for \fBsally\fR. See the configuration
 section for further details.
-.SH "EXAMPLES"
-.IX Header "EXAMPLES"
-Examples on how to use \fBsally\fR in different applications of data
-analysis and machine learning are available at
-http://www.mlsec.org/sally/examples.html.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
 Copyright (c) 2010\-2013 Konrad Rieck (konrad@mlsec.org);

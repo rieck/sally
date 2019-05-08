@@ -525,12 +525,6 @@ can be changed by using the command-line option **--xx
     An example configuration file for **sally**. See the configuration
     section for further details.
 
-# EXAMPLES
-
-Examples on how to use **sally** in different applications of data
-analysis and machine learning are available at
-http://www.mlsec.org/sally/examples.html.
-
 # COPYRIGHT
 
 Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org);

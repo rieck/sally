@@ -591,12 +591,6 @@ section for further details.
 
 =back
 
-=head1 EXAMPLES
-
-Examples on how to use B<sally> in different applications of data
-analysis and machine learning are available at
-http://www.mlsec.org/sally/examples.html.
-
 =head1 COPYRIGHT
 
 Copyright (c) 2010-2013 Konrad Rieck (konrad@mlsec.org);
