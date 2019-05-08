@@ -3,6 +3,13 @@
 Sally - A Tool for Embedding Strings in Vector Spaces
 ==
 
+This software belongs to the publication
+
+> Konrad Rieck, Christian Wressnegger, and Alexander Bikadorov.
+> Sally: A Tool for Embedding Strings in Vector Spaces
+> Journal of Machine Learning Research (JMLR), 13(Nov):3247-3251, 2012.
+> http://www.jmlr.org/papers/volume13/rieck12a/rieck12a.pdf
+
 Introduction
 -- 
 
